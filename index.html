@@ -1,0 +1,2145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neural Networks — Visual Quick Reference</title>
+
+<!-- SEO Meta -->
+<meta name="description" content="Learn neural networks visually — interactive animations, intuitive analogies, step-by-step math, activation functions, network types, and quizzes. No prerequisites needed.">
+<meta name="keywords" content="neural networks, deep learning, machine learning, AI, visual explainer, interactive tutorial, beginner friendly">
+<meta name="author" content="Dharmendra Verma">
+
+<!-- Open Graph (Facebook, LinkedIn, WhatsApp, etc.) -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://dharmendra-verma.github.io/neural-network-explainer/">
+<meta property="og:title" content="Neural Networks — Visual Quick Reference">
+<meta property="og:description" content="The most intuitive way to understand neural networks. Interactive visualizations, real-time animations, analogies, and quizzes — all in one page.">
+<meta property="og:image" content="https://dharmendra-verma.github.io/neural-network-explainer/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Neural Networks — Visual Quick Reference">
+<meta name="twitter:description" content="The most intuitive way to understand neural networks. Interactive visualizations, real-time animations, analogies, and quizzes — all in one page.">
+<meta name="twitter:image" content="https://dharmendra-verma.github.io/neural-network-explainer/og-image.png">
+
+<!-- Canonical URL -->
+<link rel="canonical" href="https://dharmendra-verma.github.io/neural-network-explainer/">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --bg:#0a0c14;--surface:#12151f;--surface2:#1a1e2e;--border:#262b3e;
+    --text:#e2e4ef;--dim:#7b80a0;--accent:#818cf8;--accent2:#c084fc;
+    --green:#34d399;--orange:#fbbf24;--pink:#f472b6;--blue:#60a5fa;--red:#f87171;
+  }
+  body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;line-height:1.65;overflow-x:hidden}
+
+  /* ── Hero ── */
+  .hero{text-align:center;padding:50px 20px 30px;position:relative}
+  .hero::before{content:'';position:absolute;top:-100px;left:50%;transform:translateX(-50%);width:700px;height:700px;background:radial-gradient(circle,rgba(129,140,248,.07),transparent 70%);pointer-events:none}
+  .hero h1{font-size:clamp(1.7rem,4vw,2.6rem);font-weight:800;background:linear-gradient(135deg,#818cf8,#c084fc,#f472b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+  .hero p{color:var(--dim);max-width:600px;margin:0 auto;font-size:.95rem}
+
+  /* ── Tabs ── */
+  .tabs{display:flex;justify-content:center;gap:5px;padding:14px 16px;flex-wrap:wrap;position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--border)}
+  .tab{padding:9px 20px;border:1px solid var(--border);border-radius:999px;background:var(--surface);color:var(--dim);cursor:pointer;font-size:.84rem;font-weight:600;transition:.25s}
+  .tab:hover{border-color:var(--accent);color:var(--text)}
+  .tab.active{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border-color:transparent;box-shadow:0 2px 14px rgba(99,102,241,.3)}
+
+  .sec{display:none;padding:28px 20px;max-width:1100px;margin:0 auto}
+  .sec.active{display:block;animation:fadeUp .3s ease}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+  h2.st{font-size:1.35rem;font-weight:700;margin-bottom:4px}
+  p.ss{color:var(--dim);font-size:.9rem;margin-bottom:18px}
+
+  /* ── Analogy Cards ── */
+  .analogy-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+  .acard{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;transition:.2s}
+  .acard:hover{transform:translateY(-3px);box-shadow:0 6px 24px rgba(0,0,0,.3)}
+  .acard .emoji{font-size:2rem;margin-bottom:10px}
+  .acard h3{font-size:1.05rem;margin-bottom:6px}
+  .acard p{font-size:.86rem;color:var(--dim);line-height:1.6}
+  .acard .mapping{margin-top:12px;padding:12px;background:var(--surface2);border-radius:10px;font-size:.82rem}
+  .acard .mapping span{display:block;margin-bottom:3px}
+  .acard .mapping strong{color:var(--accent)}
+
+  /* ── Live Network Viz ── */
+  .viz-wrap{display:flex;flex-direction:column;align-items:center;gap:16px;margin-top:12px}
+  canvas#nnCanvas{border-radius:16px;border:1px solid var(--border);background:var(--surface)}
+  .viz-controls{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+  .viz-btn{padding:8px 18px;border-radius:999px;border:1px solid var(--border);background:var(--surface2);color:var(--dim);cursor:pointer;font-size:.82rem;font-weight:600;transition:.2s}
+  .viz-btn:hover{border-color:var(--accent);color:var(--text)}
+  .viz-btn.active{background:var(--accent);color:#fff;border-color:transparent}
+  .slider-group{display:flex;align-items:center;gap:8px;font-size:.82rem;color:var(--dim)}
+  .slider-group input[type=range]{width:100px;accent-color:var(--accent)}
+
+  /* ── Concept Blocks ── */
+  .concept-flow{display:flex;flex-direction:column;gap:0;align-items:center;margin-top:12px}
+  .cblock{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 26px;max-width:640px;width:100%;position:relative;cursor:pointer;transition:.2s}
+  .cblock:hover{border-color:var(--accent);box-shadow:0 4px 18px rgba(99,102,241,.1)}
+  .cblock h3{font-size:1rem;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+  .cblock h3 .step-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;flex-shrink:0}
+  .cblock .detail{font-size:.85rem;color:var(--dim);line-height:1.6}
+  .cblock .formula{margin-top:10px;padding:10px 14px;background:var(--bg);border-radius:8px;font-family:'Courier New',monospace;font-size:.84rem;color:var(--green);overflow-x:auto}
+  .cblock .memory-tip{margin-top:10px;padding:10px 14px;background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.15);border-radius:8px;font-size:.82rem;color:var(--orange)}
+  .connector{width:2px;height:24px;background:var(--border)}
+  .arrow-down{width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid var(--border);margin-bottom:2px}
+
+  /* ── Activation Functions ── */
+  .act-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:14px}
+  .act-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;text-align:center;transition:.2s;cursor:pointer}
+  .act-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .act-card h4{font-size:.95rem;margin-bottom:4px}
+  .act-card .act-formula{font-family:'Courier New',monospace;font-size:.82rem;color:var(--green);margin-bottom:8px}
+  .act-card canvas{border-radius:8px;background:var(--bg);display:block;margin:0 auto 8px}
+  .act-card .use{font-size:.78rem;color:var(--dim)}
+
+  /* ── Types Grid ── */
+  .types-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:14px}
+  .type-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;transition:.2s;position:relative;overflow:hidden}
+  .type-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+  .type-card:hover{transform:translateY(-3px);box-shadow:0 6px 24px rgba(0,0,0,.25)}
+  .type-card[data-c="blue"]::before{background:var(--blue)}
+  .type-card[data-c="green"]::before{background:var(--green)}
+  .type-card[data-c="pink"]::before{background:var(--pink)}
+  .type-card[data-c="orange"]::before{background:var(--orange)}
+  .type-card[data-c="accent"]::before{background:var(--accent)}
+  .type-card .type-icon{font-size:1.8rem;margin-bottom:8px}
+  .type-card h4{font-size:1.02rem;margin-bottom:4px}
+  .type-card .type-tag{font-size:.72rem;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+  .type-card p{font-size:.84rem;color:var(--dim);line-height:1.55}
+  .type-card .type-use{margin-top:10px;font-size:.8rem;color:var(--green)}
+
+  /* ── Cheat Sheet ── */
+  .cheat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-top:14px}
+  .cheat-block{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px}
+  .cheat-block h4{font-size:.95rem;margin-bottom:10px;color:var(--accent)}
+  .cheat-block ul{list-style:none;padding:0}
+  .cheat-block li{font-size:.84rem;color:var(--dim);padding:5px 0;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:baseline}
+  .cheat-block li:last-child{border:none}
+  .cheat-block li .ck{color:var(--green);font-weight:700;flex-shrink:0}
+  .cheat-block li .cv{flex:1}
+
+  /* ── Quiz ── */
+  .quiz-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:30px;max-width:680px;margin:14px auto}
+  .quiz-prog{font-size:.78rem;color:var(--dim);margin-bottom:14px}
+  .quiz-q{font-size:1.02rem;margin-bottom:16px;line-height:1.5}
+  .quiz-opts{display:flex;flex-direction:column;gap:8px}
+  .qopt{padding:12px 16px;border:1px solid var(--border);border-radius:10px;background:var(--surface2);cursor:pointer;font-size:.9rem;transition:.2s;text-align:left}
+  .qopt:hover{border-color:var(--accent);background:#1e1b4b}
+  .qopt.correct{border-color:var(--green);background:rgba(52,211,153,.1);color:var(--green)}
+  .qopt.wrong{border-color:var(--red);background:rgba(248,113,113,.08);color:var(--red)}
+  .qopt.off{pointer-events:none}
+  .quiz-exp{margin-top:14px;padding:12px 16px;background:rgba(99,102,241,.06);border-radius:10px;font-size:.85rem;color:var(--dim);display:none;line-height:1.55}
+  .quiz-nxt{margin-top:14px;padding:10px 24px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:999px;font-size:.88rem;font-weight:600;cursor:pointer;display:none}
+  .quiz-score{text-align:center;padding:36px 20px}
+  .quiz-score .big{font-size:3.2rem;font-weight:800;background:linear-gradient(135deg,#818cf8,#f472b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin:14px 0}
+  .quiz-score button{margin-top:14px;padding:10px 28px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:999px;font-size:.9rem;font-weight:600;cursor:pointer}
+
+  /* ── Mnemonics ── */
+  .mnemonic{background:linear-gradient(135deg,rgba(99,102,241,.08),rgba(192,132,252,.08));border:1px solid rgba(129,140,248,.2);border-radius:14px;padding:22px;margin-top:14px;text-align:center}
+  .mnemonic h3{font-size:1.1rem;margin-bottom:6px;color:var(--accent2)}
+  .mnemonic .phrase{font-size:1.3rem;font-weight:800;letter-spacing:1px;margin:10px 0;color:var(--text)}
+  .mnemonic .breakdown{font-size:.85rem;color:var(--dim);line-height:1.6}
+
+  /* ── Introduction ── */
+  .intro-def{background:linear-gradient(135deg,rgba(99,102,241,.08),rgba(192,132,252,.06));border:1px solid rgba(129,140,248,.2);border-radius:16px;padding:28px;margin-bottom:20px;text-align:center}
+  .intro-def h3{font-size:1.2rem;margin-bottom:10px;color:var(--accent)}
+  .intro-def .def-text{font-size:1.02rem;line-height:1.7;color:var(--text);max-width:780px;margin:0 auto}
+  .intro-def .def-text strong{color:var(--accent2)}
+  .intro-def .def-oneliner{margin-top:14px;padding:12px 20px;background:var(--bg);border-radius:10px;display:inline-block;font-size:1.05rem;font-weight:700;color:var(--orange);letter-spacing:.3px}
+
+  .intro-why{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:20px}
+  .intro-why-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;text-align:center;transition:.2s}
+  .intro-why-card:hover{transform:translateY(-3px);border-color:var(--accent)}
+  .intro-why-card .iw-icon{font-size:1.8rem;margin-bottom:8px}
+  .intro-why-card h4{font-size:.92rem;margin-bottom:4px}
+  .intro-why-card p{font-size:.82rem;color:var(--dim);line-height:1.5}
+
+  .evo-timeline{position:relative;padding-left:0;margin-top:16px}
+  .evo-era{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 24px;margin-bottom:14px;position:relative;overflow:hidden;transition:.2s;cursor:pointer}
+  .evo-era:hover{border-color:var(--accent);box-shadow:0 4px 20px rgba(99,102,241,.1)}
+  .evo-era::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px}
+  .evo-era[data-c="dim"]::before{background:#555}
+  .evo-era[data-c="blue"]::before{background:var(--blue)}
+  .evo-era[data-c="green"]::before{background:var(--green)}
+  .evo-era[data-c="orange"]::before{background:var(--orange)}
+  .evo-era[data-c="pink"]::before{background:var(--pink)}
+  .evo-era[data-c="accent"]::before{background:var(--accent)}
+  .evo-era[data-c="accent2"]::before{background:var(--accent2)}
+  .evo-era .evo-header{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .evo-era .evo-date{font-size:.76rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:3px 10px;border-radius:999px;white-space:nowrap}
+  .evo-era[data-c="dim"] .evo-date{background:#55555520;color:#888}
+  .evo-era[data-c="blue"] .evo-date{background:rgba(96,165,250,.12);color:var(--blue)}
+  .evo-era[data-c="green"] .evo-date{background:rgba(52,211,153,.12);color:var(--green)}
+  .evo-era[data-c="orange"] .evo-date{background:rgba(251,191,36,.12);color:var(--orange)}
+  .evo-era[data-c="pink"] .evo-date{background:rgba(244,114,182,.12);color:var(--pink)}
+  .evo-era[data-c="accent"] .evo-date{background:rgba(129,140,248,.12);color:var(--accent)}
+  .evo-era[data-c="accent2"] .evo-date{background:rgba(192,132,252,.12);color:var(--accent2)}
+  .evo-era .evo-title{font-size:1rem;font-weight:700}
+  .evo-era .evo-body{margin-top:8px;font-size:.86rem;color:var(--dim);line-height:1.6}
+  .evo-era .evo-body strong{color:var(--text)}
+  .evo-era .evo-people{margin-top:8px;font-size:.78rem;color:var(--dim);font-style:italic}
+  .evo-era .evo-mnemonic{margin-top:8px;padding:8px 14px;background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.1);border-radius:8px;font-size:.82rem;color:var(--orange)}
+
+  .intro-bio-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;display:flex;align-items:center;gap:16px;margin-bottom:10px;transition:.2s}
+  .intro-bio-card:hover{border-color:var(--accent)}
+  .intro-bio-card .bio-icon{font-size:2rem;flex-shrink:0}
+  .intro-bio-card h4{font-size:.95rem;margin-bottom:2px}
+  .intro-bio-card p{font-size:.82rem;color:var(--dim);line-height:1.5}
+
+  /* ── Transformer Deep Dive ── */
+  .tfm-block{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:26px;margin-bottom:18px;position:relative;overflow:hidden}
+  .tfm-block::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#fbbf24,#f472b6,#818cf8)}
+  .tfm-block h3{font-size:1.1rem;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+  .tfm-block .step-badge{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;flex-shrink:0}
+  .tfm-block .explain{font-size:.88rem;color:var(--dim);line-height:1.65}
+  .tfm-block .explain strong{color:var(--text)}
+  .tfm-block canvas{display:block;margin:14px auto 10px;border-radius:10px;border:1px solid var(--border);background:var(--bg)}
+  .tfm-analogy{margin-top:12px;padding:12px 16px;background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.12);border-radius:10px;font-size:.84rem;color:var(--orange)}
+  .tfm-formula{margin-top:10px;padding:10px 14px;background:var(--bg);border-radius:8px;font-family:'Courier New',monospace;font-size:.85rem;color:var(--green);overflow-x:auto}
+  .tfm-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px}
+  @media(max-width:700px){.tfm-cols{grid-template-columns:1fr}}
+  .tfm-mini{background:var(--surface2);border-radius:10px;padding:16px}
+  .tfm-mini h4{font-size:.9rem;margin-bottom:6px}
+  .tfm-mini p{font-size:.82rem;color:var(--dim);line-height:1.55}
+  .tfm-timeline{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:14px}
+  .tfm-era{padding:10px 16px;background:var(--surface);border:1px solid var(--border);border-radius:10px;text-align:center;min-width:120px;transition:.2s}
+  .tfm-era:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .tfm-era .yr{font-size:.72rem;color:var(--dim);text-transform:uppercase;letter-spacing:.5px}
+  .tfm-era .nm{font-size:.88rem;font-weight:700;margin-top:2px}
+  .tfm-era .tp{font-size:.72rem;color:var(--dim);margin-top:2px}
+
+  /* ── Architecture Deep Dive ── */
+  .arch-switcher{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+  .arch-tab{padding:10px 22px;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:var(--dim);cursor:pointer;font-size:.88rem;font-weight:600;transition:.25s}
+  .arch-tab:hover{border-color:var(--accent);color:var(--text)}
+  .arch-tab.on{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border-color:transparent}
+  .arch-panel{display:none;animation:fadeUp .3s ease}
+  .arch-panel.on{display:block}
+
+  .arch-hero{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;margin-bottom:24px}
+  @media(max-width:768px){.arch-hero{grid-template-columns:1fr}}
+  .arch-viz{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;display:flex;justify-content:center;align-items:center;min-height:320px}
+  .arch-viz canvas{border-radius:10px}
+  .arch-info{display:flex;flex-direction:column;gap:14px}
+
+  .arch-badge{display:inline-block;padding:4px 14px;border-radius:999px;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+  .arch-title{font-size:1.3rem;font-weight:700;margin-bottom:2px}
+  .arch-one{font-size:.92rem;color:var(--dim);font-style:italic;margin-bottom:8px;line-height:1.5}
+
+  .arch-detail-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px}
+  .arch-detail-card h4{font-size:.88rem;margin-bottom:6px;color:var(--accent)}
+  .arch-detail-card p{font-size:.84rem;color:var(--dim);line-height:1.6}
+  .arch-detail-card .formula-sm{margin-top:8px;padding:8px 12px;background:var(--bg);border-radius:6px;font-family:'Courier New',monospace;font-size:.82rem;color:var(--green)}
+
+  .arch-compare{margin-top:10px}
+  .arch-compare table{width:100%;border-collapse:collapse;font-size:.84rem}
+  .arch-compare th{text-align:left;padding:10px 14px;background:var(--surface2);color:var(--dim);font-size:.76rem;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)}
+  .arch-compare td{padding:10px 14px;border-bottom:1px solid var(--border);background:var(--surface);vertical-align:top}
+  .arch-compare tr:hover td{background:var(--surface2)}
+  .arch-compare td:first-child{font-weight:600;color:var(--accent);white-space:nowrap}
+
+  .data-flow-strip{display:flex;align-items:center;gap:0;justify-content:center;flex-wrap:wrap;margin:16px 0;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:12px}
+  .df-box{padding:8px 14px;border-radius:8px;font-size:.8rem;font-weight:600;text-align:center;min-width:70px}
+  .df-arrow{color:var(--dim);font-size:1.1rem;margin:0 2px}
+
+  footer{text-align:center;padding:36px 20px;color:var(--dim);font-size:.78rem;border-top:1px solid var(--border);margin-top:36px}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Neural Networks — Visual Guide</h1>
+  <p>Understand, visualize, and remember how neural networks work. Built for quick reference.</p>
+</div>
+
+<nav class="tabs" id="tabs">
+  <button class="tab active" data-t="intro">Introduction</button>
+  <button class="tab" data-t="analogy">Analogy First</button>
+  <button class="tab" data-t="viz">Live Visualizer</button>
+  <button class="tab" data-t="how">How It Works</button>
+  <button class="tab" data-t="activations">Activations</button>
+  <button class="tab" data-t="types">NN Types</button>
+  <button class="tab" data-t="arch">Architecture Deep Dive</button>
+  <button class="tab" data-t="transformer">Transformers Deep Dive</button>
+  <button class="tab" data-t="cheat">Cheat Sheet</button>
+  <button class="tab" data-t="quiz">Quiz</button>
+</nav>
+
+<!-- ═══════ 0. INTRODUCTION ═══════ -->
+<section class="sec active" id="sec-intro">
+  <h2 class="st">What Is a Neural Network?</h2>
+  <p class="ss">The definition, why it matters, who invented it, and how it evolved — all in a format that sticks.</p>
+
+  <!-- Definition -->
+  <div class="intro-def">
+    <h3>The Definition</h3>
+    <div class="def-text">
+      A <strong>neural network</strong> is a computational system loosely inspired by the biological brain. It consists of layers of interconnected <strong>neurons</strong> (mathematical functions) that learn to recognize patterns in data by adjusting the <strong>weights</strong> of their connections through a process called <strong>training</strong>. Given enough data and layers, neural networks can learn to classify images, understand language, generate art, predict outcomes, and much more — often surpassing human performance.
+    </div>
+    <div class="def-oneliner">"Pattern-recognition machines that learn from examples, not rules."</div>
+  </div>
+
+  <!-- Why It Matters -->
+  <h3 style="font-size:1.1rem;margin-bottom:12px">Why Should You Care?</h3>
+  <div class="intro-why">
+    <div class="intro-why-card">
+      <div class="iw-icon">🗣️</div>
+      <h4>Behind Every AI</h4>
+      <p>ChatGPT, Claude, Siri, Alexa, Google Translate — all powered by neural networks under the hood.</p>
+    </div>
+    <div class="intro-why-card">
+      <div class="iw-icon">🖼️</div>
+      <h4>Computer Vision</h4>
+      <p>Face recognition, self-driving cars, medical scan diagnosis — all learned by neural networks from images.</p>
+    </div>
+    <div class="intro-why-card">
+      <div class="iw-icon">💊</div>
+      <h4>Drug Discovery</h4>
+      <p>AlphaFold predicted 200M+ protein structures using neural networks — a problem that stumped science for 50 years.</p>
+    </div>
+    <div class="intro-why-card">
+      <div class="iw-icon">🎨</div>
+      <h4>Creative AI</h4>
+      <p>DALL-E, Midjourney, Sora — generating images, music, and video from text descriptions.</p>
+    </div>
+    <div class="intro-why-card">
+      <div class="iw-icon">💼</div>
+      <h4>Your Career</h4>
+      <p>Understanding NNs is the single most valuable skill in AI/ML engineering, data science, and product management.</p>
+    </div>
+  </div>
+
+  <!-- Key Inventors -->
+  <h3 style="font-size:1.1rem;margin:20px 0 12px">The Pioneers — People to Remember</h3>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:10px">
+    <div class="intro-bio-card">
+      <div class="bio-icon">🧠</div>
+      <div><h4>Frank Rosenblatt (1958)</h4><p>Built the <strong>Perceptron</strong> — the first neural network that could learn. A single neuron that started it all.</p></div>
+    </div>
+    <div class="intro-bio-card">
+      <div class="bio-icon">📐</div>
+      <div><h4>Geoffrey Hinton — "Godfather of AI"</h4><p>Pioneered <strong>backpropagation</strong> (1986) and <strong>deep learning</strong>. Made training deep networks practical. Nobel Prize 2024.</p></div>
+    </div>
+    <div class="intro-bio-card">
+      <div class="bio-icon">📷</div>
+      <div><h4>Yann LeCun</h4><p>Invented <strong>Convolutional Neural Networks</strong> (CNNs) in 1989. Made computers see. Now Chief AI Scientist at Meta.</p></div>
+    </div>
+    <div class="intro-bio-card">
+      <div class="bio-icon">🔁</div>
+      <div><h4>Sepp Hochreiter & Jürgen Schmidhuber</h4><p>Invented <strong>LSTM</strong> (1997) — giving neural networks long-term memory. Essential for speech and language.</p></div>
+    </div>
+    <div class="intro-bio-card">
+      <div class="bio-icon">🔮</div>
+      <div><h4>Vaswani et al. (Google, 2017)</h4><p>Published <strong>"Attention Is All You Need"</strong> — the Transformer paper that launched the entire Generative AI revolution.</p></div>
+    </div>
+    <div class="intro-bio-card">
+      <div class="bio-icon">🏆</div>
+      <div><h4>Yoshua Bengio</h4><p>Pioneered <strong>word embeddings</strong> and generative models. With Hinton & LeCun, won the 2018 Turing Award — the "Nobel of CS."</p></div>
+    </div>
+  </div>
+
+  <!-- Evolution Timeline -->
+  <h3 style="font-size:1.1rem;margin:24px 0 12px">The Evolution — 8 Eras That Built Modern AI</h3>
+
+  <div class="evo-timeline">
+    <div class="evo-era" data-c="dim">
+      <div class="evo-header">
+        <span class="evo-date">1943</span>
+        <span class="evo-title">The Birth — McCulloch-Pitts Neuron</span>
+      </div>
+      <div class="evo-body">Warren McCulloch (neuroscientist) and Walter Pitts (mathematician) proposed the first <strong>mathematical model of a neuron</strong> — a simple on/off switch with inputs and a threshold. No learning, no weights — just the concept that <strong>computation could mimic the brain</strong>. This was purely theoretical.</div>
+      <div class="evo-mnemonic">💡 Remember: 1943 = "The Blueprint." They drew the architectural plans but didn't build the house yet.</div>
+    </div>
+
+    <div class="evo-era" data-c="blue">
+      <div class="evo-header">
+        <span class="evo-date">1958</span>
+        <span class="evo-title">First Learning Machine — The Perceptron</span>
+      </div>
+      <div class="evo-body">Frank Rosenblatt built the <strong>Perceptron</strong> at Cornell — a single-layer neural network that could actually <strong>learn from data</strong>. It adjusted its weights to classify simple patterns (like distinguishing shapes). The Navy funded it. The New York Times headlined: <strong>"Embryo of a computer that will walk, talk, and think."</strong> Massive hype followed.</div>
+      <div class="evo-people">Key person: Frank Rosenblatt</div>
+      <div class="evo-mnemonic">💡 Remember: 1958 = "The First Baby Step." One neuron that could learn = a baby taking its first step. Simple but revolutionary.</div>
+    </div>
+
+    <div class="evo-era" data-c="dim">
+      <div class="evo-header">
+        <span class="evo-date">1969 – 1980s</span>
+        <span class="evo-title">The First AI Winter — "It Can't Even Do XOR"</span>
+      </div>
+      <div class="evo-body">Marvin Minsky and Seymour Papert published <strong>"Perceptrons" (1969)</strong>, mathematically proving a single-layer perceptron <strong>cannot solve non-linear problems</strong> (like the XOR function). Funding dried up. Research nearly stopped for over a decade. This became known as the <strong>first AI winter</strong> — a cautionary tale about overpromising.</div>
+      <div class="evo-mnemonic">💡 Remember: 1969–80 = "The Cold Winter." One book froze an entire field. Lesson: a single neuron isn't enough — you need layers.</div>
+    </div>
+
+    <div class="evo-era" data-c="green">
+      <div class="evo-header">
+        <span class="evo-date">1986</span>
+        <span class="evo-title">The Breakthrough — Backpropagation</span>
+      </div>
+      <div class="evo-body">Rumelhart, Hinton & Williams published the <strong>backpropagation algorithm</strong> — a way to efficiently train <strong>multi-layer</strong> networks by propagating errors backward. This solved Minsky's criticism: with multiple layers AND backprop, networks could now learn XOR and far more complex patterns. Neural networks were reborn.</div>
+      <div class="evo-people">Key person: Geoffrey Hinton</div>
+      <div class="evo-mnemonic">💡 Remember: 1986 = "Spring Thaw." Backprop melted the AI winter. The key insight: errors flow backward so every weight learns its share of blame.</div>
+    </div>
+
+    <div class="evo-era" data-c="green">
+      <div class="evo-header">
+        <span class="evo-date">1989 – 1997</span>
+        <span class="evo-title">Specialized Architectures — CNN & LSTM</span>
+      </div>
+      <div class="evo-body"><strong>1989:</strong> Yann LeCun created <strong>LeNet</strong> — a CNN that could read handwritten zip codes. First practical proof that neural networks work in the real world. <strong>1997:</strong> Hochreiter & Schmidhuber invented <strong>LSTM</strong> — giving networks memory to handle sequences (speech, language). Two specialized architectures that solved two massive problems: <strong>seeing</strong> and <strong>remembering</strong>.</div>
+      <div class="evo-mnemonic">💡 Remember: 1989–97 = "Eyes & Memory." CNN gave neural networks eyes (vision). LSTM gave them memory (sequences). Two superpowers.</div>
+    </div>
+
+    <div class="evo-era" data-c="orange">
+      <div class="evo-header">
+        <span class="evo-date">2012</span>
+        <span class="evo-title">The Deep Learning Explosion — AlexNet</span>
+      </div>
+      <div class="evo-body">Alex Krizhevsky, Ilya Sutskever & Geoffrey Hinton's <strong>AlexNet</strong> won ImageNet (image classification competition) by a <strong>massive margin</strong> — cutting the error rate nearly in half. The secret: a <strong>deep CNN trained on GPUs</strong>. This single event convinced the entire industry that deep learning works. Google, Facebook, Microsoft, and others pivoted their AI research overnight.</div>
+      <div class="evo-people">Key people: Krizhevsky, Sutskever, Hinton</div>
+      <div class="evo-mnemonic">💡 Remember: 2012 = "The Earthquake." AlexNet didn't just win — it destroyed the competition. GPUs + Deep Networks + Big Data = the magic formula.</div>
+    </div>
+
+    <div class="evo-era" data-c="pink">
+      <div class="evo-header">
+        <span class="evo-date">2017</span>
+        <span class="evo-title">The Revolution — "Attention Is All You Need"</span>
+      </div>
+      <div class="evo-body">Vaswani et al. at Google published the <strong>Transformer</strong> — replacing recurrence with <strong>self-attention</strong>. Every token looks at every other token simultaneously. This enabled massive parallelism, killed the vanishing gradient problem, and scaled beautifully. It spawned <strong>BERT (2018)</strong>, <strong>GPT (2018→)</strong>, and every modern LLM including <strong>Claude, GPT-4, Gemini</strong>.</div>
+      <div class="evo-mnemonic">💡 Remember: 2017 = "The Big Bang of GenAI." One paper → BERT, GPT, DALL-E, Whisper, AlphaFold, Claude, Sora. Everything modern traces back here.</div>
+    </div>
+
+    <div class="evo-era" data-c="accent2">
+      <div class="evo-header">
+        <span class="evo-date">2020 – Present</span>
+        <span class="evo-title">The Generative AI Era — Scaling Laws</span>
+      </div>
+      <div class="evo-body">Researchers discovered <strong>scaling laws</strong>: bigger models + more data = predictably better performance. This led to <strong>GPT-3 (2020)</strong>, <strong>ChatGPT (2022)</strong>, <strong>GPT-4 (2023)</strong>, <strong>Claude (2023→)</strong>, and the explosion of generative AI. Neural networks now write code, create art, compose music, reason about math, and power autonomous agents. We're living in the era these 80 years of research built.</div>
+      <div class="evo-mnemonic">💡 Remember: 2020s = "The Harvest." Eight decades of planting seeds (1943→2017) finally produced a harvest that's changing every industry on Earth.</div>
+    </div>
+  </div>
+
+  <!-- Master Mnemonic for the eras -->
+  <div class="mnemonic" style="margin-top:20px">
+    <h3>Remember the 8 Eras: "B-P-W-B-E-E-R-G"</h3>
+    <div class="phrase">Blueprint → Perceptron → Winter → Backprop → Eyes&Memory → Earthquake → Revolution → GenAI</div>
+    <div class="breakdown">
+      <strong>1943</strong> Blueprint (McCulloch-Pitts) →
+      <strong>1958</strong> Perceptron (Rosenblatt) →
+      <strong>1969</strong> Winter (Minsky kills hype) →
+      <strong>1986</strong> Backprop (Hinton revives it) →
+      <strong>1989</strong> Eyes & Memory (CNN + LSTM) →
+      <strong>2012</strong> Earthquake (AlexNet + GPUs) →
+      <strong>2017</strong> Revolution (Transformers) →
+      <strong>2020s</strong> GenAI (scaling laws + LLMs)
+    </div>
+  </div>
+
+  <!-- Quick visual: Neuron vs Brain Neuron -->
+  <h3 style="font-size:1.1rem;margin:24px 0 12px">Biological Neuron vs. Artificial Neuron — The Inspiration</h3>
+  <div style="display:grid;grid-template-columns:1fr 60px 1fr;gap:10px;align-items:start;max-width:800px;margin:0 auto">
+    <div class="intro-bio-card" style="flex-direction:column;text-align:center;margin:0">
+      <div class="bio-icon">🧬</div>
+      <h4>Biological Neuron</h4>
+      <p><strong>Dendrites</strong> receive signals from other neurons.<br>
+      <strong>Cell body (soma)</strong> processes the signals.<br>
+      <strong>Axon</strong> transmits the output signal.<br>
+      <strong>Synapse</strong> connects to the next neuron with variable strength.</p>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:1.4rem;padding-top:40px">≈</div>
+    <div class="intro-bio-card" style="flex-direction:column;text-align:center;margin:0">
+      <div class="bio-icon">⚡</div>
+      <h4>Artificial Neuron</h4>
+      <p><strong>Inputs (x)</strong> receive data from previous layer.<br>
+      <strong>Weighted sum + bias</strong> processes the signals.<br>
+      <strong>Activation function</strong> decides the output.<br>
+      <strong>Weights (w)</strong> connect to next neuron with learned strength.</p>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:12px;font-size:.84rem;color:var(--dim)">The artificial neuron is a <strong style="color:var(--text)">loose mathematical metaphor</strong> — not a literal copy. Real brains are vastly more complex, but the core idea (receive → process → transmit → adjust connections) maps beautifully.</div>
+
+</section>
+
+<!-- ═══════ 1. ANALOGY ═══════ -->
+<section class="sec" id="sec-analogy">
+  <h2 class="st">Think of It Like This...</h2>
+  <p class="ss">Neural networks are easiest to remember through real-world analogies.</p>
+
+  <div class="analogy-grid">
+    <div class="acard">
+      <div class="emoji">🏭</div>
+      <h3>The Factory Analogy</h3>
+      <p>A neural network is like a factory with assembly lines. Raw materials (data) enter, pass through departments (layers), where workers (neurons) each do one small job, and a finished product (prediction) comes out the other end.</p>
+      <div class="mapping">
+        <span><strong>Raw materials</strong> → Input data (images, text, numbers)</span>
+        <span><strong>Departments</strong> → Layers (input, hidden, output)</span>
+        <span><strong>Workers</strong> → Neurons (each applies a weight + bias)</span>
+        <span><strong>Manager</strong> → Activation function (decides pass/no-pass)</span>
+        <span><strong>Quality inspector</strong> → Loss function (measures errors)</span>
+        <span><strong>Retrain workers</strong> → Backpropagation (adjust weights)</span>
+      </div>
+    </div>
+
+    <div class="acard">
+      <div class="emoji">🧑‍🍳</div>
+      <h3>The Recipe Analogy</h3>
+      <p>Training a neural network is like perfecting a recipe. You start with random ingredient ratios (weights), taste the result (loss), and adjust each ingredient a little (gradient descent) until it tastes perfect.</p>
+      <div class="mapping">
+        <span><strong>Ingredients</strong> → Input features</span>
+        <span><strong>Ratios</strong> → Weights</span>
+        <span><strong>Seasoning default</strong> → Bias</span>
+        <span><strong>Tasting</strong> → Forward pass</span>
+        <span><strong>"Too salty"</strong> → Loss / Error signal</span>
+        <span><strong>Adjusting pinch by pinch</strong> → Learning rate</span>
+      </div>
+    </div>
+
+    <div class="acard">
+      <div class="emoji">📬</div>
+      <h3>The Post Office Analogy</h3>
+      <p>Each neuron is like a post office sorter. Letters (signals) arrive, the sorter weighs each letter's importance (weights), adds up the scores, and forwards only important enough letters (activation threshold) to the next desk.</p>
+      <div class="mapping">
+        <span><strong>Letters</strong> → Input signals from previous layer</span>
+        <span><strong>Weight each letter</strong> → Multiply by weights</span>
+        <span><strong>Sum the pile</strong> → Weighted sum + bias</span>
+        <span><strong>"Important enough?"</strong> → Activation function</span>
+        <span><strong>Forward to next desk</strong> → Output to next layer</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="mnemonic" style="margin-top:24px">
+    <h3>Master Mnemonic: "WIFI-BAL"</h3>
+    <div class="phrase">W · I · F · I · B · A · L</div>
+    <div class="breakdown">
+      <strong>W</strong>eights multiply inputs &nbsp;→&nbsp;
+      <strong>I</strong>nputs enter the network &nbsp;→&nbsp;
+      <strong>F</strong>orward pass computes &nbsp;→&nbsp;
+      <strong>I</strong>nspect the loss &nbsp;→&nbsp;
+      <strong>B</strong>ackprop the error &nbsp;→&nbsp;
+      <strong>A</strong>djust the weights &nbsp;→&nbsp;
+      <strong>L</strong>oop until accurate
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 2. LIVE VISUALIZER ═══════ -->
+<section class="sec" id="sec-viz">
+  <h2 class="st">Interactive Neural Network</h2>
+  <p class="ss">Watch data flow through a live network. Toggle layers and hit "Fire" to see signals propagate.</p>
+  <div class="viz-wrap">
+    <canvas id="nnCanvas" width="800" height="460"></canvas>
+    <div class="viz-controls">
+      <div class="slider-group"><label>Hidden Layers:</label><input type="range" id="sliderLayers" min="1" max="4" value="2"><span id="layerVal">2</span></div>
+      <div class="slider-group"><label>Neurons/Layer:</label><input type="range" id="sliderNeurons" min="2" max="7" value="4"><span id="neuronVal">4</span></div>
+      <button class="viz-btn" id="btnFire" onclick="fireNetwork()">⚡ Fire Signal</button>
+      <button class="viz-btn" id="btnReset" onclick="resetViz()">↻ Reset</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 3. HOW IT WORKS ═══════ -->
+<section class="sec" id="sec-how">
+  <h2 class="st">How a Neural Network Learns — Step by Step</h2>
+  <p class="ss">Click any step to expand the memory tip.</p>
+
+  <div class="concept-flow">
+
+    <div class="cblock" onclick="this.classList.toggle('open')">
+      <h3><span class="step-num" style="background:var(--blue);color:#000">1</span> Input Layer — Receive Data</h3>
+      <div class="detail">Each input neuron holds one feature of your data (e.g., pixel brightness, age, price). No computation happens here — it's just a pass-through.</div>
+      <div class="memory-tip">💡 Remember: Input layer = your spreadsheet columns. One neuron per column.</div>
+    </div>
+    <div class="connector"></div><div class="arrow-down"></div>
+
+    <div class="cblock" onclick="this.classList.toggle('open')">
+      <h3><span class="step-num" style="background:var(--green);color:#000">2</span> Weighted Sum — Multiply &amp; Add</h3>
+      <div class="detail">Each connection has a <strong>weight</strong> (importance). The neuron multiplies each input by its weight, sums them up, and adds a <strong>bias</strong> (baseline shift).</div>
+      <div class="formula">z = (w₁·x₁) + (w₂·x₂) + ... + (wₙ·xₙ) + b</div>
+      <div class="memory-tip">💡 Remember: Weight = volume knob. Bias = the default volume when nobody's playing music.</div>
+    </div>
+    <div class="connector"></div><div class="arrow-down"></div>
+
+    <div class="cblock" onclick="this.classList.toggle('open')">
+      <h3><span class="step-num" style="background:var(--orange);color:#000">3</span> Activation Function — Decide</h3>
+      <div class="detail">The weighted sum goes through an activation function that introduces <strong>non-linearity</strong>. Without it, stacking layers would just be linear math — no learning of complex patterns.</div>
+      <div class="formula">a = σ(z)  — where σ is ReLU, Sigmoid, Tanh, etc.</div>
+      <div class="memory-tip">💡 Remember: Activation = a bouncer at a club. Decides who gets through and how excited they are.</div>
+    </div>
+    <div class="connector"></div><div class="arrow-down"></div>
+
+    <div class="cblock" onclick="this.classList.toggle('open')">
+      <h3><span class="step-num" style="background:var(--pink);color:#000">4</span> Forward Pass — Layer by Layer</h3>
+      <div class="detail">Steps 2–3 repeat for every neuron in every hidden layer, passing outputs forward until the signal reaches the <strong>output layer</strong>. This full journey is called one forward pass.</div>
+      <div class="memory-tip">💡 Remember: Forward pass = a relay race. Each runner (layer) takes the baton, does their leg, and hands it off.</div>
+    </div>
+    <div class="connector"></div><div class="arrow-down"></div>
+
+    <div class="cblock" onclick="this.classList.toggle('open')">
+      <h3><span class="step-num" style="background:var(--red);color:#000">5</span> Loss Function — Measure Error</h3>
+      <div class="detail">Compare the network's prediction to the actual answer. The <strong>loss function</strong> produces a single number representing "how wrong" the network was.</div>
+      <div class="formula">Loss = (1/n) Σ (predicted - actual)²  ← MSE example</div>
+      <div class="memory-tip">💡 Remember: Loss = a teacher's red pen score. The bigger the number, the worse you did.</div>
+    </div>
+    <div class="connector"></div><div class="arrow-down"></div>
+
+    <div class="cblock" onclick="this.classList.toggle('open')">
+      <h3><span class="step-num" style="background:var(--accent2);color:#000">6</span> Backpropagation — Blame Game</h3>
+      <div class="detail">The error flows <strong>backward</strong> through the network. Using the chain rule of calculus, each weight learns exactly how much it contributed to the error. This is the gradient.</div>
+      <div class="formula">∂Loss/∂w = ∂Loss/∂a · ∂a/∂z · ∂z/∂w  ← chain rule</div>
+      <div class="memory-tip">💡 Remember: Backprop = a detective tracing who caused the mistake, layer by layer, backward.</div>
+    </div>
+    <div class="connector"></div><div class="arrow-down"></div>
+
+    <div class="cblock" onclick="this.classList.toggle('open')">
+      <h3><span class="step-num" style="background:var(--accent);color:#fff">7</span> Gradient Descent — Update Weights</h3>
+      <div class="detail">Each weight is nudged in the direction that reduces the loss. The <strong>learning rate</strong> controls how big the nudge is. Too big = overshoot, too small = takes forever.</div>
+      <div class="formula">w_new = w_old - learning_rate × gradient</div>
+      <div class="memory-tip">💡 Remember: Gradient descent = walking downhill in fog. You can only feel the slope at your feet and take one step at a time.</div>
+    </div>
+    <div class="connector"></div><div class="arrow-down"></div>
+
+    <div class="cblock" style="border-color:var(--green);text-align:center">
+      <h3 style="justify-content:center"><span class="step-num" style="background:var(--green);color:#000">∞</span> Repeat for Epochs Until Loss is Minimal</h3>
+      <div class="detail">One full pass through the dataset = 1 epoch. Training runs for many epochs until the network converges (loss stops improving). Early stopping prevents overfitting.</div>
+      <div class="memory-tip">💡 Remember: Epochs = practice rounds. An athlete doesn't nail it in one try.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 4. ACTIVATIONS ═══════ -->
+<section class="sec" id="sec-activations">
+  <h2 class="st">Activation Functions — The Decision Makers</h2>
+  <p class="ss">Each function shapes the output differently. Hover to see the curve live.</p>
+
+  <div class="act-grid">
+    <div class="act-card">
+      <h4>ReLU</h4>
+      <div class="act-formula">f(x) = max(0, x)</div>
+      <canvas class="actCanvas" data-fn="relu" width="200" height="120"></canvas>
+      <div class="use">Default for hidden layers. Fast, simple, fights vanishing gradient. "If positive, pass through; if negative, kill it."</div>
+    </div>
+    <div class="act-card">
+      <h4>Sigmoid</h4>
+      <div class="act-formula">f(x) = 1 / (1 + e⁻ˣ)</div>
+      <canvas class="actCanvas" data-fn="sigmoid" width="200" height="120"></canvas>
+      <div class="use">Outputs 0–1 (probability). Used in binary classification output. "Squishes everything into a percentage."</div>
+    </div>
+    <div class="act-card">
+      <h4>Tanh</h4>
+      <div class="act-formula">f(x) = (eˣ - e⁻ˣ)/(eˣ + e⁻ˣ)</div>
+      <canvas class="actCanvas" data-fn="tanh" width="200" height="120"></canvas>
+      <div class="use">Outputs -1 to +1. Zero-centered — better gradients than sigmoid. "Like sigmoid's cooler sibling."</div>
+    </div>
+    <div class="act-card">
+      <h4>Softmax</h4>
+      <div class="act-formula">f(xᵢ) = eˣⁱ / Σeˣʲ</div>
+      <canvas class="actCanvas" data-fn="softmax" width="200" height="120"></canvas>
+      <div class="use">Outputs probability distribution summing to 1. Used for multi-class output. "Picks the winner, gives everyone a chance score."</div>
+    </div>
+    <div class="act-card">
+      <h4>Leaky ReLU</h4>
+      <div class="act-formula">f(x) = max(0.01x, x)</div>
+      <canvas class="actCanvas" data-fn="leaky" width="200" height="120"></canvas>
+      <div class="use">Fixes "dying ReLU" — lets a tiny gradient through for negatives. "ReLU with life support for dead neurons."</div>
+    </div>
+    <div class="act-card">
+      <h4>GELU</h4>
+      <div class="act-formula">f(x) = x · Φ(x)</div>
+      <canvas class="actCanvas" data-fn="gelu" width="200" height="120"></canvas>
+      <div class="use">Used in Transformers (GPT, BERT). Smooth, probabilistic gating. "The modern default for LLMs."</div>
+    </div>
+  </div>
+
+  <div class="mnemonic">
+    <h3>Quick Decision Tree</h3>
+    <div class="phrase" style="font-size:1rem;letter-spacing:0">Hidden layer? → ReLU &nbsp;|&nbsp; Binary output? → Sigmoid &nbsp;|&nbsp; Multi-class? → Softmax &nbsp;|&nbsp; Transformer? → GELU</div>
+  </div>
+</section>
+
+<!-- ═══════ 5. NN TYPES ═══════ -->
+<section class="sec" id="sec-types">
+  <h2 class="st">Types of Neural Networks</h2>
+  <p class="ss">Each architecture is designed for a specific kind of data.</p>
+
+  <div class="types-grid">
+    <div class="type-card" data-c="blue">
+      <div class="type-icon">🔗</div>
+      <h4>Feedforward (FNN / MLP)</h4>
+      <div class="type-tag">The Classic</div>
+      <p>Data flows one direction — input → hidden → output. No loops, no memory. The simplest architecture and the building block for everything else.</p>
+      <div class="type-use">Use for: tabular data, regression, simple classification</div>
+    </div>
+    <div class="type-card" data-c="green">
+      <div class="type-icon">🖼️</div>
+      <h4>Convolutional (CNN)</h4>
+      <div class="type-tag">The Eye</div>
+      <p>Uses sliding filters (kernels) to detect patterns — edges, textures, shapes. Pools to compress. Thinks "spatially" about nearby pixels.</p>
+      <div class="type-use">Use for: images, video, medical scans, anything 2D/3D spatial</div>
+    </div>
+    <div class="type-card" data-c="pink">
+      <div class="type-icon">🔁</div>
+      <h4>Recurrent (RNN / LSTM / GRU)</h4>
+      <div class="type-tag">The Memory</div>
+      <p>Has loops — output feeds back as input. Remembers previous steps. LSTM/GRU add gates to control what to remember and forget over long sequences.</p>
+      <div class="type-use">Use for: time series, speech, music, sequential data</div>
+    </div>
+    <div class="type-card" data-c="orange">
+      <div class="type-icon">🔮</div>
+      <h4>Transformer</h4>
+      <div class="type-tag">The Attention King</div>
+      <p>Uses self-attention to weigh every token against every other token simultaneously. No recurrence needed. Parallelizable. Powers GPT, BERT, Claude, and modern LLMs.</p>
+      <div class="type-use">Use for: NLP, LLMs, vision (ViT), multi-modal, everything modern</div>
+    </div>
+    <div class="type-card" data-c="accent">
+      <div class="type-icon">🎨</div>
+      <h4>Generative (GAN / VAE / Diffusion)</h4>
+      <div class="type-tag">The Creator</div>
+      <p>GANs pit a generator vs. discriminator. VAEs learn compressed representations. Diffusion models denoise random noise into images. All create new content.</p>
+      <div class="type-use">Use for: image generation, style transfer, data augmentation</div>
+    </div>
+    <div class="type-card" data-c="blue">
+      <div class="type-icon">🗺️</div>
+      <h4>Graph Neural Network (GNN)</h4>
+      <div class="type-tag">The Connector</div>
+      <p>Operates on graph-structured data — nodes and edges. Learns from relationships. Each node aggregates info from its neighbors to update its representation.</p>
+      <div class="type-use">Use for: social networks, molecules, recommendation systems, fraud detection</div>
+    </div>
+  </div>
+
+  <div class="mnemonic">
+    <h3>Remember: "Flat → Camera → Replay → Translate → Generate → Graph"</h3>
+    <div class="phrase" style="font-size:1rem">FNN sees tables · CNN sees images · RNN replays sequences · Transformers translate everything · GANs generate art · GNNs map connections</div>
+  </div>
+</section>
+
+<!-- ═══════ 6. CHEAT SHEET ═══════ -->
+<section class="sec" id="sec-cheat">
+  <h2 class="st">Neural Network Cheat Sheet</h2>
+  <p class="ss">Pin-worthy quick reference cards.</p>
+
+  <div class="cheat-grid">
+    <div class="cheat-block">
+      <h4>Core Vocabulary</h4>
+      <ul>
+        <li><span class="ck">Neuron</span><span class="cv">A unit that receives inputs, computes weighted sum + bias, applies activation</span></li>
+        <li><span class="ck">Weight</span><span class="cv">Strength of a connection — learned during training</span></li>
+        <li><span class="ck">Bias</span><span class="cv">An offset added before activation — shifts the decision boundary</span></li>
+        <li><span class="ck">Layer</span><span class="cv">A group of neurons at the same depth level</span></li>
+        <li><span class="ck">Epoch</span><span class="cv">One complete pass through the entire training dataset</span></li>
+        <li><span class="ck">Batch</span><span class="cv">A subset of data processed before one weight update</span></li>
+        <li><span class="ck">Inference</span><span class="cv">Using a trained model to make predictions (no learning)</span></li>
+      </ul>
+    </div>
+
+    <div class="cheat-block">
+      <h4>Training Essentials</h4>
+      <ul>
+        <li><span class="ck">Forward Pass</span><span class="cv">Input → weighted sums → activations → output prediction</span></li>
+        <li><span class="ck">Loss Function</span><span class="cv">Measures how wrong the prediction is (MSE, Cross-Entropy)</span></li>
+        <li><span class="ck">Backpropagation</span><span class="cv">Computes gradient of loss w.r.t. each weight using chain rule</span></li>
+        <li><span class="ck">Gradient Descent</span><span class="cv">Updates weights in the direction that reduces loss</span></li>
+        <li><span class="ck">Learning Rate</span><span class="cv">Step size for weight updates (0.001 is common default)</span></li>
+        <li><span class="ck">Optimizer</span><span class="cv">Algorithm that applies gradients (SGD, Adam, AdamW)</span></li>
+      </ul>
+    </div>
+
+    <div class="cheat-block">
+      <h4>Common Problems &amp; Fixes</h4>
+      <ul>
+        <li><span class="ck">Overfitting</span><span class="cv">Memorizes training data → fix with dropout, regularization, more data</span></li>
+        <li><span class="ck">Underfitting</span><span class="cv">Can't learn pattern → add layers/neurons, train longer, reduce regularization</span></li>
+        <li><span class="ck">Vanishing Gradient</span><span class="cv">Gradients shrink to zero in deep nets → use ReLU, batch norm, residual connections</span></li>
+        <li><span class="ck">Exploding Gradient</span><span class="cv">Gradients blow up → gradient clipping, lower learning rate</span></li>
+        <li><span class="ck">Dead Neurons</span><span class="cv">ReLU outputs 0 forever → use Leaky ReLU or proper initialization</span></li>
+      </ul>
+    </div>
+
+    <div class="cheat-block">
+      <h4>Hyperparameter Quick Guide</h4>
+      <ul>
+        <li><span class="ck">Learning Rate</span><span class="cv">Start 1e-3, reduce on plateau. Too high = diverge, too low = slow</span></li>
+        <li><span class="ck">Batch Size</span><span class="cv">32–256 typical. Larger = stable but needs more memory</span></li>
+        <li><span class="ck">Layers</span><span class="cv">Start shallow (2–3), go deeper only if underfitting</span></li>
+        <li><span class="ck">Dropout</span><span class="cv">0.1–0.5 — randomly zeroes neurons during training to prevent co-adaptation</span></li>
+        <li><span class="ck">Optimizer</span><span class="cv">Adam for most tasks, AdamW for Transformers, SGD+momentum for vision</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="mnemonic">
+    <h3>The Neural Network in One Sentence</h3>
+    <div class="phrase" style="font-size:1.05rem;letter-spacing:0">Data flows in → multiply by weights → add bias → activate → predict → measure error → backprop → adjust weights → repeat.</div>
+  </div>
+</section>
+
+<!-- ═══════ 7. ARCHITECTURE DEEP DIVE ═══════ -->
+<section class="sec" id="sec-arch">
+  <h2 class="st">Architecture Deep Dive — FNN vs CNN vs RNN vs GAN</h2>
+  <p class="ss">Click each architecture to see how data flows through it, what makes it unique, and when to use it.</p>
+
+  <div class="arch-switcher" id="archSwitcher">
+    <button class="arch-tab on" data-arch="fnn">🔗 FNN</button>
+    <button class="arch-tab" data-arch="cnn">🖼️ CNN</button>
+    <button class="arch-tab" data-arch="rnn">🔁 RNN</button>
+    <button class="arch-tab" data-arch="gan">🎭 GAN</button>
+    <button class="arch-tab" data-arch="tfm">🔮 Transformer</button>
+    <button class="arch-tab" data-arch="compare">📊 Side-by-Side</button>
+  </div>
+
+  <!-- ── FNN Panel ── -->
+  <div class="arch-panel on" id="arch-fnn">
+    <div class="arch-hero">
+      <div class="arch-viz"><canvas id="cvFnn" width="380" height="300"></canvas></div>
+      <div class="arch-info">
+        <div>
+          <span class="arch-badge" style="background:rgba(96,165,250,.15);color:var(--blue)">Feedforward Neural Network</span>
+          <div class="arch-title">FNN / MLP — The Straight Pipeline</div>
+          <div class="arch-one">"Data enters from the left, flows right, never looks back. Like water through a pipe — one direction only."</div>
+        </div>
+        <div class="arch-detail-card">
+          <h4>How Data Flows</h4>
+          <p>Every neuron in layer N connects to <strong>every</strong> neuron in layer N+1 (fully connected). Data moves strictly left-to-right. No loops, no skipping layers, no memory of previous inputs. Each input is treated as completely independent.</p>
+          <div class="formula-sm">Input → [W×x + b] → Activation → [W×x + b] → Activation → Output</div>
+        </div>
+        <div class="arch-detail-card">
+          <h4>Key Architecture Rules</h4>
+          <p><strong>No cycles:</strong> information never flows backward during inference.<br>
+          <strong>No memory:</strong> the network has zero knowledge of what it processed before.<br>
+          <strong>Fully connected:</strong> every neuron talks to every neuron in the next layer.<br>
+          <strong>Fixed input size:</strong> always expects the same number of features.</p>
+        </div>
+        <div class="arch-detail-card">
+          <h4>💡 Memory Trick</h4>
+          <p><strong>"FNN = A toll road with no U-turns."</strong> Cars (data) enter, pay tolls at each booth (layer), and exit. They can't reverse. Each car is processed alone — the booth doesn't remember the last car.</p>
+        </div>
+      </div>
+    </div>
+    <div class="data-flow-strip">
+      <div class="df-box" style="background:rgba(96,165,250,.15);color:var(--blue)">Input Features<br><small>e.g. [age, salary, score]</small></div>
+      <div class="df-arrow">→</div>
+      <div class="df-box" style="background:rgba(129,140,248,.15);color:var(--accent)">Hidden Layer 1<br><small>Weighted sum + ReLU</small></div>
+      <div class="df-arrow">→</div>
+      <div class="df-box" style="background:rgba(192,132,252,.15);color:var(--accent2)">Hidden Layer 2<br><small>Weighted sum + ReLU</small></div>
+      <div class="df-arrow">→</div>
+      <div class="df-box" style="background:rgba(244,114,182,.15);color:var(--pink)">Output<br><small>Softmax / Sigmoid</small></div>
+    </div>
+  </div>
+
+  <!-- ── CNN Panel ── -->
+  <div class="arch-panel" id="arch-cnn">
+    <div class="arch-hero">
+      <div class="arch-viz"><canvas id="cvCnn" width="380" height="300"></canvas></div>
+      <div class="arch-info">
+        <div>
+          <span class="arch-badge" style="background:rgba(52,211,153,.15);color:var(--green)">Convolutional Neural Network</span>
+          <div class="arch-title">CNN — The Pattern Scanner</div>
+          <div class="arch-one">"Instead of looking at everything at once, it slides a magnifying glass across the input, spotting local patterns — edges, textures, shapes — then zooms out."</div>
+        </div>
+        <div class="arch-detail-card">
+          <h4>How Data Flows</h4>
+          <p>A small <strong>filter/kernel</strong> (e.g. 3×3) slides across the input. At each position, it computes a dot product — producing a <strong>feature map</strong> that highlights where a pattern was found. <strong>Pooling</strong> then shrinks the map (e.g. taking the max of each 2×2 block), reducing size while keeping the important info. Multiple conv+pool stages stack up, each detecting more complex patterns. Finally, the output flattens into a regular FNN for classification.</p>
+          <div class="formula-sm">Image → [Conv → ReLU → Pool] × N → Flatten → Dense → Output</div>
+        </div>
+        <div class="arch-detail-card">
+          <h4>Key Architecture Difference from FNN</h4>
+          <p><strong>NOT fully connected:</strong> each neuron only sees a small local region (receptive field), not the entire input.<br>
+          <strong>Weight sharing:</strong> the same filter slides everywhere — so the same "edge detector" works whether the edge is top-left or bottom-right.<br>
+          <strong>Spatial awareness:</strong> preserves the 2D structure of images. FNN would flatten an image into a 1D list, losing all spatial relationships.<br>
+          <strong>Far fewer parameters:</strong> a 3×3 filter has just 9 weights, reused across the entire image.</p>
+        </div>
+        <div class="arch-detail-card">
+          <h4>💡 Memory Trick</h4>
+          <p><strong>"CNN = A detective with a magnifying glass."</strong> Instead of staring at the whole crime scene (image) at once like FNN would, CNN slowly scans small patches — first finding fingerprints (edges), then faces (shapes), then the whole story (objects). Same magnifying glass everywhere = weight sharing.</p>
+        </div>
+      </div>
+    </div>
+    <div class="data-flow-strip">
+      <div class="df-box" style="background:rgba(52,211,153,.15);color:var(--green)">Image Input<br><small>e.g. 28×28 pixels</small></div>
+      <div class="df-arrow">→</div>
+      <div class="df-box" style="background:rgba(96,165,250,.15);color:var(--blue)">Conv + ReLU<br><small>Detect edges</small></div>
+      <div class="df-arrow">→</div>
+      <div class="df-box" style="background:rgba(251,191,36,.12);color:var(--orange)">Pooling<br><small>Shrink & keep key info</small></div>
+      <div class="df-arrow">→</div>
+      <div class="df-box" style="background:rgba(96,165,250,.15);color:var(--blue)">Conv + ReLU<br><small>Detect shapes</small></div>
+      <div class="df-arrow">→</div>
+      <div class="df-box" style="background:rgba(251,191,36,.12);color:var(--orange)">Pooling<br><small>Compress further</small></div>
+      <div class="df-arrow">→</div>
+      <div class="df-box" style="background:rgba(192,132,252,.15);color:var(--accent2)">Flatten → Dense<br><small>Classify</small></div>
+    </div>
+  </div>
+
+  <!-- ── RNN Panel ── -->
+  <div class="arch-panel" id="arch-rnn">
+    <div class="arch-hero">
+      <div class="arch-viz"><canvas id="cvRnn" width="380" height="300"></canvas></div>
+      <div class="arch-info">
+        <div>
+          <span class="arch-badge" style="background:rgba(244,114,182,.15);color:var(--pink)">Recurrent Neural Network</span>
+          <div class="arch-title">RNN — The One With Memory</div>
+          <div class="arch-one">"Unlike FNN which treats each input as brand new, RNN passes a 'hidden state' from one step to the next — it remembers what it saw before."</div>
+        </div>
+        <div class="arch-detail-card">
+          <h4>How Data Flows</h4>
+          <p>At each time step, the neuron receives TWO inputs: the <strong>current data</strong> (e.g., today's word) AND the <strong>hidden state</strong> from the previous step (a summary of everything it's seen so far). It combines both, produces an output, and passes an updated hidden state to the next step. This loop is the core difference — data literally flows in a circle.</p>
+          <div class="formula-sm">hₜ = activation(W_input × xₜ + W_hidden × hₜ₋₁ + b)<br>output = W_out × hₜ</div>
+        </div>
+        <div class="arch-detail-card">
+          <h4>Key Architecture Difference from FNN</h4>
+          <p><strong>Has loops:</strong> output feeds back as input — FNN has zero loops.<br>
+          <strong>Has memory:</strong> hidden state carries information across time steps.<br>
+          <strong>Variable input length:</strong> can process sequences of any length (sentences, time series) — FNN needs fixed-size input.<br>
+          <strong>Same weights reused:</strong> the same neuron processes step 1, step 2, step 3... unlike FNN where each layer has its own weights.</p>
+        </div>
+        <div class="arch-detail-card">
+          <h4>The Vanishing Gradient Problem</h4>
+          <p>Basic RNNs forget long-ago steps because gradients shrink during backprop through time. <strong>LSTM</strong> adds gates (forget, input, output) that control what to keep/discard. <strong>GRU</strong> is a simpler 2-gate version. Think of LSTM gates as a diary with a lock — you choose what to write, what to erase, and what to share.</p>
+        </div>
+        <div class="arch-detail-card">
+          <h4>💡 Memory Trick</h4>
+          <p><strong>"RNN = Reading a book vs. seeing a photo."</strong> FNN sees a photo (one snapshot, no sequence). RNN reads a book — each word makes sense because you remember what came before. LSTM is reading with highlighters — you mark important passages so you don't forget them 200 pages later.</p>
+        </div>
+      </div>
+    </div>
+    <div class="data-flow-strip">
+      <div class="df-box" style="background:rgba(244,114,182,.15);color:var(--pink)">x₁ (Step 1)<br><small>e.g. "The"</small></div>
+      <div class="df-arrow">→</div>
+      <div class="df-box" style="background:rgba(129,140,248,.15);color:var(--accent)">RNN Cell<br><small>h₁ = f(x₁, h₀)</small></div>
+      <div class="df-arrow">→ h₁ →</div>
+      <div class="df-box" style="background:rgba(129,140,248,.15);color:var(--accent)">RNN Cell<br><small>h₂ = f(x₂, h₁)</small></div>
+      <div class="df-arrow">→ h₂ →</div>
+      <div class="df-box" style="background:rgba(129,140,248,.15);color:var(--accent)">RNN Cell<br><small>h₃ = f(x₃, h₂)</small></div>
+      <div class="df-arrow">→</div>
+      <div class="df-box" style="background:rgba(52,211,153,.15);color:var(--green)">Output<br><small>Prediction</small></div>
+    </div>
+  </div>
+
+  <!-- ── GAN Panel ── -->
+  <div class="arch-panel" id="arch-gan">
+    <div class="arch-hero">
+      <div class="arch-viz"><canvas id="cvGan" width="380" height="300"></canvas></div>
+      <div class="arch-info">
+        <div>
+          <span class="arch-badge" style="background:rgba(251,191,36,.15);color:var(--orange)">Generative Adversarial Network</span>
+          <div class="arch-title">GAN — The Forger vs. The Detective</div>
+          <div class="arch-one">"Two networks fighting each other. One creates fakes, the other spots fakes. They push each other to get better, until the fakes are indistinguishable from reality."</div>
+        </div>
+        <div class="arch-detail-card">
+          <h4>How Data Flows (Two Separate Networks!)</h4>
+          <p>The <strong>Generator (G)</strong> takes random noise and tries to create realistic data (e.g., a face). The <strong>Discriminator (D)</strong> receives both real images AND generator's fakes, and outputs "real or fake?". Both are trained simultaneously: G learns to fool D, D learns to catch G. This adversarial loop is what makes GANs unique — it's not one network, it's a competition between two.</p>
+          <div class="formula-sm">G(noise) → fake image<br>D(image) → P(real) ∈ [0,1]<br>G wants to maximize D(G(noise)); D wants to minimize it</div>
+        </div>
+        <div class="arch-detail-card">
+          <h4>Key Architecture Difference from Everything Else</h4>
+          <p><strong>Two networks, not one:</strong> FNN/CNN/RNN are single networks. GAN is a two-player game.<br>
+          <strong>No labeled data needed:</strong> the Discriminator creates its own training signal.<br>
+          <strong>Generative, not discriminative:</strong> FNN/CNN/RNN classify or predict. GAN creates new data from scratch.<br>
+          <strong>Adversarial loss:</strong> instead of minimizing a fixed loss, both networks chase a moving target (each other).</p>
+        </div>
+        <div class="arch-detail-card">
+          <h4>💡 Memory Trick</h4>
+          <p><strong>"GAN = An art forger vs. a museum curator."</strong> The forger (Generator) paints fake masterpieces. The curator (Discriminator) examines each painting — "Real Monet or fake?" Over time, the forger gets so good that even the curator can't tell. The key insight: the forger never sees real paintings — only learns from the curator's feedback!</p>
+        </div>
+      </div>
+    </div>
+    <div class="data-flow-strip">
+      <div class="df-box" style="background:rgba(129,140,248,.15);color:var(--accent)">Random Noise<br><small>z ~ N(0,1)</small></div>
+      <div class="df-arrow">→</div>
+      <div class="df-box" style="background:rgba(251,191,36,.15);color:var(--orange)">Generator (G)<br><small>Creates fake image</small></div>
+      <div class="df-arrow">→ fake →</div>
+      <div class="df-box" style="background:rgba(248,113,113,.15);color:var(--red)">Discriminator (D)<br><small>"Real or Fake?"</small></div>
+      <div class="df-arrow">← real ←</div>
+      <div class="df-box" style="background:rgba(52,211,153,.15);color:var(--green)">Real Data<br><small>Training images</small></div>
+    </div>
+  </div>
+
+  <!-- ── Transformer Panel ── -->
+  <div class="arch-panel" id="arch-tfm">
+    <div class="arch-hero">
+      <div class="arch-viz"><canvas id="cvTfm" width="380" height="300"></canvas></div>
+      <div class="arch-info">
+        <div>
+          <span class="arch-badge" style="background:rgba(251,191,36,.15);color:#fbbf24">Transformer — "Attention Is All You Need" (2017)</span>
+          <div class="arch-title">Transformer — The Attention King</div>
+          <div class="arch-one">"Instead of reading one word at a time (RNN) or scanning patches (CNN), it looks at ALL words simultaneously and asks: 'Which words should I pay attention to right now?'"</div>
+        </div>
+        <div class="arch-detail-card">
+          <h4>How Data Flows</h4>
+          <p>Input tokens are embedded + given positional encoding (since there are no loops to track order). Then <strong>Self-Attention</strong> lets every token look at every other token simultaneously, computing relevance scores. This is done multiple times in parallel via <strong>Multi-Head Attention</strong>. The result passes through a feedforward network. This Attention+FFN block repeats N times (the "layers"). An Encoder stack processes input; a Decoder stack generates output autoregressively.</p>
+          <div class="formula-sm">Attention(Q,K,V) = softmax(Q·Kᵀ / √dₖ) · V</div>
+        </div>
+        <div class="arch-detail-card">
+          <h4>Key Architecture Differences</h4>
+          <p><strong>vs. FNN:</strong> Transformer has attention — dynamically chooses what to focus on. FNN applies fixed weights blindly.<br>
+          <strong>vs. CNN:</strong> CNN only sees local patches. Transformer sees the entire sequence at once — no locality constraint.<br>
+          <strong>vs. RNN:</strong> RNN processes sequentially (slow). Transformer processes all positions in parallel (fast). No recurrent loops, no vanishing gradients.<br>
+          <strong>vs. GAN:</strong> Transformer is a single architecture for understanding/generating. GAN is two competing networks. (Though GANs can use Transformers inside!)</p>
+        </div>
+        <div class="arch-detail-card">
+          <h4>💡 Memory Trick</h4>
+          <p><strong>"Transformer = A round-table conference."</strong> Every person (token) can hear and ask questions of every other person simultaneously. They each decide who's most relevant to listen to (attention). RNN is like a phone chain — each person calls the next. CNN is like everyone reading their own section of the newspaper. The Transformer puts everyone in one room.</p>
+        </div>
+      </div>
+    </div>
+    <div class="data-flow-strip">
+      <div class="df-box" style="background:rgba(96,165,250,.15);color:var(--blue)">Input Tokens<br><small>"The cat sat"</small></div>
+      <div class="df-arrow">→</div>
+      <div class="df-box" style="background:rgba(192,132,252,.15);color:var(--accent2)">Embed + Pos<br><small>Meaning + Position</small></div>
+      <div class="df-arrow">→</div>
+      <div class="df-box" style="background:rgba(251,191,36,.15);color:var(--orange)">Self-Attention<br><small>Q·K→Scores→V</small></div>
+      <div class="df-arrow">→</div>
+      <div class="df-box" style="background:rgba(129,140,248,.15);color:var(--accent)">Feed Forward<br><small>Transform features</small></div>
+      <div class="df-arrow">→</div>
+      <div class="df-box" style="background:rgba(52,211,153,.12);color:var(--green)">×N Layers<br><small>Stack deep</small></div>
+      <div class="df-arrow">→</div>
+      <div class="df-box" style="background:rgba(244,114,182,.15);color:var(--pink)">Output<br><small>Next token / class</small></div>
+    </div>
+  </div>
+
+  <!-- ── Comparison Panel ── -->
+  <div class="arch-panel" id="arch-compare">
+    <div class="arch-compare">
+      <div style="overflow-x:auto;border-radius:14px;border:1px solid var(--border)">
+      <table>
+        <thead><tr>
+          <th>Dimension</th>
+          <th style="color:var(--blue)">FNN</th>
+          <th style="color:var(--green)">CNN</th>
+          <th style="color:var(--pink)">RNN</th>
+          <th style="color:var(--orange)">GAN</th>
+          <th style="color:#fbbf24">Transformer</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>Data Flow</td><td>One direction →</td><td>One direction → (local scan)</td><td>Forward + loops ↺</td><td>Two competing ⇄</td><td>All-to-all attention (parallel) ⇉</td></tr>
+          <tr><td>Memory</td><td>None</td><td>None</td><td>Hidden state</td><td>None</td><td>Attention = dynamic, context-based memory</td></tr>
+          <tr><td>Connection</td><td>Every-to-every</td><td>Local filter window</td><td>Same weights across steps</td><td>G+D separate</td><td>Every token attends to every token</td></tr>
+          <tr><td>Input Type</td><td>Fixed flat vector</td><td>2D/3D spatial</td><td>Variable sequences</td><td>Random noise</td><td>Variable sequences (+ images via ViT)</td></tr>
+          <tr><td>Weight Sharing</td><td>No</td><td>Yes (filter reuse)</td><td>Yes (cell reuse)</td><td>No</td><td>Yes (attention heads shared across positions)</td></tr>
+          <tr><td>Purpose</td><td>Classify / regress</td><td>Spatial patterns</td><td>Sequential deps</td><td>Generate data</td><td>Universal: NLP, vision, audio, multi-modal</td></tr>
+          <tr><td># of Networks</td><td>1</td><td>1</td><td>1</td><td>2</td><td>1 (or Encoder+Decoder pair)</td></tr>
+          <tr><td>Parallelizable</td><td>Yes</td><td>Yes</td><td>No (sequential)</td><td>Partially</td><td>Yes — fully parallel (key advantage)</td></tr>
+          <tr><td>Long-Range Deps</td><td>No</td><td>Limited (receptive field)</td><td>Struggles (vanishing grad)</td><td>N/A</td><td>Excellent — attends to any distance</td></tr>
+          <tr><td>Positional Info</td><td>None</td><td>Inherent (spatial grid)</td><td>Inherent (step order)</td><td>N/A</td><td>Must be added (positional encoding)</td></tr>
+          <tr><td>Key Innovation</td><td>Universal approx</td><td>Filters + pooling</td><td>Recurrent loop</td><td>Adversarial</td><td>Self-attention + multi-head + pos encoding</td></tr>
+          <tr><td>Analogy</td><td>Toll road</td><td>Magnifying glass</td><td>Reading a book</td><td>Forger vs. Curator</td><td>Round-table conference</td></tr>
+          <tr><td>Best For</td><td>Tabular data</td><td>Images, video</td><td>Time series, audio</td><td>Image generation</td><td>LLMs, translation, vision, everything modern</td></tr>
+          <tr><td>Weakness</td><td>No sequence/spatial</td><td>No sequences</td><td>Slow, vanishing grad</td><td>Mode collapse</td><td>O(n²) memory for long sequences</td></tr>
+          <tr><td>Modern Status</td><td>Tabular / final layers</td><td>Dominant for vision</td><td>Replaced by Transformers</td><td>Rivaled by Diffusion</td><td>Dominant everywhere — powers all LLMs</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <div class="mnemonic" style="margin-top:20px">
+      <h3>The One-Line Differentiator</h3>
+      <div class="phrase" style="font-size:1rem;letter-spacing:0">
+        FNN: "I see each input once, fully connected, no memory."<br>
+        CNN: "I scan locally with shared filters, preserving spatial structure."<br>
+        RNN: "I loop — my output feeds back in, so I remember the past."<br>
+        GAN: "I'm two networks fighting — one creates, one judges."<br>
+        Transformer: "Everyone talks to everyone at once — I attend to what matters."
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 8. TRANSFORMERS DEEP DIVE ═══════ -->
+<section class="sec" id="sec-transformer">
+  <h2 class="st">Transformers — The Architecture That Changed Everything</h2>
+  <p class="ss">The 2017 paper "Attention Is All You Need" gave birth to GPT, BERT, Claude, and the entire Generative AI revolution. Let's understand it piece by piece.</p>
+
+  <!-- Big Picture -->
+  <div class="tfm-block">
+    <h3><span class="step-badge" style="background:#fbbf2433;color:#fbbf24">🗺️</span> The Big Picture First</h3>
+    <div class="explain">
+      Before Transformers, the best sequence models were RNNs/LSTMs — they read words one-by-one, like reading a book letter by letter. This was <strong>slow</strong> (can't parallelize) and <strong>forgetful</strong> (vanishing gradients over long texts). The Transformer's breakthrough was a radical idea: <strong>throw away recurrence entirely</strong> and replace it with a mechanism called <strong>Self-Attention</strong> that lets every word look at every other word in the sentence simultaneously.
+      <br><br>
+      A Transformer has two halves: an <strong>Encoder</strong> (understands the input) and a <strong>Decoder</strong> (generates the output). Some models use both (original Transformer, T5), some use only the Encoder (BERT — understands text), and some use only the Decoder (GPT, Claude — generates text).
+    </div>
+    <canvas id="cvTfmBigPicture" width="760" height="340"></canvas>
+    <div class="tfm-analogy">💡 <strong>Analogy:</strong> The Encoder is like someone reading a foreign book and understanding it. The Decoder is like that person now writing a translation. Encoder-only models are great readers. Decoder-only models are great writers. The original Transformer was a reader+writer.</div>
+  </div>
+
+  <!-- Step 1: Input Embedding + Positional Encoding -->
+  <div class="tfm-block">
+    <h3><span class="step-badge" style="background:#60a5fa33;color:var(--blue)">1</span> Input Embedding + Positional Encoding</h3>
+    <div class="explain">
+      Words enter as tokens (integer IDs). The <strong>embedding layer</strong> converts each token into a rich vector (e.g., 512 dimensions) capturing its meaning. But unlike RNNs, a Transformer processes all tokens at once — so it has <strong>no built-in sense of order</strong>. "The cat sat on the mat" and "mat the on sat cat the" would look the same!
+      <br><br>
+      <strong>Positional Encoding</strong> fixes this by adding a unique signal to each position. The original paper used sine/cosine waves at different frequencies — position 1 gets one wave pattern, position 2 gets a different one, and so on. These are added directly to the embeddings so each token now carries both <strong>what it means</strong> and <strong>where it is</strong>.
+    </div>
+    <canvas id="cvTfmEmbed" width="700" height="200"></canvas>
+    <div class="tfm-formula">final_embedding[i] = token_embedding[i] + positional_encoding[i]<br>PE(pos, 2i)   = sin(pos / 10000^(2i/d_model))<br>PE(pos, 2i+1) = cos(pos / 10000^(2i/d_model))</div>
+    <div class="tfm-analogy">💡 <strong>Analogy:</strong> Embedding = giving each word a name badge with their personality. Positional encoding = also writing their seat number on the badge. Without the seat number, the Transformer doesn't know who's sitting where.</div>
+  </div>
+
+  <!-- Step 2: Self-Attention -->
+  <div class="tfm-block">
+    <h3><span class="step-badge" style="background:#fbbf2433;color:#fbbf24">2</span> Self-Attention — The Core Innovation</h3>
+    <div class="explain">
+      This is <strong>the</strong> idea that made Transformers revolutionary. For each token, self-attention asks: <strong>"Which other tokens in this sentence should I pay attention to?"</strong>
+      <br><br>
+      Each token is projected into three vectors:
+      <br>• <strong>Query (Q)</strong> — "What am I looking for?" (like a search query)
+      <br>• <strong>Key (K)</strong> — "What do I contain?" (like a search index)
+      <br>• <strong>Value (V)</strong> — "What information do I actually carry?" (like the search result)
+      <br><br>
+      The attention score between two tokens = dot product of Query and Key. High score = these two tokens are relevant to each other. The scores are scaled (÷ √dₖ to prevent huge numbers), passed through softmax (convert to probabilities), then used to weight the Values. The result: each token gets a new representation that's a <strong>weighted mix of all other tokens</strong> — weighted by relevance.
+    </div>
+    <canvas id="cvTfmAttention" width="700" height="300"></canvas>
+    <div class="tfm-formula">Attention(Q, K, V) = softmax( Q · Kᵀ / √dₖ ) · V<br><br>Step by step:<br>1. scores    = Q · Kᵀ          → how much each token cares about each other token<br>2. scaled    = scores / √dₖ    → prevent values from getting too large<br>3. weights   = softmax(scaled)  → convert to probabilities (sum to 1)<br>4. output    = weights · V      → weighted combination of all Values</div>
+    <div class="tfm-cols">
+      <div class="tfm-mini">
+        <h4 style="color:var(--blue)">Why Q, K, V?</h4>
+        <p>Think of it like a library. You walk in with a <strong>Question (Q)</strong>. Each book has a title on the spine — that's the <strong>Key (K)</strong>. You compare your question against all the titles. When you find a match, you pull the book off the shelf and read its content — that's the <strong>Value (V)</strong>. Self-attention does this for every word against every word, simultaneously.</p>
+      </div>
+      <div class="tfm-mini">
+        <h4 style="color:var(--orange)">Why divide by √dₖ?</h4>
+        <p>The dot products of Q and K can grow very large as the dimension increases. Large values push softmax into regions with tiny gradients (near 0 or 1), making learning difficult. Dividing by √dₖ keeps the scores in a range where softmax behaves well. It's a simple but critical numerical stability trick.</p>
+      </div>
+    </div>
+    <div class="tfm-analogy">💡 <strong>Analogy:</strong> Self-attention = a cocktail party. Every person (token) listens to every conversation in the room simultaneously, but chooses to focus on the people most relevant to them. In "The cat sat on the mat because <strong>it</strong> was tired" — the word "it" attends strongly to "cat" because that's what "it" refers to.</div>
+  </div>
+
+  <!-- Step 3: Multi-Head Attention -->
+  <div class="tfm-block">
+    <h3><span class="step-badge" style="background:#c084fc33;color:var(--accent2)">3</span> Multi-Head Attention — Parallel Perspectives</h3>
+    <div class="explain">
+      One attention "head" can only capture one type of relationship. But language has many simultaneous relationships: syntactic (subject↔verb), semantic (synonyms), positional (nearby words), referential (pronouns↔nouns). <strong>Multi-Head Attention</strong> runs multiple self-attention operations in parallel — typically 8 or 16 heads — each with its own Q, K, V projections. Each head learns a <strong>different aspect</strong> of the relationships. Their outputs are concatenated and linearly projected back together.
+    </div>
+    <canvas id="cvTfmMultiHead" width="700" height="220"></canvas>
+    <div class="tfm-formula">MultiHead(Q,K,V) = Concat(head₁, head₂, ..., headₕ) · Wᴼ<br>where headᵢ  = Attention(Q·Wᵢᵠ, K·Wᵢᴷ, V·Wᵢⱽ)</div>
+    <div class="tfm-analogy">💡 <strong>Analogy:</strong> Multi-head attention = reading a sentence with 8 different-colored highlighters simultaneously. The yellow highlighter marks grammar relationships, the blue one marks meaning connections, the green one tracks pronouns — all at once. Then you combine all the highlights to get a complete understanding.</div>
+  </div>
+
+  <!-- Step 4: Add & Norm + Feed Forward -->
+  <div class="tfm-block">
+    <h3><span class="step-badge" style="background:#34d39933;color:var(--green)">4</span> Add & Norm + Feed-Forward Network</h3>
+    <div class="explain">
+      After multi-head attention, two critical operations happen:
+      <br><br>
+      <strong>Residual Connection (Add):</strong> The attention output is <strong>added</strong> to the original input (skip connection). This lets gradients flow directly through deep networks and means the network can learn "just add a little adjustment" rather than having to reconstruct the entire representation from scratch.
+      <br><br>
+      <strong>Layer Normalization (Norm):</strong> Normalizes the values to have mean≈0, variance≈1. Stabilizes training and speeds convergence.
+      <br><br>
+      <strong>Feed-Forward Network (FFN):</strong> A simple 2-layer MLP applied to each position independently. This is where the actual "thinking" happens — transforming the attention output into richer features. It typically expands the dimension (e.g., 512→2048), applies ReLU/GELU, then projects back down (2048→512).
+    </div>
+    <div class="tfm-formula">output = LayerNorm(x + MultiHeadAttention(x))<br>output = LayerNorm(output + FFN(output))<br><br>FFN(x) = GELU(x · W₁ + b₁) · W₂ + b₂</div>
+    <div class="tfm-analogy">💡 <strong>Analogy:</strong> The residual connection is like taking notes AND keeping the original textbook. If the notes are bad, you still have the original. The FFN is like thinking deeply about what you just read — attention gathered the relevant info, now FFN processes it.</div>
+  </div>
+
+  <!-- Step 5: Encoder vs Decoder -->
+  <div class="tfm-block">
+    <h3><span class="step-badge" style="background:#f472b633;color:var(--pink)">5</span> Encoder vs. Decoder — Two Halves, Different Jobs</h3>
+    <div class="explain">
+      <strong>Encoder</strong> (e.g., BERT): Processes the full input with <strong>bidirectional</strong> self-attention — every token can see every other token. Used for understanding tasks (classification, NER, sentiment).
+      <br><br>
+      <strong>Decoder</strong> (e.g., GPT, Claude): Uses <strong>masked/causal</strong> self-attention — each token can only see tokens <strong>before</strong> it (not future tokens). This is essential for generation: when predicting the next word, you can't peek at words that haven't been generated yet. Additionally, in the original Transformer, the Decoder has <strong>cross-attention</strong> — it attends to the Encoder's output, bridging the understanding→generation gap.
+    </div>
+    <canvas id="cvTfmEncDec" width="700" height="260"></canvas>
+    <div class="tfm-cols">
+      <div class="tfm-mini">
+        <h4 style="color:var(--green)">Encoder-Only (BERT)</h4>
+        <p><strong>Sees:</strong> all tokens at once (bidirectional).<br>
+        <strong>Good at:</strong> understanding — classification, search, NER, Q&A extraction.<br>
+        <strong>Limitation:</strong> can't generate text autoregressively.</p>
+      </div>
+      <div class="tfm-mini">
+        <h4 style="color:var(--pink)">Decoder-Only (GPT, Claude)</h4>
+        <p><strong>Sees:</strong> only past tokens (causal mask).<br>
+        <strong>Good at:</strong> generation — writing, code, chat, reasoning.<br>
+        <strong>Insight:</strong> turns out, with enough scale, decoders become great at understanding too!</p>
+      </div>
+    </div>
+    <div class="tfm-analogy">💡 <strong>Analogy:</strong> Encoder = reading an entire exam question before answering (sees everything). Decoder = writing an essay word by word — you can look back at what you've written but can't peek ahead.</div>
+  </div>
+
+  <!-- Step 6: Why Transformers Won -->
+  <div class="tfm-block">
+    <h3><span class="step-badge" style="background:#818cf833;color:var(--accent)">6</span> Why Transformers Won — The 4 Killer Advantages</h3>
+    <div class="explain" style="font-size:.9rem">
+      <strong>1. Parallelism:</strong> RNNs must process step 1 before step 2 before step 3... Transformers process ALL steps at once. A sentence with 1000 tokens? All computed in parallel. This makes them <strong>dramatically faster</strong> to train on GPUs/TPUs.
+      <br><br>
+      <strong>2. Long-Range Attention:</strong> In an RNN, information from step 1 must survive through steps 2, 3, 4... to reach step 100. It degrades with each step (vanishing gradients). In a Transformer, step 1 directly attends to step 100 — just one hop, no degradation.
+      <br><br>
+      <strong>3. Scalability:</strong> Transformers scale beautifully with more data and more parameters. This led to the "scaling laws" that power modern LLMs — GPT-4, Claude, Gemini. RNNs didn't scale this way because sequential processing created bottlenecks.
+      <br><br>
+      <strong>4. Versatility:</strong> Originally designed for text translation, Transformers now dominate <strong>everything</strong>: text (GPT), images (ViT, DALL-E), audio (Whisper), video (Sora), protein folding (AlphaFold), code (Codex), multi-modal (GPT-4o, Claude). No other architecture has shown this cross-domain dominance.
+    </div>
+    <div class="tfm-analogy">💡 <strong>The key insight:</strong> Transformers traded computational cost (attention is O(n²)) for extreme parallelism and direct long-range connections. For modern hardware (GPUs love parallel math), this was the perfect trade-off.</div>
+  </div>
+
+  <!-- Evolution Timeline -->
+  <div class="tfm-block">
+    <h3><span class="step-badge" style="background:#f472b633;color:var(--pink)">📅</span> The Transformer Family Tree</h3>
+    <div class="explain">From one 2017 paper to powering the entire AI revolution:</div>
+    <div class="tfm-timeline">
+      <div class="tfm-era"><div class="yr">June 2017</div><div class="nm">Transformer</div><div class="tp">Google · Encoder+Decoder</div></div>
+      <div class="tfm-era"><div class="yr">Oct 2018</div><div class="nm">BERT</div><div class="tp">Google · Encoder-only</div></div>
+      <div class="tfm-era"><div class="yr">Jun 2018→</div><div class="nm">GPT 1→2→3→4</div><div class="tp">OpenAI · Decoder-only</div></div>
+      <div class="tfm-era"><div class="yr">2019</div><div class="nm">T5</div><div class="tp">Google · Encoder+Decoder</div></div>
+      <div class="tfm-era"><div class="yr">2020</div><div class="nm">ViT</div><div class="tp">Google · Vision Transformer</div></div>
+      <div class="tfm-era"><div class="yr">2022</div><div class="nm">Whisper</div><div class="tp">OpenAI · Audio Transformer</div></div>
+      <div class="tfm-era"><div class="yr">2021→</div><div class="nm">AlphaFold 2</div><div class="tp">DeepMind · Protein Folding</div></div>
+      <div class="tfm-era"><div class="yr">2023→</div><div class="nm">Claude · GPT-4</div><div class="tp">Modern LLMs</div></div>
+      <div class="tfm-era"><div class="yr">2024→</div><div class="nm">Sora · GPT-4o</div><div class="tp">Video + Multi-modal</div></div>
+    </div>
+  </div>
+
+  <!-- Master Mnemonic -->
+  <div class="mnemonic">
+    <h3>Transformer in One Flow</h3>
+    <div class="phrase" style="font-size:1rem;letter-spacing:0">
+      Tokens → Embed + Position → [Self-Attention → Add&Norm → FFN → Add&Norm] × N → Output
+    </div>
+    <div class="breakdown" style="margin-top:10px">
+      <strong>E</strong>mbed words → <strong>P</strong>osition tells order → <strong>A</strong>ttention finds relevance → <strong>N</strong>ormalize → <strong>F</strong>eed-forward thinks → <strong>R</strong>epeat N times → <strong>O</strong>utput prediction<br>
+      <strong style="color:var(--accent2);font-size:1.1rem">Mnemonic: "Every Person Attends, Normalizes, Feeds-forward, Repeats, Outputs" → E·P·A·N·F·R·O</strong>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 9. QUIZ ═══════ -->
+<section class="sec" id="sec-quiz">
+  <h2 class="st">Test Your Understanding</h2>
+  <p class="ss">17 questions covering neural networks and Transformers.</p>
+  <div class="quiz-card" id="qzCard"></div>
+</section>
+
+<footer>Neural Network Visual Quick Reference — Built for learning &amp; retention, March 2026</footer>
+
+<script>
+// ── Tabs ──
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('sec-'+t.dataset.t).classList.add('active');
+    if(t.dataset.t==='viz') setTimeout(drawNet,50);
+    if(t.dataset.t==='activations') setTimeout(drawActivations,50);
+  });
+});
+
+// ── Neural Network Visualizer ──
+const nnC=document.getElementById('nnCanvas'), nx=nnC.getContext('2d');
+const slL=document.getElementById('sliderLayers'), slN=document.getElementById('sliderNeurons');
+const lV=document.getElementById('layerVal'), nV=document.getElementById('neuronVal');
+
+let netLayers=[], netWeights=[], firing=false, fireProgress=0, fireLayer=0;
+
+function buildNet(){
+  const nH=+slL.value, nN=+slN.value;
+  lV.textContent=nH; nV.textContent=nN;
+  netLayers=[3]; // input
+  for(let i=0;i<nH;i++) netLayers.push(nN);
+  netLayers.push(2); // output
+
+  netWeights=[];
+  for(let l=0;l<netLayers.length-1;l++){
+    const w=[];
+    for(let i=0;i<netLayers[l];i++){
+      const row=[];
+      for(let j=0;j<netLayers[l+1];j++) row.push((Math.random()-.5)*2);
+      w.push(row);
+    }
+    netWeights.push(w);
+  }
+  fireLayer=-1; firing=false;
+  drawNet();
+}
+
+function neuronPos(layer, idx){
+  const W=nnC.width, H=nnC.height;
+  const nLayers=netLayers.length;
+  const xGap=W/(nLayers+1);
+  const x=xGap*(layer+1);
+  const nCount=netLayers[layer];
+  const yGap=H/(nCount+1);
+  const y=yGap*(idx+1);
+  return {x,y};
+}
+
+function drawNet(){
+  const W=nnC.width, H=nnC.height;
+  nx.clearRect(0,0,W,H);
+
+  // Connections
+  for(let l=0;l<netLayers.length-1;l++){
+    for(let i=0;i<netLayers[l];i++){
+      for(let j=0;j<netLayers[l+1];j++){
+        const a=neuronPos(l,i), b=neuronPos(l+1,j);
+        const w=netWeights[l][i][j];
+        const bright=firing&&l<fireLayer?1:firing&&l===fireLayer?fireProgress:0.15;
+        nx.beginPath();
+        nx.moveTo(a.x,a.y); nx.lineTo(b.x,b.y);
+        if(w>0) nx.strokeStyle=`rgba(96,165,250,${Math.abs(w)*bright*.5+.05})`;
+        else nx.strokeStyle=`rgba(248,113,113,${Math.abs(w)*bright*.5+.05})`;
+        nx.lineWidth=Math.abs(w)*1.5+.5;
+        nx.stroke();
+      }
+    }
+  }
+
+  // Neurons
+  const labels=['Input','','','','','','Output'];
+  const colors=['#60a5fa','#818cf8','#c084fc','#f472b6','#fbbf24','#34d399','#f87171'];
+  for(let l=0;l<netLayers.length;l++){
+    for(let i=0;i<netLayers[l];i++){
+      const p=neuronPos(l,i);
+      const lit=firing&&l<=fireLayer?1:0;
+      const ci=l===netLayers.length-1?6:l%6;
+      nx.beginPath();
+      nx.arc(p.x,p.y,14+lit*4,0,Math.PI*2);
+      nx.fillStyle=lit? colors[ci]+'cc' : colors[ci]+'33';
+      nx.fill();
+      nx.strokeStyle=colors[ci];
+      nx.lineWidth=2;
+      nx.stroke();
+      if(lit){
+        nx.beginPath();nx.arc(p.x,p.y,20,0,Math.PI*2);
+        nx.fillStyle=colors[ci]+'15';nx.fill();
+      }
+    }
+    // Labels — top label + count annotation
+    const pTop=neuronPos(l,0);
+    nx.textAlign='center';
+    if(l===0){
+      nx.fillStyle='#60a5fa';nx.font='bold 11px system-ui';
+      nx.fillText('Input Layer',pTop.x,24);
+      nx.fillStyle='#7b80a0';nx.font='10px system-ui';
+      nx.fillText('(3 features = 3 neurons)',pTop.x,38);
+      nx.fillText('Fixed by your data',pTop.x,50);
+    } else if(l===netLayers.length-1){
+      nx.fillStyle='#f87171';nx.font='bold 11px system-ui';
+      nx.fillText('Output Layer',pTop.x,24);
+      nx.fillStyle='#7b80a0';nx.font='10px system-ui';
+      nx.fillText('(2 classes = 2 neurons)',pTop.x,38);
+      nx.fillText('Fixed by your problem',pTop.x,50);
+    } else if(l===1){
+      nx.fillStyle='#c084fc';nx.font='bold 11px system-ui';
+      nx.fillText('Hidden Layers',pTop.x,24);
+      nx.fillStyle='#7b80a0';nx.font='10px system-ui';
+      nx.fillText('('+netLayers[l]+' neurons — your choice!)',pTop.x,38);
+      nx.fillText('Tune this slider ↓',pTop.x,50);
+    }
+  }
+}
+
+function fireNetwork(){
+  if(firing) return;
+  firing=true; fireLayer=0; fireProgress=0;
+  const anim=()=>{
+    fireProgress+=0.04;
+    if(fireProgress>=1){
+      fireProgress=1; drawNet();
+      fireLayer++;
+      if(fireLayer>=netLayers.length){
+        firing=false;
+        return;
+      }
+      fireProgress=0;
+    }
+    drawNet();
+    requestAnimationFrame(anim);
+  };
+  requestAnimationFrame(anim);
+}
+
+function resetViz(){
+  firing=false; fireLayer=-1; buildNet();
+}
+
+slL.addEventListener('input', buildNet);
+slN.addEventListener('input', buildNet);
+buildNet();
+
+// ── Activation Function Graphs ──
+function drawActivations(){
+  document.querySelectorAll('.actCanvas').forEach(c=>{
+    const fn=c.dataset.fn, ctx=c.getContext('2d');
+    const W=c.width, H=c.height;
+    ctx.clearRect(0,0,W,H);
+
+    // Axes
+    ctx.strokeStyle='#2e3347';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(0,H/2);ctx.lineTo(W,H/2);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(W/2,0);ctx.lineTo(W/2,H);ctx.stroke();
+
+    // Function
+    ctx.beginPath();ctx.strokeStyle='#818cf8';ctx.lineWidth=2.5;
+    for(let px=0;px<W;px++){
+      const x=(px-W/2)/(W/8);
+      let y;
+      switch(fn){
+        case 'relu': y=Math.max(0,x);break;
+        case 'sigmoid': y=1/(1+Math.exp(-x));break;
+        case 'tanh': y=Math.tanh(x);break;
+        case 'softmax': y=1/(1+Math.exp(-x));break; // show sigmoid-like for single
+        case 'leaky': y=x>0?x:0.01*x;break;
+        case 'gelu': y=0.5*x*(1+Math.tanh(Math.sqrt(2/Math.PI)*(x+0.044715*x*x*x)));break;
+      }
+      const py=H/2-y*(H/4);
+      px===0?ctx.moveTo(px,py):ctx.lineTo(px,py);
+    }
+    ctx.stroke();
+  });
+}
+setTimeout(drawActivations,200);
+
+// ── Quiz ──
+const qs=[
+  {q:"What does a weight in a neural network control?",opts:["The speed of training","The importance/strength of a connection between neurons","The number of layers","The activation function type"],c:1,e:"Weights determine how much influence one neuron's output has on the next neuron's input. They're the primary learnable parameters."},
+  {q:"Why do we need activation functions?",opts:["To speed up computation","To add non-linearity so the network can learn complex patterns","To reduce the number of parameters","To normalize outputs"],c:1,e:"Without activation functions, stacking layers would only produce linear transformations. Non-linearity lets networks learn curves, boundaries, and complex patterns."},
+  {q:"What is backpropagation?",opts:["Sending data forward through the network","A type of neural network architecture","Computing gradients of the loss w.r.t. each weight by working backward","Removing dead neurons"],c:2,e:"Backprop uses the chain rule of calculus to compute how much each weight contributed to the error, working backward from output to input."},
+  {q:"Which activation function is the default choice for hidden layers?",opts:["Sigmoid","Softmax","Tanh","ReLU"],c:3,e:"ReLU (Rectified Linear Unit) is the default for hidden layers — it's fast to compute, doesn't saturate for positive values, and helps fight vanishing gradients."},
+  {q:"A CNN is best suited for:",opts:["Tabular data like spreadsheets","Sequential text data","Image and spatial data","Graph-structured data"],c:2,e:"CNNs use convolutional filters that slide across spatial data to detect local patterns like edges, textures, and shapes — perfect for images."},
+  {q:"What does the learning rate control?",opts:["How many neurons to use","How fast weights are updated during training","The depth of the network","The batch size"],c:1,e:"The learning rate is the step size for weight updates. Too high and training diverges; too low and it takes forever or gets stuck in local minima."},
+  {q:"Overfitting means the model:",opts:["Can't learn any pattern","Memorizes training data but fails on new data","Trains too slowly","Uses too many layers"],c:1,e:"An overfit model has essentially 'memorized' the training examples rather than learning general patterns, so it performs poorly on unseen data."},
+  {q:"Which architecture powers GPT, BERT, and Claude?",opts:["CNN","RNN","Transformer","GAN"],c:2,e:"Transformers use self-attention to process all tokens simultaneously, enabling massive parallelization and capturing long-range dependencies — the foundation of all modern LLMs."},
+  {q:"What is the 'bias' in a neuron?",opts:["A prejudice in the training data","An offset added to the weighted sum before activation","The initial weight value","A type of loss function"],c:1,e:"Bias is a constant added to the weighted sum (z = Wx + b). It shifts the activation function, allowing the neuron to activate even when all inputs are zero."},
+  {q:"Vanishing gradient problem is solved by:",opts:["Using more Sigmoid activations","Adding more data","Using ReLU, batch normalization, or residual connections","Reducing learning rate"],c:2,e:"ReLU doesn't saturate for positive values, batch norm stabilizes distributions, and residual connections (skip connections) provide gradient highways through deep networks."},
+  {q:"Softmax activation is used when:",opts:["You have a binary yes/no classification","You want to output a probability distribution over multiple classes","You need negative outputs","You want the fastest training"],c:1,e:"Softmax converts a vector of raw scores into probabilities that sum to 1, making it ideal for multi-class classification where you need to pick one of N classes."},
+  {q:"One complete pass through the entire training dataset is called:",opts:["A batch","An iteration","An epoch","A cycle"],c:2,e:"An epoch = one full pass through all training samples. Training typically requires many epochs. Within each epoch, the data is split into batches for practical computation."},
+  {q:"In a Transformer, what are Q, K, and V?",opts:["Quality, Knowledge, Velocity","Queue, Key, Value from databases","Query, Key, Value — projections of each token for computing attention","Quantized, Keyed, Validated weights"],c:2,e:"Each token is projected into Query (what am I looking for?), Key (what do I contain?), and Value (what info do I carry?). The dot product of Q and K gives attention scores, which weight the Values."},
+  {q:"Why do Transformers need Positional Encoding?",opts:["To speed up training","Because they process all tokens in parallel and have no built-in sense of order","To reduce memory usage","To connect the encoder and decoder"],c:1,e:"Unlike RNNs which process sequentially (and thus know order inherently), Transformers see all tokens simultaneously. Without positional encoding, 'cat sat on mat' and 'mat on sat cat' would look identical."},
+  {q:"The main advantage of Transformers over RNNs is:",opts:["They use less memory","They can process all tokens in parallel and capture long-range dependencies","They are smaller in size","They don't need training data"],c:1,e:"RNNs must process tokens sequentially (slow, can't parallelize) and struggle with long-range dependencies (vanishing gradients). Transformers process all tokens at once and directly attend to any distance."},
+  {q:"Multi-Head Attention exists because:",opts:["More heads = faster training","Each head learns a different type of relationship (grammar, meaning, references, etc.)","It reduces the model size","It replaces the feed-forward network"],c:1,e:"A single attention head can only capture one type of relationship. Multiple heads run in parallel, each learning different aspects — syntax, semantics, position, co-reference — then combine for complete understanding."},
+  {q:"GPT and Claude use which Transformer variant?",opts:["Encoder-only","Encoder+Decoder","Decoder-only","None — they don't use Transformers"],c:2,e:"GPT, Claude, and most modern LLMs use decoder-only Transformers with causal masking. Each token can only attend to previous tokens, making them natural text generators. BERT uses encoder-only (bidirectional)."},
+];
+
+let qi=0,sc=0;
+const qzC=document.getElementById('qzCard');
+
+function renderQ(){
+  if(qi>=qs.length){
+    const p=Math.round(sc/qs.length*100);
+    qzC.innerHTML=`<div class="quiz-score"><h3>Quiz Complete!</h3><div class="big">${sc}/${qs.length}</div><p style="color:var(--dim)">${p>=80?'Outstanding! You have a solid grasp of neural networks.':p>=50?'Good foundation! Revisit the sections above to fill gaps.':'Keep going! Browse each tab and retry.'}</p><button onclick="qi=0;sc=0;renderQ()">Retry</button></div>`;
+    return;
+  }
+  const q=qs[qi];
+  qzC.innerHTML=`<div class="quiz-prog">Question ${qi+1}/${qs.length} · Score: ${sc}</div><div class="quiz-q">${q.q}</div><div class="quiz-opts">${q.opts.map((o,i)=>`<div class="qopt" data-i="${i}">${o}</div>`).join('')}</div><div class="quiz-exp" id="qExp">${q.e}</div><button class="quiz-nxt" id="qNxt" onclick="qi++;renderQ()">Next →</button>`;
+  qzC.querySelectorAll('.qopt').forEach(o=>{
+    o.addEventListener('click',()=>{
+      qzC.querySelectorAll('.qopt').forEach(x=>{x.classList.add('off');if(+x.dataset.i===q.c)x.classList.add('correct')});
+      if(+o.dataset.i!==q.c)o.classList.add('wrong'); else sc++;
+      document.getElementById('qExp').style.display='block';
+      document.getElementById('qNxt').style.display='inline-block';
+    });
+  });
+}
+renderQ();
+
+// ── Architecture Deep Dive ──
+document.querySelectorAll('.arch-tab').forEach(t=>{
+  t.addEventListener('click',()=>{
+    document.querySelectorAll('.arch-tab').forEach(b=>b.classList.remove('on'));
+    document.querySelectorAll('.arch-panel').forEach(p=>p.classList.remove('on'));
+    t.classList.add('on');
+    document.getElementById('arch-'+t.dataset.arch).classList.add('on');
+    setTimeout(()=>{
+      if(t.dataset.arch==='fnn') drawFNN();
+      if(t.dataset.arch==='cnn') drawCNN();
+      if(t.dataset.arch==='rnn') drawRNN();
+      if(t.dataset.arch==='gan') drawGAN();
+      if(t.dataset.arch==='tfm') drawTfmArch();
+    },50);
+  });
+});
+
+// Draw all arch canvases when tab opens
+const origTabClick=document.querySelector('.tab[data-t="arch"]');
+if(origTabClick){
+  origTabClick.addEventListener('click',()=>setTimeout(()=>{drawFNN();drawCNN();drawRNN();drawGAN();drawTfmArch();},100));
+}
+
+// Draw Transformer deep-dive canvases when that tab opens
+const tfmTabBtn=document.querySelector('.tab[data-t="transformer"]');
+if(tfmTabBtn){
+  tfmTabBtn.addEventListener('click',()=>setTimeout(drawAllTfmCanvases,100));
+}
+
+function drawFNN(){
+  const c=document.getElementById('cvFnn'); if(!c) return;
+  const x=c.getContext('2d'),W=c.width,H=c.height;
+  x.clearRect(0,0,W,H);
+  const layers=[3,5,4,2];
+  const cols=['#60a5fa','#818cf8','#c084fc','#f472b6'];
+  const labels=['Input','Hidden 1','Hidden 2','Output'];
+
+  function pos(l,i){const gx=W/(layers.length+1);const gy=H/(layers[l]+1);return{x:gx*(l+1),y:gy*(i+1)};}
+
+  // connections
+  for(let l=0;l<layers.length-1;l++){
+    for(let i=0;i<layers[l];i++){
+      for(let j=0;j<layers[l+1];j++){
+        const a=pos(l,i),b=pos(l+1,j);
+        x.beginPath();x.moveTo(a.x,a.y);x.lineTo(b.x,b.y);
+        x.strokeStyle='rgba(129,140,248,0.12)';x.lineWidth=1;x.stroke();
+      }
+    }
+  }
+  // arrows on connections (show direction)
+  for(let l=0;l<layers.length-1;l++){
+    const a=pos(l,Math.floor(layers[l]/2)),b=pos(l+1,Math.floor(layers[l+1]/2));
+    const mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
+    x.fillStyle='#818cf8';x.font='16px system-ui';x.textAlign='center';
+    x.fillText('→',mx,my);
+  }
+  // neurons
+  for(let l=0;l<layers.length;l++){
+    for(let i=0;i<layers[l];i++){
+      const p=pos(l,i);
+      x.beginPath();x.arc(p.x,p.y,12,0,Math.PI*2);
+      x.fillStyle=cols[l]+'44';x.fill();
+      x.strokeStyle=cols[l];x.lineWidth=2;x.stroke();
+    }
+    x.fillStyle=cols[l];x.font='bold 10px system-ui';x.textAlign='center';
+    x.fillText(labels[l],pos(l,0).x,22);
+  }
+  // big label
+  x.fillStyle='#7b80a0';x.font='11px system-ui';x.textAlign='center';
+  x.fillText('Every neuron connects to every neuron in next layer →',W/2,H-12);
+  x.fillText('DATA FLOWS ONE DIRECTION ONLY',W/2,H-28);
+}
+
+function drawCNN(){
+  const c=document.getElementById('cvCnn'); if(!c) return;
+  const x=c.getContext('2d'),W=c.width,H=c.height;
+  x.clearRect(0,0,W,H);
+
+  // Draw image grid
+  const gs=8,gx=20,gy=60;
+  for(let r=0;r<gs;r++){for(let cl=0;cl<gs;cl++){
+    x.fillStyle=`hsl(${(r*cl*5)%360},40%,${30+Math.random()*20}%)`;
+    x.fillRect(gx+cl*14,gy+r*14,12,12);
+  }}
+  x.strokeStyle='#60a5fa';x.lineWidth=1.5;x.strokeRect(gx,gy,gs*14,gs*14);
+  x.fillStyle='#60a5fa';x.font='bold 10px system-ui';x.textAlign='center';
+  x.fillText('Input Image',gx+gs*7,gy-8);
+
+  // Filter/kernel
+  const fx=gx+gs*14+24, fy=gy+20;
+  x.strokeStyle='#fbbf24';x.lineWidth=2;
+  x.strokeRect(fx,fy,36,36);
+  for(let r=0;r<3;r++){for(let cl=0;cl<3;cl++){
+    x.fillStyle='rgba(251,191,36,0.2)';x.fillRect(fx+cl*12,fy+r*12,11,11);
+    x.fillStyle='#fbbf24';x.font='9px monospace';x.textAlign='center';
+    x.fillText(['1','0','-1','0','1','0','-1','0','1'][r*3+cl],fx+cl*12+5.5,fy+r*12+8);
+  }}
+  x.fillStyle='#fbbf24';x.font='bold 10px system-ui';
+  x.fillText('3×3 Filter',fx+18,fy-8);
+
+  // Arrow
+  x.fillStyle='#7b80a0';x.font='18px system-ui';x.textAlign='center';
+  x.fillText('→',fx+52,fy+18);
+
+  // Feature map
+  const mx=fx+70,my=gy+10;
+  for(let r=0;r<6;r++){for(let cl=0;cl<6;cl++){
+    const v=Math.random();
+    x.fillStyle=`rgba(52,211,153,${v*0.6+0.1})`;
+    x.fillRect(mx+cl*12,my+r*12,11,11);
+  }}
+  x.strokeStyle='#34d399';x.lineWidth=1.5;x.strokeRect(mx,my,72,72);
+  x.fillStyle='#34d399';x.font='bold 10px system-ui';
+  x.fillText('Feature Map',mx+36,my-8);
+
+  // Arrow to pooling
+  x.fillStyle='#7b80a0';x.font='18px system-ui';
+  x.fillText('→',mx+86,my+36);
+
+  // Pooling
+  const px=mx+100,py=my+12;
+  for(let r=0;r<3;r++){for(let cl=0;cl<3;cl++){
+    x.fillStyle=`rgba(244,114,182,${Math.random()*0.5+0.2})`;
+    x.fillRect(px+cl*16,py+r*16,14,14);
+  }}
+  x.strokeStyle='#f472b6';x.lineWidth=1.5;x.strokeRect(px,py,48,48);
+  x.fillStyle='#f472b6';x.font='bold 10px system-ui';
+  x.fillText('Pooled',px+24,py-8);
+
+  // Highlight the sliding filter on image
+  x.strokeStyle='#fbbf24';x.lineWidth=2;x.setLineDash([4,3]);
+  x.strokeRect(gx+14,gy+14,14*3,14*3);
+  x.setLineDash([]);
+
+  // Bottom labels
+  x.fillStyle='#7b80a0';x.font='11px system-ui';x.textAlign='center';
+  x.fillText('Filter SLIDES across image → only sees local patches (not everything)',W/2,H-28);
+  x.fillText('SAME filter reused everywhere = weight sharing',W/2,H-12);
+}
+
+function drawRNN(){
+  const c=document.getElementById('cvRnn'); if(!c) return;
+  const x=c.getContext('2d'),W=c.width,H=c.height;
+  x.clearRect(0,0,W,H);
+
+  const steps=4, cw=60, ch=50, gap=75, startX=30, cy=140;
+
+  for(let s=0;s<steps;s++){
+    const cx1=startX+s*(cw+gap), cy1=cy;
+
+    // Input arrow
+    x.beginPath();x.moveTo(cx1+cw/2,cy1+ch+30);x.lineTo(cx1+cw/2,cy1+ch);
+    x.strokeStyle='#60a5fa';x.lineWidth=2;x.stroke();
+    x.fillStyle='#60a5fa';x.beginPath();x.moveTo(cx1+cw/2-4,cy1+ch);x.lineTo(cx1+cw/2+4,cy1+ch);x.lineTo(cx1+cw/2,cy1+ch-6);x.fill();
+
+    // Input label
+    x.fillStyle='#60a5fa';x.font='bold 10px system-ui';x.textAlign='center';
+    x.fillText('x'+(s+1),cx1+cw/2,cy1+ch+44);
+    const words=['The','cat','sat','down'];
+    x.fillStyle='#7b80a0';x.font='9px system-ui';
+    x.fillText('"'+words[s]+'"',cx1+cw/2,cy1+ch+56);
+
+    // RNN Cell
+    x.fillStyle='rgba(129,140,248,0.15)';
+    x.fillRect(cx1,cy1,cw,ch);
+    x.strokeStyle='#818cf8';x.lineWidth=2;
+    x.strokeRect(cx1,cy1,cw,ch);
+    x.fillStyle='#818cf8';x.font='bold 11px system-ui';x.textAlign='center';
+    x.fillText('RNN',cx1+cw/2,cy1+ch/2+4);
+
+    // Output arrow up
+    x.beginPath();x.moveTo(cx1+cw/2,cy1);x.lineTo(cx1+cw/2,cy1-30);
+    x.strokeStyle='#34d399';x.lineWidth=2;x.stroke();
+    x.fillStyle='#34d399';x.beginPath();x.moveTo(cx1+cw/2-4,cy1-30);x.lineTo(cx1+cw/2+4,cy1-30);x.lineTo(cx1+cw/2,cy1-36);x.fill();
+    x.fillStyle='#34d399';x.font='bold 10px system-ui';
+    x.fillText('y'+(s+1),cx1+cw/2,cy1-42);
+
+    // Hidden state arrow to next (the key loop!)
+    if(s<steps-1){
+      const nx1=startX+(s+1)*(cw+gap);
+      x.beginPath();x.moveTo(cx1+cw,cy1+ch/2);x.lineTo(nx1,cy1+ch/2);
+      x.strokeStyle='#f472b6';x.lineWidth=2.5;x.stroke();
+      // arrow head
+      x.fillStyle='#f472b6';x.beginPath();
+      x.moveTo(nx1,cy1+ch/2-5);x.lineTo(nx1,cy1+ch/2+5);x.lineTo(nx1+7,cy1+ch/2);x.fill();
+      // label
+      x.fillStyle='#f472b6';x.font='bold 10px system-ui';
+      x.fillText('h'+(s+1),(cx1+cw+nx1)/2,cy1+ch/2-8);
+    }
+  }
+
+  // The loop annotation
+  x.fillStyle='#f472b6';x.font='bold 12px system-ui';x.textAlign='center';
+  x.fillText('← Hidden State passes memory forward →',W/2,cy+ch+80);
+
+  x.fillStyle='#7b80a0';x.font='11px system-ui';
+  x.fillText('SAME weights reused at every step — the cell "unrolls" over time',W/2,H-12);
+  x.fillText('Key difference: h (hidden state) carries info from past steps',W/2,H-28);
+}
+
+function drawGAN(){
+  const c=document.getElementById('cvGan'); if(!c) return;
+  const x=c.getContext('2d'),W=c.width,H=c.height;
+  x.clearRect(0,0,W,H);
+
+  // Random noise
+  const nw=60,nh=50,nx1=20,ny=120;
+  x.fillStyle='rgba(129,140,248,0.15)';x.fillRect(nx1,ny,nw,nh);
+  x.strokeStyle='#818cf8';x.lineWidth=1.5;x.strokeRect(nx1,ny,nw,nh);
+  x.fillStyle='#818cf8';x.font='bold 9px system-ui';x.textAlign='center';
+  x.fillText('Random',nx1+nw/2,ny+nh/2-4);x.fillText('Noise (z)',nx1+nw/2,ny+nh/2+8);
+
+  // Arrow to Generator
+  x.strokeStyle='#7b80a0';x.lineWidth=1.5;
+  x.beginPath();x.moveTo(nx1+nw,ny+nh/2);x.lineTo(nx1+nw+15,ny+nh/2);x.stroke();
+  x.fillStyle='#7b80a0';x.beginPath();x.moveTo(nx1+nw+15,ny+nh/2-4);x.lineTo(nx1+nw+15,ny+nh/2+4);x.lineTo(nx1+nw+20,ny+nh/2);x.fill();
+
+  // Generator
+  const gw=80,gh=60,gxp=nx1+nw+22,gyp=ny-5;
+  x.fillStyle='rgba(251,191,36,0.12)';
+  const gr=x.createLinearGradient(gxp,gyp,gxp+gw,gyp+gh);
+  gr.addColorStop(0,'rgba(251,191,36,0.2)');gr.addColorStop(1,'rgba(251,191,36,0.05)');
+  x.fillStyle=gr;x.fillRect(gxp,gyp,gw,gh);
+  x.strokeStyle='#fbbf24';x.lineWidth=2;x.strokeRect(gxp,gyp,gw,gh);
+  x.fillStyle='#fbbf24';x.font='bold 11px system-ui';x.textAlign='center';
+  x.fillText('Generator',gxp+gw/2,gyp+gh/2-4);
+  x.font='9px system-ui';x.fillText('(creates fakes)',gxp+gw/2,gyp+gh/2+10);
+
+  // Arrow from Generator — fake image
+  const fakeX=gxp+gw+15, fakeY=ny;
+  x.strokeStyle='#fbbf24';x.lineWidth=1.5;
+  x.beginPath();x.moveTo(gxp+gw,gyp+gh/2);x.lineTo(fakeX,gyp+gh/2);x.stroke();
+
+  // Fake image placeholder
+  x.fillStyle='rgba(251,191,36,0.1)';x.fillRect(fakeX,fakeY,40,50);
+  x.strokeStyle='#fbbf24';x.lineWidth=1;x.strokeRect(fakeX,fakeY,40,50);
+  for(let i=0;i<4;i++){for(let j=0;j<5;j++){
+    x.fillStyle=`rgba(251,191,36,${Math.random()*0.4+0.1})`;x.fillRect(fakeX+i*10,fakeY+j*10,9,9);
+  }}
+  x.fillStyle='#fbbf24';x.font='bold 9px system-ui';x.fillText('Fake',fakeX+20,fakeY-6);
+
+  // Arrow to Discriminator
+  const dx1=fakeX+55;
+  x.strokeStyle='#fbbf24';x.lineWidth=1.5;x.setLineDash([]);
+  x.beginPath();x.moveTo(fakeX+40,fakeY+25);x.lineTo(dx1,fakeY+25);x.stroke();
+
+  // Discriminator
+  const dw=80,dh=60,dxp=dx1+5,dyp=ny-5;
+  x.fillStyle='rgba(248,113,113,0.1)';x.fillRect(dxp,dyp,dw,dh);
+  x.strokeStyle='#f87171';x.lineWidth=2;x.strokeRect(dxp,dyp,dw,dh);
+  x.fillStyle='#f87171';x.font='bold 11px system-ui';x.textAlign='center';
+  x.fillText('Discriminator',dxp+dw/2,dyp+dh/2-4);
+  x.font='9px system-ui';x.fillText('(spots fakes)',dxp+dw/2,dyp+dh/2+10);
+
+  // Real data input from below
+  const realX=dxp+dw/2,realY=dyp+dh+20;
+  x.fillStyle='rgba(52,211,153,0.1)';x.fillRect(realX-20,realY,40,40);
+  x.strokeStyle='#34d399';x.lineWidth=1;x.strokeRect(realX-20,realY,40,40);
+  for(let i=0;i<4;i++){for(let j=0;j<4;j++){
+    x.fillStyle=`rgba(52,211,153,${Math.random()*0.4+0.2})`;x.fillRect(realX-20+i*10,realY+j*10,9,9);
+  }}
+  x.fillStyle='#34d399';x.font='bold 9px system-ui';x.textAlign='center';
+  x.fillText('Real',realX,realY-6);
+
+  x.strokeStyle='#34d399';x.lineWidth=1.5;
+  x.beginPath();x.moveTo(realX,realY);x.lineTo(realX,dyp+dh);x.stroke();
+  x.fillStyle='#34d399';x.beginPath();x.moveTo(realX-4,dyp+dh);x.lineTo(realX+4,dyp+dh);x.lineTo(realX,dyp+dh-6);x.fill();
+
+  // Output from Discriminator
+  const outX=dxp+dw+10;
+  x.strokeStyle='#f87171';x.lineWidth=1.5;
+  x.beginPath();x.moveTo(dxp+dw,dyp+dh/2);x.lineTo(outX+10,dyp+dh/2);x.stroke();
+  x.fillStyle='#f87171';x.font='bold 10px system-ui';x.textAlign='left';
+  x.fillText('Real?',outX+14,dyp+dh/2-6);
+  x.fillText('or Fake?',outX+14,dyp+dh/2+8);
+
+  // Feedback loop (backprop to G)
+  x.setLineDash([5,4]);x.strokeStyle='#c084fc';x.lineWidth=1.5;
+  x.beginPath();
+  x.moveTo(dxp+dw/2,dyp);x.lineTo(dxp+dw/2,dyp-30);x.lineTo(gxp+gw/2,dyp-30);x.lineTo(gxp+gw/2,gyp);
+  x.stroke();x.setLineDash([]);
+  x.fillStyle='#c084fc';x.font='bold 9px system-ui';x.textAlign='center';
+  x.fillText('Feedback: "You got caught" → G improves',(gxp+gw/2+dxp+dw/2)/2,dyp-35);
+
+  // Bottom labels
+  x.fillStyle='#7b80a0';x.font='11px system-ui';x.textAlign='center';
+  x.fillText('TWO networks competing — G never sees real data, only learns from D\'s feedback',W/2,H-12);
+}
+
+// ── Transformer (Architecture Deep Dive panel) ──
+function drawTfmArch(){
+  const c=document.getElementById('cvTfm'); if(!c) return;
+  const x=c.getContext('2d'),W=c.width,H=c.height;
+  x.clearRect(0,0,W,H);
+
+  const tokens=['The','cat','sat','on','mat'];
+  const tw=56,th=28,gap=8,startX=(W-tokens.length*(tw+gap))/2,startY=H-50;
+
+  // Input tokens
+  tokens.forEach((t,i)=>{
+    const tx=startX+i*(tw+gap);
+    x.fillStyle='rgba(96,165,250,0.15)';x.fillRect(tx,startY,tw,th);
+    x.strokeStyle='#60a5fa';x.lineWidth=1;x.strokeRect(tx,startY,tw,th);
+    x.fillStyle='#60a5fa';x.font='bold 10px system-ui';x.textAlign='center';
+    x.fillText(t,tx+tw/2,startY+th/2+3);
+  });
+  x.fillStyle='#7b80a0';x.font='9px system-ui';x.textAlign='center';
+  x.fillText('Input Tokens',W/2,startY+th+14);
+
+  // Attention lines (all-to-all)
+  const attnY=startY-70;
+  tokens.forEach((_,i)=>{
+    tokens.forEach((_,j)=>{
+      const x1=startX+i*(tw+gap)+tw/2, x2=startX+j*(tw+gap)+tw/2;
+      const alpha=i===j?0.5:(Math.abs(i-j)<=1?0.25:0.08);
+      x.beginPath();x.moveTo(x1,startY);x.quadraticCurveTo((x1+x2)/2,attnY-Math.abs(i-j)*12,x2,startY);
+      x.strokeStyle=`rgba(251,191,36,${alpha})`;x.lineWidth=i===j?2:1;x.stroke();
+    });
+  });
+
+  // Attention label
+  x.fillStyle='#fbbf24';x.font='bold 11px system-ui';x.textAlign='center';
+  x.fillText('Self-Attention: Every token attends to every other token',W/2,attnY-30);
+
+  // Encoder/Decoder blocks
+  const bw=100,bh=50;
+  // Encoder
+  x.fillStyle='rgba(52,211,153,0.1)';x.fillRect(40,30,bw,bh);
+  x.strokeStyle='#34d399';x.lineWidth=2;x.strokeRect(40,30,bw,bh);
+  x.fillStyle='#34d399';x.font='bold 11px system-ui';x.textAlign='center';
+  x.fillText('Encoder',90,50);x.font='9px system-ui';x.fillText('(understands)',90,64);
+
+  // Arrow
+  x.fillStyle='#7b80a0';x.font='18px system-ui';x.fillText('→',160,55);
+
+  // Decoder
+  x.fillStyle='rgba(244,114,182,0.1)';x.fillRect(185,30,bw,bh);
+  x.strokeStyle='#f472b6';x.lineWidth=2;x.strokeRect(185,30,bw,bh);
+  x.fillStyle='#f472b6';x.font='bold 11px system-ui';
+  x.fillText('Decoder',235,50);x.font='9px system-ui';x.fillText('(generates)',235,64);
+
+  // Arrow to output
+  x.fillStyle='#7b80a0';x.font='18px system-ui';x.fillText('→',305,55);
+  x.fillStyle='var(--text)';x.font='bold 10px system-ui';
+  x.fillText('Output',340,55);
+
+  // Key difference label
+  x.fillStyle='#818cf8';x.font='bold 10px system-ui';x.textAlign='right';
+  x.fillText('All tokens processed',W-20,30);x.fillText('IN PARALLEL',W-20,44);
+  x.fillText('(not sequentially like RNN)',W-20,58);
+
+  x.fillStyle='#7b80a0';x.font='10px system-ui';x.textAlign='center';
+  x.fillText('No recurrence, no convolution — ATTENTION IS ALL YOU NEED',W/2,H-4);
+}
+
+// ── Transformer Deep Dive Canvases ──
+function drawAllTfmCanvases(){
+  drawTfmBigPicture();
+  drawTfmEmbed();
+  drawTfmAttention();
+  drawTfmMultiHead();
+  drawTfmEncDec();
+}
+
+function drawTfmBigPicture(){
+  const c=document.getElementById('cvTfmBigPicture'); if(!c) return;
+  const x=c.getContext('2d'),W=c.width,H=c.height;
+  x.clearRect(0,0,W,H);
+
+  // Full Transformer architecture diagram
+  const cx=W/2, pad=30;
+
+  // Encoder stack (left)
+  const eX=pad+40, eW=200, eH=240, eY=50;
+  x.fillStyle='rgba(52,211,153,0.06)';x.fillRect(eX,eY,eW,eH);
+  x.strokeStyle='#34d399';x.lineWidth=2;x.setLineDash([]);x.strokeRect(eX,eY,eW,eH);
+  x.fillStyle='#34d399';x.font='bold 13px system-ui';x.textAlign='center';
+  x.fillText('ENCODER',eX+eW/2,eY-8);
+  x.font='9px system-ui';x.fillStyle='#7b80a0';x.fillText('×N layers',eX+eW/2,eY+eH+14);
+
+  // Encoder internals
+  const eBlockY=eY+20, eBlockW=eW-30, eBlockX=eX+15;
+  // Multi-Head Attention
+  x.fillStyle='rgba(251,191,36,0.12)';x.fillRect(eBlockX,eBlockY,eBlockW,45);
+  x.strokeStyle='#fbbf24';x.lineWidth=1.5;x.strokeRect(eBlockX,eBlockY,eBlockW,45);
+  x.fillStyle='#fbbf24';x.font='bold 10px system-ui';x.fillText('Multi-Head Self-Attention',eBlockX+eBlockW/2,eBlockY+20);
+  x.font='9px system-ui';x.fillStyle='#7b80a0';x.fillText('(bidirectional — sees all tokens)',eBlockX+eBlockW/2,eBlockY+34);
+
+  // Add & Norm
+  x.fillStyle='rgba(129,140,248,0.1)';x.fillRect(eBlockX,eBlockY+55,eBlockW,25);
+  x.strokeStyle='#818cf8';x.lineWidth=1;x.strokeRect(eBlockX,eBlockY+55,eBlockW,25);
+  x.fillStyle='#818cf8';x.font='bold 9px system-ui';x.fillText('Add & Layer Norm',eBlockX+eBlockW/2,eBlockY+71);
+
+  // FFN
+  x.fillStyle='rgba(192,132,252,0.1)';x.fillRect(eBlockX,eBlockY+90,eBlockW,45);
+  x.strokeStyle='#c084fc';x.lineWidth=1.5;x.strokeRect(eBlockX,eBlockY+90,eBlockW,45);
+  x.fillStyle='#c084fc';x.font='bold 10px system-ui';x.fillText('Feed-Forward Network',eBlockX+eBlockW/2,eBlockY+108);
+  x.font='9px system-ui';x.fillStyle='#7b80a0';x.fillText('(2-layer MLP, GELU)',eBlockX+eBlockW/2,eBlockY+122);
+
+  // Add & Norm 2
+  x.fillStyle='rgba(129,140,248,0.1)';x.fillRect(eBlockX,eBlockY+145,eBlockW,25);
+  x.strokeStyle='#818cf8';x.lineWidth=1;x.strokeRect(eBlockX,eBlockY+145,eBlockW,25);
+  x.fillStyle='#818cf8';x.font='bold 9px system-ui';x.fillText('Add & Layer Norm',eBlockX+eBlockW/2,eBlockY+161);
+
+  // Residual arrows (skip connections)
+  x.setLineDash([3,3]);x.strokeStyle='#34d39960';x.lineWidth=1;
+  x.beginPath();x.moveTo(eBlockX-8,eBlockY+5);x.lineTo(eBlockX-8,eBlockY+65);x.lineTo(eBlockX,eBlockY+65);x.stroke();
+  x.beginPath();x.moveTo(eBlockX-8,eBlockY+95);x.lineTo(eBlockX-8,eBlockY+155);x.lineTo(eBlockX,eBlockY+155);x.stroke();
+  x.setLineDash([]);
+
+  // Input arrow
+  x.strokeStyle='#60a5fa';x.lineWidth=2;
+  x.beginPath();x.moveTo(eX+eW/2,eY+eH+2);x.lineTo(eX+eW/2,eY+eH+30);x.stroke();
+  x.fillStyle='#60a5fa';x.font='bold 10px system-ui';x.fillText('Input Embedding + Positional Encoding',eX+eW/2,eY+eH+42);
+
+  // Decoder stack (right)
+  const dX=W-pad-240, dW=200, dH=240, dY=50;
+  x.fillStyle='rgba(244,114,182,0.06)';x.fillRect(dX,dY,dW,dH);
+  x.strokeStyle='#f472b6';x.lineWidth=2;x.strokeRect(dX,dY,dW,dH);
+  x.fillStyle='#f472b6';x.font='bold 13px system-ui';x.textAlign='center';
+  x.fillText('DECODER',dX+dW/2,dY-8);
+  x.font='9px system-ui';x.fillStyle='#7b80a0';x.fillText('×N layers',dX+dW/2,dY+dH+14);
+
+  // Decoder internals
+  const dBlockY=dY+12,dBlockW=dW-30,dBlockX=dX+15;
+  // Masked Self-Attention
+  x.fillStyle='rgba(248,113,113,0.1)';x.fillRect(dBlockX,dBlockY,dBlockW,38);
+  x.strokeStyle='#f87171';x.lineWidth=1.5;x.strokeRect(dBlockX,dBlockY,dBlockW,38);
+  x.fillStyle='#f87171';x.font='bold 9px system-ui';x.fillText('Masked Self-Attention',dBlockX+dBlockW/2,dBlockY+16);
+  x.font='8px system-ui';x.fillStyle='#7b80a0';x.fillText('(can only see past tokens)',dBlockX+dBlockW/2,dBlockY+29);
+
+  // Add & Norm
+  x.fillStyle='rgba(129,140,248,0.1)';x.fillRect(dBlockX,dBlockY+46,dBlockW,20);
+  x.strokeStyle='#818cf8';x.lineWidth=1;x.strokeRect(dBlockX,dBlockY+46,dBlockW,20);
+  x.fillStyle='#818cf8';x.font='bold 8px system-ui';x.fillText('Add & Norm',dBlockX+dBlockW/2,dBlockY+59);
+
+  // Cross-Attention
+  x.fillStyle='rgba(251,191,36,0.12)';x.fillRect(dBlockX,dBlockY+74,dBlockW,38);
+  x.strokeStyle='#fbbf24';x.lineWidth=1.5;x.strokeRect(dBlockX,dBlockY+74,dBlockW,38);
+  x.fillStyle='#fbbf24';x.font='bold 9px system-ui';x.fillText('Cross-Attention',dBlockX+dBlockW/2,dBlockY+90);
+  x.font='8px system-ui';x.fillStyle='#7b80a0';x.fillText('(attends to encoder output)',dBlockX+dBlockW/2,dBlockY+103);
+
+  // Arrow from Encoder to Cross-Attention
+  x.strokeStyle='#34d399';x.lineWidth=2;x.setLineDash([5,3]);
+  x.beginPath();x.moveTo(eX+eW,eY+eH/2);x.lineTo(dBlockX,dBlockY+90);x.stroke();
+  x.setLineDash([]);
+  x.fillStyle='#34d399';x.font='8px system-ui';x.fillText('K, V from encoder',(eX+eW+dBlockX)/2,(eY+eH/2+dBlockY+90)/2-8);
+
+  // Add & Norm 2
+  x.fillStyle='rgba(129,140,248,0.1)';x.fillRect(dBlockX,dBlockY+120,dBlockW,20);
+  x.strokeStyle='#818cf8';x.lineWidth=1;x.strokeRect(dBlockX,dBlockY+120,dBlockW,20);
+  x.fillStyle='#818cf8';x.font='bold 8px system-ui';x.fillText('Add & Norm',dBlockX+dBlockW/2,dBlockY+133);
+
+  // FFN
+  x.fillStyle='rgba(192,132,252,0.1)';x.fillRect(dBlockX,dBlockY+148,dBlockW,38);
+  x.strokeStyle='#c084fc';x.lineWidth=1.5;x.strokeRect(dBlockX,dBlockY+148,dBlockW,38);
+  x.fillStyle='#c084fc';x.font='bold 9px system-ui';x.fillText('Feed-Forward Network',dBlockX+dBlockW/2,dBlockY+164);
+
+  // Add & Norm 3
+  x.fillStyle='rgba(129,140,248,0.1)';x.fillRect(dBlockX,dBlockY+194,dBlockW,20);
+  x.strokeStyle='#818cf8';x.lineWidth=1;x.strokeRect(dBlockX,dBlockY+194,dBlockW,20);
+  x.fillStyle='#818cf8';x.font='bold 8px system-ui';x.fillText('Add & Norm',dBlockX+dBlockW/2,dBlockY+207);
+
+  // Output
+  x.fillStyle='#f472b6';x.font='bold 10px system-ui';
+  x.fillText('Output Probabilities (Softmax)',dX+dW/2,dY+dH+42);
+  x.strokeStyle='#f472b6';x.lineWidth=2;
+  x.beginPath();x.moveTo(dX+dW/2,dY+dH+2);x.lineTo(dX+dW/2,dY+dH+30);x.stroke();
+
+  // Title
+  x.fillStyle='#7b80a0';x.font='11px system-ui';
+  x.fillText('Original Transformer: Encoder processes input → Decoder generates output token by token',W/2,H-8);
+}
+
+function drawTfmEmbed(){
+  const c=document.getElementById('cvTfmEmbed'); if(!c) return;
+  const x=c.getContext('2d'),W=c.width,H=c.height;
+  x.clearRect(0,0,W,H);
+
+  const tokens=['The','cat','sat','on','the','mat'];
+  const tw=80,th=30,gap=10,startX=(W-tokens.length*(tw+gap))/2;
+
+  // Token row
+  tokens.forEach((t,i)=>{
+    const tx=startX+i*(tw+gap);
+    // Token
+    x.fillStyle='rgba(96,165,250,0.15)';x.fillRect(tx,15,tw,th);
+    x.strokeStyle='#60a5fa';x.lineWidth=1;x.strokeRect(tx,15,tw,th);
+    x.fillStyle='#60a5fa';x.font='bold 10px system-ui';x.textAlign='center';
+    x.fillText(`"${t}"`,tx+tw/2,33);
+
+    // Plus sign
+    x.fillStyle='#7b80a0';x.font='14px system-ui';x.fillText('+',tx+tw/2,60);
+
+    // Positional encoding
+    x.fillStyle='rgba(251,191,36,0.1)';x.fillRect(tx,68,tw,th);
+    x.strokeStyle='#fbbf24';x.lineWidth=1;x.strokeRect(tx,68,tw,th);
+    x.fillStyle='#fbbf24';x.font='bold 9px system-ui';
+    x.fillText(`pos=${i}`,tx+tw/2,79);
+    // Mini sine wave
+    x.beginPath();x.strokeStyle='#fbbf2488';x.lineWidth=1;
+    for(let p=0;p<tw-4;p++){
+      const py=86+Math.sin(p/6+i*1.5)*4;
+      p===0?x.moveTo(tx+2+p,py):x.lineTo(tx+2+p,py);
+    }
+    x.stroke();
+
+    // Equals
+    x.fillStyle='#7b80a0';x.font='14px system-ui';x.fillText('=',tx+tw/2,112);
+
+    // Final embedding
+    x.fillStyle='rgba(52,211,153,0.12)';x.fillRect(tx,120,tw,th);
+    x.strokeStyle='#34d399';x.lineWidth=1;x.strokeRect(tx,120,tw,th);
+    x.fillStyle='#34d399';x.font='bold 9px system-ui';
+    x.fillText('meaning+pos',tx+tw/2,138);
+  });
+
+  // Labels
+  x.fillStyle='#60a5fa';x.font='bold 9px system-ui';x.textAlign='left';x.fillText('Token Embedding',4,30);
+  x.fillStyle='#fbbf24';x.fillText('Position Encoding',4,82);
+  x.fillStyle='#34d399';x.fillText('Final Input',4,138);
+  x.fillStyle='#7b80a0';x.font='10px system-ui';x.textAlign='center';
+  x.fillText('Each token gets: WHAT it means + WHERE it sits',W/2,H-6);
+}
+
+function drawTfmAttention(){
+  const c=document.getElementById('cvTfmAttention'); if(!c) return;
+  const x=c.getContext('2d'),W=c.width,H=c.height;
+  x.clearRect(0,0,W,H);
+
+  // Show Q K V for a sentence
+  const tokens=['The','cat','sat','because','it','was','tired'];
+  const n=tokens.length,tw=70,gap=10;
+  const startX=(W-n*(tw+gap))/2, ty=H-40;
+
+  // Token row
+  tokens.forEach((t,i)=>{
+    const tx=startX+i*(tw+gap);
+    x.fillStyle='rgba(96,165,250,0.1)';x.fillRect(tx,ty,tw,28);
+    x.strokeStyle='#60a5fa';x.lineWidth=1;x.strokeRect(tx,ty,tw,28);
+    x.fillStyle='#60a5fa';x.font='bold 9px system-ui';x.textAlign='center';
+    x.fillText(t,tx+tw/2,ty+17);
+  });
+
+  // Highlight attention from "it" (index 4) to all others
+  const focusIdx=4;
+  const attentionWeights=[0.05,0.55,0.08,0.1,0.05,0.07,0.1]; // "it" mostly attends to "cat"
+  const focusX=startX+focusIdx*(tw+gap)+tw/2;
+
+  tokens.forEach((t,i)=>{
+    const tx=startX+i*(tw+gap)+tw/2;
+    const w=attentionWeights[i];
+    x.beginPath();x.moveTo(focusX,ty);
+    x.quadraticCurveTo((focusX+tx)/2,ty-40-w*120,tx,ty);
+    x.strokeStyle=`rgba(251,191,36,${w*1.5+0.1})`;x.lineWidth=w*6+0.5;x.stroke();
+    // Weight label
+    if(w>0.08){
+      x.fillStyle='#fbbf24';x.font='bold 9px system-ui';x.textAlign='center';
+      x.fillText((w*100).toFixed(0)+'%',(focusX+tx)/2,ty-20-w*70);
+    }
+  });
+
+  // "it" highlight
+  const itX=startX+focusIdx*(tw+gap);
+  x.strokeStyle='#fbbf24';x.lineWidth=2;x.strokeRect(itX-2,ty-2,tw+4,32);
+
+  // Q K V diagram at top
+  const qkvY=20, qkvH=35, qkvW=110, qkvGap=30;
+  const qkvStartX=(W-3*(qkvW+qkvGap))/2;
+
+  // Query
+  x.fillStyle='rgba(96,165,250,0.15)';x.fillRect(qkvStartX,qkvY,qkvW,qkvH);
+  x.strokeStyle='#60a5fa';x.lineWidth=2;x.strokeRect(qkvStartX,qkvY,qkvW,qkvH);
+  x.fillStyle='#60a5fa';x.font='bold 11px system-ui';x.textAlign='center';
+  x.fillText('Query (Q)',qkvStartX+qkvW/2,qkvY+15);
+  x.font='8px system-ui';x.fillStyle='#7b80a0';x.fillText('"What am I looking for?"',qkvStartX+qkvW/2,qkvY+28);
+
+  // Key
+  const kX=qkvStartX+qkvW+qkvGap;
+  x.fillStyle='rgba(251,191,36,0.15)';x.fillRect(kX,qkvY,qkvW,qkvH);
+  x.strokeStyle='#fbbf24';x.lineWidth=2;x.strokeRect(kX,qkvY,qkvW,qkvH);
+  x.fillStyle='#fbbf24';x.font='bold 11px system-ui';
+  x.fillText('Key (K)',kX+qkvW/2,qkvY+15);
+  x.font='8px system-ui';x.fillStyle='#7b80a0';x.fillText('"What do I contain?"',kX+qkvW/2,qkvY+28);
+
+  // Value
+  const vX=kX+qkvW+qkvGap;
+  x.fillStyle='rgba(52,211,153,0.15)';x.fillRect(vX,qkvY,qkvW,qkvH);
+  x.strokeStyle='#34d399';x.lineWidth=2;x.strokeRect(vX,qkvY,qkvW,qkvH);
+  x.fillStyle='#34d399';x.font='bold 11px system-ui';
+  x.fillText('Value (V)',vX+qkvW/2,qkvY+15);
+  x.font='8px system-ui';x.fillStyle='#7b80a0';x.fillText('"What info do I carry?"',vX+qkvW/2,qkvY+28);
+
+  // Formula
+  x.fillStyle='#818cf8';x.font='bold 10px system-ui';x.textAlign='center';
+  x.fillText('Q·Kᵀ → attention scores → softmax → weights × V → new representation',W/2,qkvY+qkvH+18);
+
+  // Annotation
+  x.fillStyle='#fbbf24';x.font='bold 10px system-ui';
+  x.fillText('"it" attends strongly to "cat" (55%) — it learned the pronoun reference!',W/2,ty-8);
+}
+
+function drawTfmMultiHead(){
+  const c=document.getElementById('cvTfmMultiHead'); if(!c) return;
+  const x=c.getContext('2d'),W=c.width,H=c.height;
+  x.clearRect(0,0,W,H);
+
+  const headColors=['#60a5fa','#fbbf24','#34d399','#f472b6','#818cf8','#f87171','#c084fc','#a78bfa'];
+  const headLabels=['Grammar','Meaning','Position','Reference','Negation','Tense','Entity','Style'];
+  const nHeads=8, headW=68, headH=90, gap=10;
+  const startX=(W-nHeads*(headW+gap))/2, startY=30;
+
+  // Draw each head
+  for(let h=0;h<nHeads;h++){
+    const hx=startX+h*(headW+gap);
+    x.fillStyle=headColors[h]+'15';x.fillRect(hx,startY,headW,headH);
+    x.strokeStyle=headColors[h];x.lineWidth=1.5;x.strokeRect(hx,startY,headW,headH);
+
+    x.fillStyle=headColors[h];x.font='bold 9px system-ui';x.textAlign='center';
+    x.fillText(`Head ${h+1}`,hx+headW/2,startY+16);
+    x.font='8px system-ui';x.fillStyle='#7b80a0';
+    x.fillText(headLabels[h],hx+headW/2,startY+30);
+
+    // Mini attention pattern
+    const sz=6,grd=4,ox=hx+(headW-grd*sz)/2,oy=startY+40;
+    for(let r=0;r<grd;r++){for(let cl=0;cl<grd;cl++){
+      const v=Math.random();
+      x.fillStyle=headColors[h]+(Math.floor(v*200+55).toString(16).padStart(2,'0'));
+      x.fillRect(ox+cl*(sz+1),oy+r*(sz+1),sz,sz);
+    }}
+    x.font='7px system-ui';x.fillStyle='#7b80a0';
+    x.fillText('attn pattern',hx+headW/2,startY+headH-4);
+  }
+
+  // Concat arrow
+  const concatY=startY+headH+12;
+  x.fillStyle='#7b80a0';x.font='16px system-ui';x.textAlign='center';
+  x.fillText('⬇  Concatenate all heads  ⬇',W/2,concatY);
+
+  // Output bar
+  const outY=concatY+14,outH=24;
+  const grad=x.createLinearGradient(startX,0,startX+nHeads*(headW+gap),0);
+  headColors.forEach((c,i)=>{grad.addColorStop(i/(nHeads-1),c+'44');});
+  x.fillStyle=grad;x.fillRect(startX,outY,nHeads*(headW+gap)-gap,outH);
+  x.strokeStyle='#818cf8';x.lineWidth=1.5;x.strokeRect(startX,outY,nHeads*(headW+gap)-gap,outH);
+  x.fillStyle='#818cf8';x.font='bold 10px system-ui';
+  x.fillText('Linear Projection → Combined Multi-Head Output',W/2,outY+outH/2+3);
+
+  // Bottom label
+  x.fillStyle='#7b80a0';x.font='10px system-ui';
+  x.fillText('Each head learns a DIFFERENT type of relationship — then they combine for full understanding',W/2,H-8);
+}
+
+function drawTfmEncDec(){
+  const c=document.getElementById('cvTfmEncDec'); if(!c) return;
+  const x=c.getContext('2d'),W=c.width,H=c.height;
+  x.clearRect(0,0,W,H);
+
+  // Three model types side by side
+  const models=[
+    {name:'Encoder-Only',sub:'(BERT)',color:'#34d399',examples:'Classification, NER, Search',mask:'Bidirectional\n← sees ALL tokens →',y:30},
+    {name:'Decoder-Only',sub:'(GPT, Claude)',color:'#f472b6',examples:'Text generation, Chat, Code',mask:'Causal Mask\n← sees only PAST tokens',y:30},
+    {name:'Encoder+Decoder',sub:'(T5, Original)',color:'#fbbf24',examples:'Translation, Summarization',mask:'Enc: bidirectional\nDec: causal + cross-attn',y:30}
+  ];
+
+  const mw=200,mh=180,gap=20;
+  const startX=(W-models.length*(mw+gap))/2;
+
+  models.forEach((m,i)=>{
+    const mx=startX+i*(mw+gap);
+
+    // Card
+    x.fillStyle=m.color+'0a';x.fillRect(mx,m.y,mw,mh);
+    x.strokeStyle=m.color;x.lineWidth=2;x.strokeRect(mx,m.y,mw,mh);
+
+    // Title
+    x.fillStyle=m.color;x.font='bold 12px system-ui';x.textAlign='center';
+    x.fillText(m.name,mx+mw/2,m.y+22);
+    x.font='10px system-ui';x.fillStyle='#7b80a0';
+    x.fillText(m.sub,mx+mw/2,m.y+36);
+
+    // Attention pattern visualization
+    const sz=8,n=5,ox=mx+(mw-n*(sz+2))/2,oy=m.y+50;
+    for(let r=0;r<n;r++){for(let cl=0;cl<n;cl++){
+      let visible=true;
+      if(i===1) visible=cl<=r; // causal: only see past
+      x.fillStyle=visible?m.color+'55':m.color+'10';
+      x.fillRect(ox+cl*(sz+2),oy+r*(sz+2),sz,sz);
+    }}
+
+    // Mask label
+    x.fillStyle='#7b80a0';x.font='9px system-ui';
+    const lines=m.mask.split('\n');
+    lines.forEach((l,li)=>x.fillText(l,mx+mw/2,oy+n*(sz+2)+14+li*12));
+
+    // Use cases
+    x.fillStyle=m.color;x.font='bold 9px system-ui';
+    x.fillText('Best for:',mx+mw/2,m.y+mh-24);
+    x.font='8px system-ui';x.fillStyle='#7b80a0';
+    x.fillText(m.examples,mx+mw/2,m.y+mh-10);
+  });
+
+  // Legend for attention grid
+  x.fillStyle='#7b80a0';x.font='10px system-ui';x.textAlign='center';
+  x.fillText('Attention grids: bright = token CAN attend, dim = token CANNOT attend (masked)',W/2,H-8);
+}
+</script>
+</body>
+</html>
