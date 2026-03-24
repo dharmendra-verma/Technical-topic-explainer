@@ -1,41 +1,35 @@
-# Neural Networks — Visual Quick Reference
+# Technical Topic Explainer
 
-An interactive, single-page visual guide to understanding neural networks from scratch. No prerequisites needed.
+A collection of interactive, single-page visual quick-reference guides on technical topics. No prerequisites needed — just open and learn.
 
-**[View Live Demo →](https://dharmendra-verma.github.io/neural-network-explainer/)**
+**[Browse All Topics →](https://dharmendra-verma.github.io/Technical-topic-explainer/)**
 
-![Preview](og-image.png)
+## Topics
 
-## What's Inside
-
-- **Intuitive Analogies** — Neural networks explained through everyday concepts like kitchens, orchestras, and factory assembly lines
-- **Live Network Visualization** — Interactive canvas animation showing how data flows through neurons in real-time
-- **Step-by-Step Math** — Forward propagation, backpropagation, and gradient descent broken down with formulas and memory tips
-- **Activation Functions** — Visual graphs of Sigmoid, ReLU, Tanh, Softmax, and Leaky ReLU with use-case guidance
-- **Network Types** — CNN, RNN, Transformer, GAN, and Autoencoder explained with real-world applications
-- **Interactive Quiz** — Test your understanding with 10 questions and detailed explanations
-- **Cheat Sheet** — Quick-reference cards for hyperparameters, common pitfalls, and a learning roadmap
+| Topic | Description | Link |
+|-------|-------------|------|
+| **Neural Networks** | Interactive animations, analogies, step-by-step math, activation functions, network types, and quizzes | [View →](https://dharmendra-verma.github.io/Technical-topic-explainer/neural-network-explainer/) |
+| **Auth & Security** | Authentication, authorization, OAuth, JWT, SSO, API keys, RBAC, and security best practices | [View →](https://dharmendra-verma.github.io/Technical-topic-explainer/auth-quick-reference/) |
 
 ## Tech
 
-Zero dependencies. One self-contained HTML file with vanilla JavaScript and CSS — no build step, no frameworks. Just open `index.html` in a browser.
+Zero dependencies. Each topic is a self-contained HTML file with vanilla JavaScript and CSS — no build step, no frameworks.
 
 ## Usage
 
 ```bash
-# Clone and open
-git clone https://github.com/dharmendra-verma/neural-network-explainer.git
-cd neural-network-explainer
-open index.html    # macOS
-# or
-xdg-open index.html  # Linux
+git clone https://github.com/dharmendra-verma/Technical-topic-explainer.git
+cd Technical-topic-explainer
+# Open any topic
+open neural-network-explainer/index.html
+open auth-quick-reference/index.html
 ```
 
-Or just visit the [live site](https://dharmendra-verma.github.io/neural-network-explainer/).
+Or browse the [live site](https://dharmendra-verma.github.io/Technical-topic-explainer/).
 
 ## Contributing
 
-Found a typo or want to add a section? PRs welcome.
+Found a typo or want to add a topic? PRs welcome.
 
 ## License
 

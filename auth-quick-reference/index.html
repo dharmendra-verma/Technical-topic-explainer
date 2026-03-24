@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auth & Security — Quick Reference</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #0f172a; color: #e2e8f0; line-height: 1.6; }
+
+  /* Header */
+  .header { background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%); padding: 40px 20px 30px; text-align: center; border-bottom: 3px solid #3b82f6; }
+  .header h1 { font-size: 2rem; color: #fff; margin-bottom: 6px; }
+  .header p { color: #94a3b8; font-size: 0.95rem; }
+
+  /* Navigation */
+  .nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; padding: 20px; background: #1e293b; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #334155; }
+  .nav a { padding: 8px 18px; border-radius: 20px; background: #334155; color: #93c5fd; text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: all 0.2s; }
+  .nav a:hover, .nav a.active { background: #3b82f6; color: #fff; }
+
+  /* Main */
+  .container { max-width: 1100px; margin: 0 auto; padding: 30px 20px; }
+
+  /* Section */
+  .section { margin-bottom: 50px; scroll-margin-top: 80px; }
+  .section-title { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .section-title .icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0; }
+  .section-title h2 { font-size: 1.5rem; color: #fff; }
+
+  /* Cards */
+  .card { background: #1e293b; border: 1px solid #334155; border-radius: 16px; padding: 28px; margin-bottom: 20px; }
+  .card h3 { color: #93c5fd; font-size: 1.1rem; margin-bottom: 12px; }
+  .card p { color: #cbd5e1; margin-bottom: 12px; }
+
+  /* One-liner box */
+  .one-liner { background: #172554; border-left: 4px solid #3b82f6; padding: 16px 20px; border-radius: 0 12px 12px 0; margin-bottom: 20px; font-size: 1.05rem; color: #93c5fd; font-weight: 600; }
+
+  /* Comparison grid */
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .compare-box { background: #1e293b; border-radius: 14px; padding: 24px; border: 2px solid transparent; }
+  .compare-box.green { border-color: #22c55e; }
+  .compare-box.orange { border-color: #f59e0b; }
+  .compare-box .label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; }
+  .compare-box.green .label { color: #22c55e; }
+  .compare-box.orange .label { color: #f59e0b; }
+  .compare-box h3 { color: #fff; font-size: 1.2rem; margin-bottom: 6px; }
+  .compare-box .tagline { color: #94a3b8; font-style: italic; margin-bottom: 14px; font-size: 0.9rem; }
+  .compare-box ul { list-style: none; padding: 0; }
+  .compare-box ul li { padding: 6px 0; color: #cbd5e1; font-size: 0.92rem; }
+  .compare-box ul li::before { content: "→ "; color: #64748b; font-weight: bold; }
+
+  /* Analogy box */
+  .analogy { background: linear-gradient(135deg, #1e1b4b, #172554); border: 1px solid #4338ca; border-radius: 14px; padding: 24px; margin-bottom: 20px; display: flex; align-items: flex-start; gap: 16px; }
+  .analogy .emoji { font-size: 2rem; flex-shrink: 0; }
+  .analogy .text { color: #c7d2fe; }
+  .analogy .text strong { color: #a5b4fc; }
+
+  /* Flow diagram */
+  .flow { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0; margin: 24px 0; padding: 20px; background: #0f172a; border-radius: 14px; border: 1px solid #334155; }
+  .flow-step { background: #1e293b; border: 2px solid #3b82f6; border-radius: 12px; padding: 14px 18px; text-align: center; min-width: 130px; }
+  .flow-step .num { font-size: 0.7rem; color: #3b82f6; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+  .flow-step .desc { color: #e2e8f0; font-size: 0.85rem; font-weight: 600; margin-top: 4px; }
+  .flow-step .sub { color: #64748b; font-size: 0.75rem; margin-top: 2px; }
+  .flow-arrow { font-size: 1.5rem; color: #3b82f6; padding: 0 6px; flex-shrink: 0; }
+
+  /* JWT visual */
+  .jwt-visual { background: #0f172a; border-radius: 14px; padding: 24px; margin: 20px 0; border: 1px solid #334155; }
+  .jwt-parts { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 20px; font-family: 'Courier New', monospace; font-size: 0.95rem; word-break: break-all; justify-content: center; }
+  .jwt-parts .header-part { color: #f87171; background: #451a1a; padding: 8px 12px; border-radius: 8px; }
+  .jwt-parts .payload-part { color: #a78bfa; background: #2e1065; padding: 8px 12px; border-radius: 8px; }
+  .jwt-parts .sig-part { color: #34d399; background: #052e16; padding: 8px 12px; border-radius: 8px; }
+  .jwt-parts .dot { color: #64748b; font-size: 1.4rem; display: flex; align-items: center; font-weight: bold; }
+  .jwt-legend { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .jwt-legend-item { padding: 14px; border-radius: 10px; }
+  .jwt-legend-item.red { background: #451a1a; border: 1px solid #f8717155; }
+  .jwt-legend-item.purple { background: #2e1065; border: 1px solid #a78bfa55; }
+  .jwt-legend-item.green-bg { background: #052e16; border: 1px solid #34d39955; }
+  .jwt-legend-item h4 { font-size: 0.85rem; margin-bottom: 6px; }
+  .jwt-legend-item.red h4 { color: #f87171; }
+  .jwt-legend-item.purple h4 { color: #a78bfa; }
+  .jwt-legend-item.green-bg h4 { color: #34d399; }
+  .jwt-legend-item p { color: #94a3b8; font-size: 0.8rem; }
+
+  /* Token lifecycle */
+  .lifecycle { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  .lifecycle-card { background: #1e293b; border-radius: 14px; padding: 22px; border-left: 4px solid; }
+  .lifecycle-card.access { border-color: #3b82f6; }
+  .lifecycle-card.refresh { border-color: #f59e0b; }
+  .lifecycle-card h4 { font-size: 1rem; margin-bottom: 10px; }
+  .lifecycle-card.access h4 { color: #3b82f6; }
+  .lifecycle-card.refresh h4 { color: #f59e0b; }
+  .lifecycle-card table { width: 100%; }
+  .lifecycle-card table td { padding: 5px 0; font-size: 0.85rem; color: #94a3b8; }
+  .lifecycle-card table td:first-child { color: #cbd5e1; font-weight: 600; width: 40%; }
+
+  /* SSO diagram */
+  .sso-flow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: 20px 0; }
+  .sso-app { background: #1e293b; border-radius: 14px; padding: 20px; text-align: center; border: 2px solid #334155; position: relative; }
+  .sso-app .app-icon { font-size: 2rem; margin-bottom: 8px; }
+  .sso-app h4 { color: #e2e8f0; font-size: 0.95rem; }
+  .sso-app p { color: #64748b; font-size: 0.8rem; }
+  .sso-center { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .sso-center .badge { background: #3b82f6; color: #fff; padding: 10px 20px; border-radius: 30px; font-weight: 700; font-size: 0.9rem; margin-bottom: 10px; }
+  .sso-center .check { color: #22c55e; font-size: 0.85rem; }
+
+  /* Key-value list */
+  .kv-list { margin: 12px 0; }
+  .kv-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid #1e293b; }
+  .kv-item:last-child { border-bottom: none; }
+  .kv-key { color: #93c5fd; font-weight: 700; min-width: 140px; font-size: 0.9rem; }
+  .kv-val { color: #cbd5e1; font-size: 0.9rem; }
+
+  /* Protocol list */
+  .proto-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  .proto-card { background: #1e293b; border-radius: 14px; padding: 20px; }
+  .proto-card h4 { color: #f59e0b; font-size: 0.95rem; margin-bottom: 8px; }
+  .proto-card p { color: #94a3b8; font-size: 0.85rem; }
+  .proto-card .use { color: #22c55e; font-size: 0.82rem; margin-top: 8px; }
+
+  /* Interview tips */
+  .tip-box { background: linear-gradient(135deg, #14532d, #052e16); border: 1px solid #22c55e44; border-radius: 14px; padding: 24px; margin: 20px 0; }
+  .tip-box h4 { color: #22c55e; margin-bottom: 12px; font-size: 1rem; }
+  .tip-box p { color: #bbf7d0; font-size: 0.92rem; margin-bottom: 8px; }
+
+  /* Real-world context */
+  .realworld-box { background: linear-gradient(135deg, #1e1b4b, #0f172a); border: 1px solid #6366f144; border-radius: 14px; padding: 24px; margin: 20px 0; }
+  .realworld-box h4 { color: #a5b4fc; margin-bottom: 12px; }
+  .realworld-box p, .realworld-box li { color: #c7d2fe; font-size: 0.9rem; }
+  .realworld-box ul { list-style: none; padding: 0; }
+  .realworld-box ul li { padding: 5px 0; }
+  .realworld-box ul li::before { content: "⚡ "; }
+
+  /* Cheat sheet */
+  .cheat { background: #1e293b; border: 2px dashed #3b82f6; border-radius: 14px; padding: 24px; margin: 20px 0; }
+  .cheat h4 { color: #3b82f6; margin-bottom: 14px; }
+  .cheat-row { display: flex; gap: 12px; padding: 8px 0; border-bottom: 1px solid #334155; align-items: baseline; }
+  .cheat-row:last-child { border: none; }
+  .cheat-term { color: #fbbf24; font-weight: 700; min-width: 160px; font-size: 0.9rem; }
+  .cheat-def { color: #94a3b8; font-size: 0.88rem; }
+
+  /* Interview Q&A */
+  .qa-item { background: #1e293b; border: 1px solid #334155; border-radius: 14px; margin-bottom: 16px; overflow: hidden; }
+  .qa-question { padding: 18px 24px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; }
+  .qa-question:hover { background: #263548; }
+  .qa-question h4 { color: #93c5fd; font-size: 0.95rem; flex: 1; padding-right: 12px; }
+  .qa-question .qa-toggle { color: #3b82f6; font-size: 1.2rem; font-weight: 700; transition: transform 0.3s; flex-shrink: 0; }
+  .qa-item.open .qa-toggle { transform: rotate(45deg); }
+  .qa-answer { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+  .qa-item.open .qa-answer { max-height: 2000px; }
+  .qa-answer-inner { padding: 0 24px 20px; color: #cbd5e1; font-size: 0.9rem; line-height: 1.7; border-top: 1px solid #334155; }
+  .qa-answer-inner p { margin-bottom: 10px; }
+  .qa-answer-inner code { background: #0f172a; padding: 2px 6px; border-radius: 4px; font-size: 0.82rem; color: #fbbf24; }
+  .qa-answer-inner .qa-key { color: #22c55e; font-weight: 600; }
+  .qa-answer-inner .qa-warn { color: #f59e0b; font-weight: 600; }
+  .qa-difficulty { font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border-radius: 6px; margin-right: 10px; white-space: nowrap; flex-shrink: 0; }
+  .qa-difficulty.basic { background: #14532d; color: #4ade80; }
+  .qa-difficulty.intermediate { background: #713f12; color: #fbbf24; }
+  .qa-difficulty.advanced { background: #7f1d1d; color: #f87171; }
+
+  /* Footer */
+  .footer { text-align: center; padding: 30px; color: #475569; font-size: 0.8rem; border-top: 1px solid #1e293b; }
+
+  /* ===== ANIMATED WORKFLOW ===== */
+  .anim-container { background: #0f172a; border: 1px solid #334155; border-radius: 18px; padding: 30px 20px; margin: 20px 0; position: relative; overflow: hidden; }
+  .anim-controls { display: flex; justify-content: center; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
+  .anim-btn { padding: 10px 22px; border-radius: 10px; border: 2px solid #3b82f6; background: transparent; color: #93c5fd; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; }
+  .anim-btn:hover { background: #1e3a5f; }
+  .anim-btn.active { background: #3b82f6; color: #fff; }
+  .anim-btn.play { background: #22c55e; border-color: #22c55e; color: #fff; }
+  .anim-btn.play:hover { background: #16a34a; }
+  .anim-btn.reset { background: transparent; border-color: #64748b; color: #94a3b8; }
+
+  .anim-canvas { position: relative; width: 100%; height: 580px; }
+
+  /* Nodes */
+  .anim-node { position: absolute; border-radius: 16px; padding: 14px 18px; text-align: center; transition: all 0.4s ease; opacity: 0.35; transform: scale(0.95); z-index: 2; }
+  .anim-node.active { opacity: 1; transform: scale(1); box-shadow: 0 0 30px rgba(59,130,246,0.3); }
+  .anim-node.done { opacity: 0.7; transform: scale(0.97); }
+  .anim-node .node-icon { font-size: 1.6rem; margin-bottom: 4px; }
+  .anim-node .node-label { font-weight: 700; font-size: 0.85rem; color: #fff; }
+  .anim-node .node-sub { font-size: 0.72rem; color: #94a3b8; margin-top: 2px; }
+
+  .node-user { background: #1e3a5f; border: 2px solid #3b82f6; left: 2%; top: 40%; width: 130px; }
+  .node-app { background: #1e293b; border: 2px solid #8b5cf6; left: 22%; top: 12%; width: 140px; }
+  .node-idp { background: #1e293b; border: 2px solid #f59e0b; left: 50%; top: 4%; width: 150px; transform-origin: center; }
+  .node-idp.active { box-shadow: 0 0 40px rgba(245,158,11,0.4); }
+  .node-api { background: #1e293b; border: 2px solid #22c55e; left: 76%; top: 12%; width: 140px; }
+  .node-db { background: #1e293b; border: 2px solid #ef4444; right: 2%; top: 42%; width: 130px; }
+
+  /* Token badges */
+  .token-badge { position: absolute; padding: 8px 14px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; z-index: 10; opacity: 0; transition: all 0.5s ease; transform: translateY(10px); white-space: nowrap; }
+  .token-badge.visible { opacity: 1; transform: translateY(0); }
+  .token-badge.id-token { background: #7c3aed; color: #ede9fe; border: 1px solid #a78bfa; }
+  .token-badge.access-token { background: #1d4ed8; color: #dbeafe; border: 1px solid #60a5fa; }
+  .token-badge.refresh-token { background: #b45309; color: #fef3c7; border: 1px solid #fbbf24; }
+  .token-badge.auth-code { background: #065f46; color: #d1fae5; border: 1px solid #34d399; }
+
+  /* Arrows (SVG paths) */
+  .anim-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; overflow: visible; }
+  .anim-svg path.arrow-line { fill: none; stroke-width: 3; stroke-linecap: round; }
+  .anim-svg path.arrow-line.drawing { stroke-dashoffset: 0 !important; transition: stroke-dashoffset 0.7s ease-out; }
+  .anim-svg path.arrow-line.dim { opacity: 0.12; }
+  .anim-svg .arrow-label { font-size: 11px; font-weight: 700; fill: #94a3b8; font-family: 'Segoe UI', system-ui, sans-serif; }
+  /* Traveling dot */
+  .anim-svg circle.travel-dot { filter: drop-shadow(0 0 6px currentColor); }
+  /* Glow on active arrows */
+  .anim-svg path.arrow-line.glow { filter: drop-shadow(0 0 6px currentColor); stroke-width: 3.5; }
+
+  /* Message log */
+  .anim-log { background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 20px; margin-top: 0; max-height: 230px; overflow-y: auto; }
+  .anim-log h4 { color: #93c5fd; margin-bottom: 12px; font-size: 0.95rem; }
+  .log-entry { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid #0f172a; align-items: flex-start; opacity: 0; transition: opacity 0.4s ease; }
+  .log-entry.visible { opacity: 1; }
+  .log-step { background: #3b82f6; color: #fff; font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border-radius: 6px; white-space: nowrap; flex-shrink: 0; min-width: 52px; text-align: center; }
+  .log-step.auth { background: #f59e0b; }
+  .log-step.token { background: #7c3aed; }
+  .log-step.api { background: #22c55e; }
+  .log-step.refresh { background: #ef4444; }
+  .log-text { color: #cbd5e1; font-size: 0.84rem; line-height: 1.5; }
+  .log-text code { background: #0f172a; padding: 2px 6px; border-radius: 4px; font-size: 0.78rem; color: #fbbf24; }
+  .log-text .jwt-mini { color: #f87171; }
+  .log-text .jwt-mini-p { color: #a78bfa; }
+  .log-text .jwt-mini-s { color: #34d399; }
+
+  /* Step counter */
+  .step-indicator { text-align: center; margin-bottom: 16px; }
+  .step-indicator span { display: inline-block; width: 32px; height: 32px; line-height: 32px; border-radius: 50%; background: #334155; color: #64748b; font-size: 0.8rem; font-weight: 700; margin: 0 4px; transition: all 0.3s; }
+  .step-indicator span.active { background: #3b82f6; color: #fff; box-shadow: 0 0 15px rgba(59,130,246,0.5); }
+  .step-indicator span.done { background: #22c55e; color: #fff; }
+
+  /* Scenario tabs */
+  .scenario-tabs { display: flex; justify-content: center; gap: 6px; margin-bottom: 18px; }
+  .scenario-tab { padding: 7px 16px; border-radius: 8px; background: #1e293b; color: #94a3b8; font-size: 0.8rem; cursor: pointer; border: 1px solid #334155; transition: all 0.2s; }
+  .scenario-tab.active { background: #172554; color: #93c5fd; border-color: #3b82f6; }
+
+  @media (max-width: 768px) {
+    .compare-grid, .jwt-legend, .lifecycle, .sso-flow, .proto-grid { grid-template-columns: 1fr; }
+    .flow { flex-direction: column; }
+    .flow-arrow { transform: rotate(90deg); }
+    .anim-canvas { height: 520px; }
+    .node-user { left: 1%; top: 38%; width: 100px; }
+    .node-app { left: 16%; top: 6%; width: 110px; }
+    .node-idp { left: 40%; top: 2%; width: 120px; }
+    .node-api { left: 68%; top: 6%; width: 110px; }
+    .node-db { right: 1%; top: 38%; width: 100px; }
+    .anim-node .node-icon { font-size: 1.2rem; }
+    .anim-node .node-label { font-size: 0.72rem; }
+    .anim-node .node-sub { font-size: 0.62rem; }
+    .scenario-tabs { gap: 4px; }
+    .scenario-tab { font-size: 0.72rem; padding: 5px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Auth & Security — Quick Reference</h1>
+  <p>Authentication, Authorization, OIDC, JWT, Refresh Tokens & SSO — Complete Reference</p>
+</div>
+
+<div class="nav" id="nav">
+  <a href="#authn-authz" class="active">AuthN vs AuthZ</a>
+  <a href="#oidc">OIDC</a>
+  <a href="#jwt">JWT</a>
+  <a href="#tokens">Token Lifecycle</a>
+  <a href="#sso">SSO</a>
+  <a href="#animated-flow">Animated Flow</a>
+  <a href="#realworld">Real-World Patterns</a>
+  <a href="#cheatsheet">Cheat Sheet</a>
+  <a href="#interview-qa">Interview Q&A</a>
+</div>
+
+<div class="container">
+
+  <!-- ==================== SECTION 1: AuthN vs AuthZ ==================== -->
+  <div class="section" id="authn-authz">
+    <div class="section-title">
+      <div class="icon" style="background:#1e3a5f;">🔐</div>
+      <h2>Authentication vs Authorization</h2>
+    </div>
+
+    <div class="one-liner">Authentication = "Who are you?" &nbsp;|&nbsp; Authorization = "What can you do?"</div>
+
+    <div class="analogy">
+      <div class="emoji">🏨</div>
+      <div class="text">
+        <strong>Hotel Analogy:</strong> Authentication is showing your ID at the front desk to prove who you are. Authorization is your room key — it lets you into Room 305 but not Room 410 or the staff lounge. You must authenticate first, then the system decides what you're authorized to access.
+      </div>
+    </div>
+
+    <div class="compare-grid">
+      <div class="compare-box green">
+        <div class="label">Authentication (AuthN)</div>
+        <h3>Verifying Identity</h3>
+        <div class="tagline">"Prove you are who you claim to be"</div>
+        <ul>
+          <li>Username + Password</li>
+          <li>Multi-Factor Authentication (MFA)</li>
+          <li>Biometrics (fingerprint, face)</li>
+          <li>Certificates / Smart Cards</li>
+          <li>SSO via OIDC / SAML</li>
+        </ul>
+      </div>
+      <div class="compare-box orange">
+        <div class="label">Authorization (AuthZ)</div>
+        <h3>Granting Permissions</h3>
+        <div class="tagline">"What are you allowed to do?"</div>
+        <ul>
+          <li>Role-Based Access (RBAC)</li>
+          <li>Attribute-Based Access (ABAC)</li>
+          <li>OAuth 2.0 scopes & consents</li>
+          <li>API permissions / policies</li>
+          <li>Resource-level access control</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <h4>Interview Tip</h4>
+      <p>"Authentication always comes first. You can't authorize someone whose identity you haven't verified. For example, a user authenticates via SSO + MFA, then authorization determines whether they can view Project A's data or only Project B's — that's RBAC combined with data-level access control."</p>
+    </div>
+  </div>
+
+  <!-- ==================== SECTION 2: OIDC ==================== -->
+  <div class="section" id="oidc">
+    <div class="section-title">
+      <div class="icon" style="background:#4338ca;">🪪</div>
+      <h2>OpenID Connect (OIDC)</h2>
+    </div>
+
+    <div class="one-liner">OIDC = Authentication layer built ON TOP of OAuth 2.0</div>
+
+    <div class="analogy">
+      <div class="emoji">🧩</div>
+      <div class="text">
+        <strong>Key Insight:</strong> OAuth 2.0 was designed only for <strong>authorization</strong> (granting access to resources). But apps also needed to know <strong>who</strong> the user is. OIDC adds an <strong>ID Token</strong> (a JWT) on top of OAuth so you get both identity AND access in one flow.
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>How OIDC Works — The Authorization Code Flow</h3>
+      <p>This is the most secure and common flow for web applications:</p>
+      <div class="flow">
+        <div class="flow-step">
+          <div class="num">Step 1</div>
+          <div class="desc">User clicks "Login"</div>
+          <div class="sub">App redirects to IdP</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="num">Step 2</div>
+          <div class="desc">User authenticates</div>
+          <div class="sub">At Identity Provider</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="num">Step 3</div>
+          <div class="desc">IdP returns code</div>
+          <div class="sub">Auth code to app</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="num">Step 4</div>
+          <div class="desc">App exchanges code</div>
+          <div class="sub">Code → Tokens (server-side)</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="num">Step 5</div>
+          <div class="desc">Receives tokens</div>
+          <div class="sub">ID Token + Access Token</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>OIDC vs OAuth 2.0 vs SAML — When to Use What</h3>
+      <div class="proto-grid">
+        <div class="proto-card">
+          <h4>OAuth 2.0</h4>
+          <p>Authorization framework. Grants third-party apps limited access to user resources WITHOUT sharing passwords.</p>
+          <div class="use">Use: "Let this app access my Google Drive files"</div>
+        </div>
+        <div class="proto-card">
+          <h4>OIDC</h4>
+          <p>Identity layer on OAuth 2.0. Returns an ID Token (JWT) with user identity. Modern standard for web & mobile.</p>
+          <div class="use">Use: "Login with Google" — modern apps, APIs, SPAs</div>
+        </div>
+        <div class="proto-card">
+          <h4>SAML 2.0</h4>
+          <p>XML-based, enterprise-focused SSO protocol. Older but still dominant in corporate environments. Heavy payload.</p>
+          <div class="use">Use: Enterprise SSO — Okta, Active Directory, large orgs</div>
+        </div>
+        <div class="proto-card">
+          <h4>LDAP</h4>
+          <p>Directory protocol for looking up user/group info. Often the backend that SAML/OIDC authenticate against.</p>
+          <div class="use">Use: Internal user directories, Active Directory queries</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Key OIDC Terminology</h3>
+      <div class="kv-list">
+        <div class="kv-item"><span class="kv-key">Identity Provider (IdP)</span><span class="kv-val">The system that authenticates users — e.g., Azure AD, Okta, Auth0, Google</span></div>
+        <div class="kv-item"><span class="kv-key">Relying Party (RP)</span><span class="kv-val">Your application — it "relies" on the IdP to verify identity</span></div>
+        <div class="kv-item"><span class="kv-key">ID Token</span><span class="kv-val">A JWT containing user identity claims (name, email, roles). OIDC's key addition to OAuth</span></div>
+        <div class="kv-item"><span class="kv-key">Access Token</span><span class="kv-val">Token used to call APIs. Can be JWT or opaque. Carries scopes (permissions)</span></div>
+        <div class="kv-item"><span class="kv-key">Scopes</span><span class="kv-val">Permissions requested — <code>openid</code> (required for OIDC), <code>profile</code>, <code>email</code>, custom scopes</span></div>
+        <div class="kv-item"><span class="kv-key">Claims</span><span class="kv-val">Key-value pairs inside a token — <code>sub</code> (user ID), <code>name</code>, <code>email</code>, <code>roles</code></span></div>
+        <div class="kv-item"><span class="kv-key">UserInfo Endpoint</span><span class="kv-val">API endpoint to fetch additional user profile data using an access token</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SECTION 3: JWT ==================== -->
+  <div class="section" id="jwt">
+    <div class="section-title">
+      <div class="icon" style="background:#7c2d12;">🎫</div>
+      <h2>JSON Web Token (JWT)</h2>
+    </div>
+
+    <div class="one-liner">JWT = A self-contained, signed token with 3 parts: Header . Payload . Signature</div>
+
+    <div class="analogy">
+      <div class="emoji">📛</div>
+      <div class="text">
+        <strong>Boarding Pass Analogy:</strong> A JWT is like a boarding pass. The <strong>header</strong> says what type of pass it is. The <strong>payload</strong> has your name, seat, flight details. The <strong>signature</strong> is the airline's stamp proving it's genuine. Anyone can read the pass, but only the airline can issue a valid one. If someone tampers with the seat number, the stamp won't match.
+      </div>
+    </div>
+
+    <div class="jwt-visual">
+      <div class="jwt-parts">
+        <span class="header-part">eyJhbGciOiJSUzI1NiJ9</span>
+        <span class="dot">.</span>
+        <span class="payload-part">eyJzdWIiOiIxMjM0NTY3ODkwIn0</span>
+        <span class="dot">.</span>
+        <span class="sig-part">SflKxwRJSMeKKF2QT4fw</span>
+      </div>
+      <div class="jwt-legend">
+        <div class="jwt-legend-item red">
+          <h4>Header</h4>
+          <p>Algorithm (RS256, HS256) and token type (JWT). Tells the server how to verify the signature.</p>
+        </div>
+        <div class="jwt-legend-item purple">
+          <h4>Payload (Claims)</h4>
+          <p>User data: <code>sub</code> (user ID), <code>name</code>, <code>email</code>, <code>roles</code>, <code>exp</code> (expiry), <code>iss</code> (issuer). NOT encrypted — only Base64 encoded!</p>
+        </div>
+        <div class="jwt-legend-item green-bg">
+          <h4>Signature</h4>
+          <p>HMAC or RSA signature of Header + Payload. Proves the token hasn't been tampered with. Server verifies using secret/public key.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Critical Things to Remember About JWTs</h3>
+      <div class="kv-list">
+        <div class="kv-item"><span class="kv-key">NOT encrypted</span><span class="kv-val">Anyone can decode and read the payload (it's just Base64). Never put sensitive data like passwords in a JWT. Use JWE if you need encryption.</span></div>
+        <div class="kv-item"><span class="kv-key">Signed, not secret</span><span class="kv-val">The signature proves integrity (no tampering) and authenticity (issued by trusted party), not confidentiality.</span></div>
+        <div class="kv-item"><span class="kv-key">Stateless</span><span class="kv-val">Server doesn't need to store sessions — the token itself contains all needed info. This is why JWTs scale well for microservices.</span></div>
+        <div class="kv-item"><span class="kv-key">Can't be revoked easily</span><span class="kv-val">Once issued, a JWT is valid until it expires. This is why access tokens should be short-lived (5-15 min). For immediate revocation, you need a blocklist.</span></div>
+        <div class="kv-item"><span class="kv-key">RS256 vs HS256</span><span class="kv-val">HS256: shared secret (symmetric) — both sides know the key. RS256: public/private key pair (asymmetric) — anyone can verify, only issuer can sign. RS256 is preferred for distributed systems.</span></div>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <h4>Interview Tip</h4>
+      <p>"JWTs are ideal for microservices architectures because they're stateless — each service can independently verify the token without calling a central session store. But the trade-off is revocation: if a user's access should be revoked immediately (like a terminated employee), you need either very short token lifetimes or a token blocklist. As a PM, I'd push for short-lived access tokens (5-15 min) with refresh token rotation for any security-sensitive application."</p>
+    </div>
+  </div>
+
+  <!-- ==================== SECTION 4: Token Lifecycle ==================== -->
+  <div class="section" id="tokens">
+    <div class="section-title">
+      <div class="icon" style="background:#854d0e;">🔄</div>
+      <h2>Token Lifecycle & Refresh Strategy</h2>
+    </div>
+
+    <div class="one-liner">Access Token = short-lived key to APIs &nbsp;|&nbsp; Refresh Token = long-lived key to get new access tokens</div>
+
+    <div class="analogy">
+      <div class="emoji">🎟️</div>
+      <div class="text">
+        <strong>Theme Park Analogy:</strong> Your <strong>access token</strong> is a wristband that expires at 5 PM. Your <strong>refresh token</strong> is a receipt that lets you go to the kiosk and get a new wristband without buying another ticket. If you lose the receipt (refresh token compromised), someone else could get wristbands. That's why refresh token rotation exists — each time you use the receipt, you get a new receipt too, and the old one is invalidated.
+      </div>
+    </div>
+
+    <div class="lifecycle">
+      <div class="lifecycle-card access">
+        <h4>Access Token</h4>
+        <table>
+          <tr><td>Purpose</td><td>Authorize API requests</td></tr>
+          <tr><td>Lifetime</td><td>5–15 minutes (short!)</td></tr>
+          <tr><td>Storage</td><td>In-memory (browser) or HTTP-only cookie</td></tr>
+          <tr><td>Format</td><td>Usually JWT (self-contained)</td></tr>
+          <tr><td>Sent via</td><td>Authorization: Bearer &lt;token&gt; header</td></tr>
+          <tr><td>If stolen</td><td>Limited damage due to short expiry</td></tr>
+        </table>
+      </div>
+      <div class="lifecycle-card refresh">
+        <h4>Refresh Token</h4>
+        <table>
+          <tr><td>Purpose</td><td>Get new access tokens silently</td></tr>
+          <tr><td>Lifetime</td><td>Hours to days (7–30 days common)</td></tr>
+          <tr><td>Storage</td><td>HTTP-only secure cookie or server-side</td></tr>
+          <tr><td>Format</td><td>Opaque string (not JWT typically)</td></tr>
+          <tr><td>Sent to</td><td>Token endpoint only — never to APIs</td></tr>
+          <tr><td>If stolen</td><td>Major risk — use rotation + detection</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Refresh Token Flow</h3>
+      <div class="flow">
+        <div class="flow-step">
+          <div class="num">Step 1</div>
+          <div class="desc">API call with Access Token</div>
+          <div class="sub">Authorization: Bearer xyz</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step" style="border-color: #f87171;">
+          <div class="num" style="color:#f87171;">Step 2</div>
+          <div class="desc">401 Unauthorized</div>
+          <div class="sub">Access token expired</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step" style="border-color: #f59e0b;">
+          <div class="num" style="color:#f59e0b;">Step 3</div>
+          <div class="desc">Send Refresh Token</div>
+          <div class="sub">POST /token (grant_type=refresh_token)</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step" style="border-color: #22c55e;">
+          <div class="num" style="color:#22c55e;">Step 4</div>
+          <div class="desc">New tokens issued</div>
+          <div class="sub">New Access + Rotated Refresh</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Refresh Token Rotation — Why It Matters</h3>
+      <p>With <strong>rotation</strong>, every time a refresh token is used, it's invalidated and a new one is issued. If an attacker steals and uses the old refresh token, the server detects the reuse (since it was already consumed) and invalidates the entire token family — forcing re-authentication.</p>
+      <p style="margin-top: 12px;">This is mandatory in security-sensitive applications (finance, healthcare, enterprise SaaS) because it provides <strong>stolen token detection</strong> — a critical security control for compliance.</p>
+    </div>
+  </div>
+
+  <!-- ==================== SECTION 5: SSO ==================== -->
+  <div class="section" id="sso">
+    <div class="section-title">
+      <div class="icon" style="background:#166534;">🔗</div>
+      <h2>Single Sign-On (SSO)</h2>
+    </div>
+
+    <div class="one-liner">SSO = One login, access to many applications — authenticate once, authorized everywhere</div>
+
+    <div class="analogy">
+      <div class="emoji">🏢</div>
+      <div class="text">
+        <strong>Office Building Analogy:</strong> SSO is like your office badge. You swipe it once at the building entrance (authenticate). Then you can access the cafeteria, gym, meeting rooms, and your floor — all without swiping again. Each facility (application) trusts the building's security system (IdP) to verify you're an employee.
+      </div>
+    </div>
+
+    <div class="sso-flow">
+      <div class="sso-app">
+        <div class="app-icon">💼</div>
+        <h4>Portfolio App</h4>
+        <p>Trusts the IdP</p>
+      </div>
+      <div class="sso-app sso-center">
+        <div class="badge">Identity Provider</div>
+        <div class="check">Azure AD / Okta / Ping</div>
+        <div style="color:#94a3b8; font-size:0.8rem; margin-top:8px;">Login once here ↕</div>
+      </div>
+      <div class="sso-app">
+        <div class="app-icon">📊</div>
+        <h4>Risk Dashboard</h4>
+        <p>Trusts the IdP</p>
+      </div>
+    </div>
+    <div style="text-align:center; color:#64748b; font-size:0.85rem; margin-bottom: 20px;">One authentication → Access to all connected apps without re-entering credentials</div>
+
+    <div class="card">
+      <h3>SSO Protocols in Practice</h3>
+      <div class="kv-list">
+        <div class="kv-item"><span class="kv-key">SAML-based SSO</span><span class="kv-val">Most common in enterprises. IdP sends a signed XML assertion to the app. Used by Azure AD, Okta for corporate apps. Standard in large organizations.</span></div>
+        <div class="kv-item"><span class="kv-key">OIDC-based SSO</span><span class="kv-val">Modern alternative. IdP issues JWT tokens. Used by Google, Auth0. Better for APIs and SPAs. Lighter than SAML.</span></div>
+        <div class="kv-item"><span class="kv-key">Kerberos</span><span class="kv-val">Windows domain authentication. Users authenticate once to Active Directory, then access any domain resource silently. Common in on-premises enterprise environments.</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>SSO Benefits & Risks</h3>
+      <div class="compare-grid">
+        <div class="compare-box green">
+          <div class="label">Benefits</div>
+          <ul>
+            <li>One password to remember — fewer password-related support tickets (reduces 30-50% of helpdesk calls)</li>
+            <li>Centralized access control — disable one account, revoke access to all apps instantly</li>
+            <li>Better security posture — can enforce MFA at one point</li>
+            <li>Improved UX — seamless navigation between apps</li>
+            <li>Compliance — centralized audit trail of who accessed what</li>
+          </ul>
+        </div>
+        <div class="compare-box orange">
+          <div class="label">Risks to Manage</div>
+          <ul>
+            <li>Single point of failure — if IdP goes down, no one can log in (need HA for IdP)</li>
+            <li>Blast radius — one compromised account accesses everything (must enforce MFA)</li>
+            <li>Session management complexity — how long should SSO session last?</li>
+            <li>Vendor lock-in — tightly coupled to IdP vendor</li>
+            <li>Federation complexity — cross-organization SSO adds trust management overhead</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SECTION 6: ANIMATED WORKFLOW ==================== -->
+  <div class="section" id="animated-flow">
+    <div class="section-title">
+      <div class="icon" style="background: linear-gradient(135deg,#3b82f6,#8b5cf6);">🎬</div>
+      <h2>Animated Auth Workflow</h2>
+    </div>
+
+    <div class="one-liner">Watch how Authentication, Authorization, Tokens & Refresh work together end-to-end</div>
+
+    <div class="scenario-tabs">
+      <div class="scenario-tab active" data-scenario="login">Full Login Flow</div>
+      <div class="scenario-tab" data-scenario="api">API Call with JWT</div>
+      <div class="scenario-tab" data-scenario="refresh">Token Refresh</div>
+    </div>
+
+    <div class="anim-container" id="animContainer">
+      <div class="step-indicator" id="stepIndicator"></div>
+
+      <div class="anim-canvas" id="animCanvas">
+        <svg class="anim-svg" id="animSvg"></svg>
+
+        <div class="anim-node node-user" id="nodeUser">
+          <div class="node-icon">👤</div>
+          <div class="node-label">User</div>
+          <div class="node-sub">End User</div>
+        </div>
+        <div class="anim-node node-app" id="nodeApp">
+          <div class="node-icon">💻</div>
+          <div class="node-label">Client App</div>
+          <div class="node-sub">Web / SPA / Mobile</div>
+        </div>
+        <div class="anim-node node-idp" id="nodeIdp">
+          <div class="node-icon">🛡️</div>
+          <div class="node-label">Identity Provider</div>
+          <div class="node-sub">Azure AD / Okta</div>
+        </div>
+        <div class="anim-node node-api" id="nodeApi">
+          <div class="node-icon">⚡</div>
+          <div class="node-label">API Gateway</div>
+          <div class="node-sub">Azure API Mgmt</div>
+        </div>
+        <div class="anim-node node-db" id="nodeDb">
+          <div class="node-icon">🗄️</div>
+          <div class="node-label">Resources</div>
+          <div class="node-sub">Database / Service</div>
+        </div>
+
+        <!-- Token badges -->
+        <div class="token-badge auth-code" id="badgeCode" style="left:38%;top:48%;">Auth Code</div>
+        <div class="token-badge id-token" id="badgeId" style="left:28%;top:56%;">ID Token (JWT)</div>
+        <div class="token-badge access-token" id="badgeAccess" style="left:48%;top:56%;">Access Token (JWT)</div>
+        <div class="token-badge refresh-token" id="badgeRefresh" style="left:32%;top:68%;">Refresh Token</div>
+      </div>
+
+      <div class="anim-controls">
+        <button class="anim-btn play" id="btnPlay">▶ Play</button>
+        <button class="anim-btn" id="btnStep">Step →</button>
+        <button class="anim-btn reset" id="btnReset">↺ Reset</button>
+        <span style="color:#64748b;font-size:0.82rem;display:flex;align-items:center;margin-left:8px;" id="speedLabel">Speed: Normal</span>
+      </div>
+
+      <div class="anim-log" id="animLog">
+        <h4>Step-by-Step Explanation</h4>
+        <div id="logEntries"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SECTION 7: Real-World Patterns ==================== -->
+  <div class="section" id="realworld">
+    <div class="section-title">
+      <div class="icon" style="background:#1e3a5f;">🌍</div>
+      <h2>Real-World Auth Patterns</h2>
+    </div>
+
+    <div class="realworld-box">
+      <h4>How Auth Works Across Different Application Types</h4>
+      <p style="margin-bottom: 14px;">Auth patterns vary by architecture. Here's how these concepts apply in practice:</p>
+      <ul>
+        <li><strong>SPA (React / Angular):</strong> Uses OIDC Authorization Code + PKCE (no client secret in browser). Access tokens stored in-memory (never localStorage). Silent refresh via hidden iframe or refresh token rotation. API calls use <code>Bearer</code> header.</li>
+        <li><strong>Mobile Apps:</strong> Same PKCE flow as SPAs. Refresh tokens stored in secure OS storage (Keychain / Keystore). Biometric auth for step-up. Deep link redirects for SSO with the system browser.</li>
+        <li><strong>Microservices (Service-to-Service):</strong> OAuth 2.0 Client Credentials flow — no user involved. Each service gets its own access token with minimal scopes (least privilege). API Gateway validates JWTs centrally and enforces rate limits.</li>
+        <li><strong>Enterprise Internal Apps:</strong> SSO via SAML or OIDC with corporate IdP (Azure AD, Okta). RBAC for role-based permissions. Often combined with network-level security (VPN, Zero Trust). Kerberos for legacy on-prem systems.</li>
+        <li><strong>Multi-Tenant SaaS:</strong> Tenant ID embedded as a JWT claim. Authorization checks both role AND tenant to prevent cross-tenant data leaks. Separate signing keys per tenant for isolation. Token scopes restrict API surface per subscription tier.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Common Security Mistakes to Avoid</h3>
+      <div class="kv-list">
+        <div class="kv-item"><span class="kv-key" style="color:#ef4444;">Storing JWTs in localStorage</span><span class="kv-val">Vulnerable to XSS attacks. Use HTTP-only cookies or in-memory storage instead.</span></div>
+        <div class="kv-item"><span class="kv-key" style="color:#ef4444;">Long-lived access tokens</span><span class="kv-val">If stolen, attacker has extended access. Keep access tokens short (5-15 min), use refresh tokens for longevity.</span></div>
+        <div class="kv-item"><span class="kv-key" style="color:#ef4444;">No refresh token rotation</span><span class="kv-val">Without rotation, a stolen refresh token is a permanent backdoor. Always rotate + detect reuse.</span></div>
+        <div class="kv-item"><span class="kv-key" style="color:#ef4444;">Trusting JWT payload without verifying signature</span><span class="kv-val">Anyone can forge a JWT payload. Always verify the cryptographic signature using the IdP's public key.</span></div>
+        <div class="kv-item"><span class="kv-key" style="color:#ef4444;">Using HS256 in distributed systems</span><span class="kv-val">Shared secret means every service can forge tokens. Use RS256 (asymmetric) — only the IdP can sign, anyone can verify.</span></div>
+        <div class="kv-item"><span class="kv-key" style="color:#ef4444;">Missing audience (aud) validation</span><span class="kv-val">A token meant for Service A could be replayed against Service B. Always validate <code>aud</code> claim matches your API.</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ==================== SECTION 7: Cheat Sheet ==================== -->
+  <div class="section" id="cheatsheet">
+    <div class="section-title">
+      <div class="icon" style="background:#7c2d12;">📋</div>
+      <h2>Quick-Fire Cheat Sheet</h2>
+    </div>
+
+    <div class="cheat">
+      <h4>Terms You Must Know — One Liners</h4>
+      <div class="cheat-row"><span class="cheat-term">Authentication</span><span class="cheat-def">Verifying who you are (identity proof)</span></div>
+      <div class="cheat-row"><span class="cheat-term">Authorization</span><span class="cheat-def">Determining what you can access (permission check)</span></div>
+      <div class="cheat-row"><span class="cheat-term">OAuth 2.0</span><span class="cheat-def">Authorization framework — grants scoped access to resources without sharing passwords</span></div>
+      <div class="cheat-row"><span class="cheat-term">OIDC</span><span class="cheat-def">Identity layer on OAuth 2.0 — adds ID Token (JWT) so you know WHO the user is</span></div>
+      <div class="cheat-row"><span class="cheat-term">SAML</span><span class="cheat-def">XML-based enterprise SSO protocol — older but dominant in corporate environments</span></div>
+      <div class="cheat-row"><span class="cheat-term">JWT</span><span class="cheat-def">Self-contained signed token: Header.Payload.Signature — stateless, not encrypted</span></div>
+      <div class="cheat-row"><span class="cheat-term">Access Token</span><span class="cheat-def">Short-lived (5-15 min), used to call APIs, usually a JWT</span></div>
+      <div class="cheat-row"><span class="cheat-term">Refresh Token</span><span class="cheat-def">Long-lived, used only to get new access tokens, should be rotated</span></div>
+      <div class="cheat-row"><span class="cheat-term">ID Token</span><span class="cheat-def">JWT with user identity claims — OIDC specific, never sent to APIs</span></div>
+      <div class="cheat-row"><span class="cheat-term">SSO</span><span class="cheat-def">Login once, access multiple apps — uses SAML or OIDC under the hood</span></div>
+      <div class="cheat-row"><span class="cheat-term">MFA</span><span class="cheat-def">Multi-factor authentication — something you know + have + are</span></div>
+      <div class="cheat-row"><span class="cheat-term">RBAC</span><span class="cheat-def">Role-Based Access Control — permissions assigned to roles, users get roles</span></div>
+      <div class="cheat-row"><span class="cheat-term">ABAC</span><span class="cheat-def">Attribute-Based Access Control — rules based on user/resource/context attributes</span></div>
+      <div class="cheat-row"><span class="cheat-term">Scope</span><span class="cheat-def">Permission boundary in OAuth — defines what an access token can do</span></div>
+      <div class="cheat-row"><span class="cheat-term">Claim</span><span class="cheat-def">Key-value pair inside a JWT — sub, name, email, roles, exp</span></div>
+      <div class="cheat-row"><span class="cheat-term">IdP</span><span class="cheat-def">Identity Provider — Azure AD, Okta, Auth0 — the system that authenticates users</span></div>
+      <div class="cheat-row"><span class="cheat-term">PKCE</span><span class="cheat-def">Proof Key for Code Exchange — security extension for OAuth in public clients (SPAs, mobile)</span></div>
+      <div class="cheat-row"><span class="cheat-term">Token Rotation</span><span class="cheat-def">Issue new refresh token on each use, invalidate old one — detects theft</span></div>
+      <div class="cheat-row"><span class="cheat-term">Step-up Auth</span><span class="cheat-def">Require stronger authentication for sensitive operations (e.g., wire transfer needs biometric even if already logged in)</span></div>
+      <div class="cheat-row"><span class="cheat-term">Zero Trust</span><span class="cheat-def">"Never trust, always verify" — every request is authenticated and authorized regardless of network location</span></div>
+    </div>
+  </div>
+
+  <!-- ==================== SECTION: Interview Q&A ==================== -->
+  <div class="section" id="interview-qa">
+    <div class="section-title">
+      <div class="icon" style="background: linear-gradient(135deg, #dc2626, #f59e0b);">🎯</div>
+      <h2>Interview Questions & Answers</h2>
+    </div>
+
+    <div class="one-liner">Click any question to reveal the answer. Covers concepts interviewers frequently test.</div>
+
+    <!-- Q1 -->
+    <div class="qa-item">
+      <div class="qa-question"><span class="qa-difficulty basic">BASIC</span><h4>What is the difference between authentication and authorization?</h4><span class="qa-toggle">+</span></div>
+      <div class="qa-answer"><div class="qa-answer-inner">
+        <p><span class="qa-key">Authentication (AuthN)</span> verifies <em>who you are</em> — it's the process of proving your identity. Examples: entering a password, scanning a fingerprint, or completing MFA.</p>
+        <p><span class="qa-key">Authorization (AuthZ)</span> determines <em>what you can do</em> — it's the process of checking permissions after identity is confirmed. Examples: RBAC (role-based access control), OAuth scopes, API permissions.</p>
+        <p><span class="qa-key">Key point:</span> Authentication always happens first. You must establish identity before the system can check permissions. A common analogy: authentication is showing your ID at the door; authorization is the access badge that lets you into specific rooms.</p>
+      </div></div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="qa-item">
+      <div class="qa-question"><span class="qa-difficulty basic">BASIC</span><h4>What is OAuth 2.0 and how does it differ from OIDC?</h4><span class="qa-toggle">+</span></div>
+      <div class="qa-answer"><div class="qa-answer-inner">
+        <p><span class="qa-key">OAuth 2.0</span> is an <em>authorization</em> framework. It allows a third-party app to access a user's resources without knowing their password. Example: "Allow this app to access your Google Drive files." OAuth issues an <strong>Access Token</strong> but does NOT tell the app who the user is.</p>
+        <p><span class="qa-key">OIDC (OpenID Connect)</span> is an <em>identity layer built on top of OAuth 2.0</em>. It adds an <strong>ID Token</strong> (a JWT) that contains user identity information (name, email, roles). So you get both: who the user is (AuthN) AND scoped access (AuthZ).</p>
+        <p><span class="qa-warn">Common mistake in interviews:</span> Saying "OAuth handles login." OAuth is NOT an authentication protocol — it's authorization only. OIDC is what handles login by extending OAuth with identity.</p>
+      </div></div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="qa-item">
+      <div class="qa-question"><span class="qa-difficulty intermediate">INTERMEDIATE</span><h4>Can you explain the structure of a JWT and how it is validated?</h4><span class="qa-toggle">+</span></div>
+      <div class="qa-answer"><div class="qa-answer-inner">
+        <p>A JWT has three Base64-encoded parts separated by dots: <code>Header.Payload.Signature</code></p>
+        <p><span class="qa-key">Header:</span> Contains the algorithm (<code>RS256</code>, <code>HS256</code>) and token type. Tells the verifier how to check the signature.</p>
+        <p><span class="qa-key">Payload:</span> Contains claims — key-value data like <code>sub</code> (user ID), <code>exp</code> (expiry), <code>iss</code> (issuer), <code>aud</code> (audience), <code>roles</code>. This is NOT encrypted — anyone can decode it. Never put secrets here.</p>
+        <p><span class="qa-key">Signature:</span> Cryptographic hash of Header + Payload using a secret key (HS256) or private key (RS256). Proves the token hasn't been tampered with.</p>
+        <p><strong>Validation steps:</strong> (1) Decode the header to find the algorithm. (2) Verify the signature using the IdP's public key (for RS256). (3) Check claims: <code>exp</code> not expired? <code>iss</code> from trusted issuer? <code>aud</code> matches our API? If any check fails → reject with 401.</p>
+        <p><span class="qa-warn">Important:</span> JWTs are <em>signed, not encrypted</em>. The signature proves integrity and authenticity, not confidentiality. If you need encryption, use JWE (JSON Web Encryption).</p>
+      </div></div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="qa-item">
+      <div class="qa-question"><span class="qa-difficulty intermediate">INTERMEDIATE</span><h4>What is PKCE and why was it introduced?</h4><span class="qa-toggle">+</span></div>
+      <div class="qa-answer"><div class="qa-answer-inner">
+        <p><span class="qa-key">PKCE (Proof Key for Code Exchange)</span> is a security extension for the OAuth Authorization Code flow. It prevents <strong>authorization code interception attacks</strong>.</p>
+        <p><strong>The problem:</strong> In public clients (SPAs, mobile apps), there's no client secret — the code lives in the browser or on the device. If an attacker intercepts the authorization code (via a malicious app or redirect), they could exchange it for tokens.</p>
+        <p><strong>How PKCE solves this:</strong> (1) The app generates a random <code>code_verifier</code> (kept secret, in memory). (2) It computes <code>code_challenge = SHA256(code_verifier)</code> and sends the challenge with the auth request. (3) When exchanging the code for tokens, the app sends the original <code>code_verifier</code>. (4) The IdP computes SHA256 of the verifier and checks it matches the original challenge. If it doesn't match → the exchange is rejected.</p>
+        <p><span class="qa-key">Key insight:</span> Even if an attacker steals the authorization code, they can't exchange it because they don't have the <code>code_verifier</code> that was never transmitted over the network — only its hash was. PKCE is now recommended for ALL OAuth clients, not just public ones.</p>
+      </div></div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="qa-item">
+      <div class="qa-question"><span class="qa-difficulty intermediate">INTERMEDIATE</span><h4>What is the difference between an ID Token and an Access Token?</h4><span class="qa-toggle">+</span></div>
+      <div class="qa-answer"><div class="qa-answer-inner">
+        <p><span class="qa-key">ID Token:</span> Issued by OIDC. Contains user identity claims (who you are): <code>sub</code>, <code>name</code>, <code>email</code>, <code>roles</code>. It's always a JWT. The client app consumes it to know who logged in. <strong>Never send it to an API</strong> — it's meant for the client only.</p>
+        <p><span class="qa-key">Access Token:</span> Issued by OAuth/OIDC. Contains authorization claims (what you can do): <code>scope</code>, <code>aud</code>, <code>exp</code>. Used to call APIs via <code>Authorization: Bearer &lt;token&gt;</code>. Can be JWT or opaque. <strong>Sent to APIs, never consumed by the client for identity.</strong></p>
+        <p><span class="qa-warn">A common interview trap:</span> "Can you use an Access Token to get user info?" Technically the token might contain user claims, but the correct answer is: the ID Token is for identity, the Access Token is for API access. If you need user info at the API, the API reads claims from the Access Token or calls the UserInfo endpoint — it should never receive the ID Token.</p>
+      </div></div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="qa-item">
+      <div class="qa-question"><span class="qa-difficulty intermediate">INTERMEDIATE</span><h4>Why shouldn't you store JWTs in localStorage?</h4><span class="qa-toggle">+</span></div>
+      <div class="qa-answer"><div class="qa-answer-inner">
+        <p><code>localStorage</code> is accessible to any JavaScript running on the page. If your app has an <strong>XSS vulnerability</strong> (Cross-Site Scripting) — even in a third-party library — an attacker's script can read the JWT from localStorage and send it to their server. Game over: they now have your access token.</p>
+        <p><span class="qa-key">Better alternatives:</span></p>
+        <p>(1) <strong>In-memory storage:</strong> Store tokens in a JavaScript variable. They're cleared on page refresh, but that's actually a security feature — combine with silent refresh or refresh tokens for persistence.</p>
+        <p>(2) <strong>HTTP-only, Secure, SameSite cookies:</strong> The browser automatically sends them with requests, and JavaScript cannot access them — immune to XSS. Set <code>Secure</code> (HTTPS only), <code>HttpOnly</code> (no JS access), and <code>SameSite=Strict</code> (CSRF protection).</p>
+        <p><span class="qa-warn">Note:</span> <code>sessionStorage</code> has the same XSS vulnerability as localStorage — it's not a safe alternative.</p>
+      </div></div>
+    </div>
+
+    <!-- Q7 -->
+    <div class="qa-item">
+      <div class="qa-question"><span class="qa-difficulty advanced">ADVANCED</span><h4>How does refresh token rotation work and why is it important?</h4><span class="qa-toggle">+</span></div>
+      <div class="qa-answer"><div class="qa-answer-inner">
+        <p>With <span class="qa-key">refresh token rotation</span>, every time a refresh token is used, the server invalidates it and issues a <strong>new</strong> refresh token along with the new access token. The old refresh token can never be used again.</p>
+        <p><strong>Why it matters — theft detection:</strong> Suppose an attacker steals a refresh token. Two scenarios:</p>
+        <p>(1) <em>Attacker uses it first:</em> They get new tokens. When the legitimate user tries to use the (now-invalidated) original refresh token, the server detects reuse of a consumed token → <strong>revokes the entire token family</strong> (all tokens in that chain). Attacker is also kicked out.</p>
+        <p>(2) <em>Legitimate user uses it first:</em> The token is rotated. When the attacker tries to use the stolen (old) token → reuse detected → entire family revoked.</p>
+        <p><span class="qa-key">Either way, compromise is detected.</span> Without rotation, a stolen refresh token is a permanent backdoor — the attacker can silently generate new access tokens indefinitely.</p>
+        <p>This is why modern security best practices (and the OAuth 2.0 Security Best Current Practice RFC) recommend rotation for all refresh tokens, especially for public clients.</p>
+      </div></div>
+    </div>
+
+    <!-- Q8 -->
+    <div class="qa-item">
+      <div class="qa-question"><span class="qa-difficulty advanced">ADVANCED</span><h4>What is the difference between HS256 and RS256? When would you use each?</h4><span class="qa-toggle">+</span></div>
+      <div class="qa-answer"><div class="qa-answer-inner">
+        <p><span class="qa-key">HS256 (HMAC-SHA256):</span> Symmetric algorithm. A single shared secret is used to both sign and verify the token. Fast, simple, but the secret must be shared with every service that needs to verify tokens.</p>
+        <p><span class="qa-key">RS256 (RSA-SHA256):</span> Asymmetric algorithm. A private key signs the token (only the IdP has this). A public key verifies it (anyone can have this). The public key is published at the IdP's <code>/.well-known/jwks.json</code> endpoint.</p>
+        <p><strong>When to use HS256:</strong> Single-service architectures where the same server issues and verifies tokens. Simple setup, no key distribution needed.</p>
+        <p><strong>When to use RS256:</strong> Distributed systems, microservices, any architecture where multiple services need to verify tokens. Since only the IdP holds the private key, no other service can forge tokens — even if they have the public key. This is the standard for production systems.</p>
+        <p><span class="qa-warn">Security risk of HS256 in distributed systems:</span> If you share the HS256 secret with 10 microservices, any one of them can forge tokens for any user. With RS256, only the IdP can sign — the services can only verify.</p>
+      </div></div>
+    </div>
+
+    <!-- Q9 -->
+    <div class="qa-item">
+      <div class="qa-question"><span class="qa-difficulty advanced">ADVANCED</span><h4>How would you revoke a JWT that hasn't expired yet?</h4><span class="qa-toggle">+</span></div>
+      <div class="qa-answer"><div class="qa-answer-inner">
+        <p>This is one of JWT's fundamental trade-offs. Since JWTs are <strong>stateless</strong> — the server doesn't track issued tokens — there's no built-in revocation mechanism. A valid, unexpired JWT will be accepted until <code>exp</code> passes.</p>
+        <p><strong>Strategies for revocation:</strong></p>
+        <p>(1) <span class="qa-key">Short-lived access tokens (recommended):</span> Set expiry to 5-15 minutes. Even if stolen, the window of exploitation is small. Pair with refresh tokens for session longevity.</p>
+        <p>(2) <span class="qa-key">Token blocklist/denylist:</span> Maintain a server-side list of revoked token IDs (<code>jti</code> claim). Check every incoming token against this list. Downside: you've reintroduced server-side state, which defeats the stateless advantage. Use a fast store like Redis to minimize latency.</p>
+        <p>(3) <span class="qa-key">Token versioning:</span> Store a "token version" per user in your database. Embed the version in the JWT. On revocation, increment the version. Tokens with the old version are rejected. Only requires one DB lookup per user, not per token.</p>
+        <p>(4) <span class="qa-key">Revoke the refresh token:</span> You can't recall an access token in the wild, but you can revoke its refresh token so no new access tokens are issued. Combined with short access token lifetimes, the old token expires naturally within minutes.</p>
+        <p><span class="qa-warn">The practical answer:</span> Most production systems combine strategy 1 + 4: short access tokens + refresh token revocation. The blocklist approach (strategy 2) is used only for critical scenarios like immediate employee termination.</p>
+      </div></div>
+    </div>
+
+    <!-- Q10 -->
+    <div class="qa-item">
+      <div class="qa-question"><span class="qa-difficulty basic">BASIC</span><h4>What is Single Sign-On (SSO) and what are its security trade-offs?</h4><span class="qa-toggle">+</span></div>
+      <div class="qa-answer"><div class="qa-answer-inner">
+        <p><span class="qa-key">SSO</span> allows users to authenticate once with a central Identity Provider and then access multiple applications without logging in again. Under the hood, it uses protocols like SAML 2.0 or OIDC.</p>
+        <p><strong>Benefits:</strong> Fewer passwords to remember (reduces password fatigue and reuse), centralized access control (disable one account → revoke access everywhere), single place to enforce MFA, comprehensive audit trail of who accessed what, and reduced help desk tickets for password resets.</p>
+        <p><strong>Trade-offs:</strong></p>
+        <p>(1) <span class="qa-warn">Single point of failure:</span> If the IdP goes down, no one can log into any app. Mitigation: high-availability IdP deployment.</p>
+        <p>(2) <span class="qa-warn">Increased blast radius:</span> One compromised account gives access to everything. Mitigation: mandatory MFA, anomaly detection, step-up auth for sensitive operations.</p>
+        <p>(3) <span class="qa-warn">Session management complexity:</span> How long should the SSO session last? Too long = security risk. Too short = users re-authenticate constantly. Most systems use sliding sessions with idle timeout.</p>
+      </div></div>
+    </div>
+
+    <!-- Q11 -->
+    <div class="qa-item">
+      <div class="qa-question"><span class="qa-difficulty intermediate">INTERMEDIATE</span><h4>What is a CSRF attack and how do OAuth/OIDC protect against it?</h4><span class="qa-toggle">+</span></div>
+      <div class="qa-answer"><div class="qa-answer-inner">
+        <p><span class="qa-key">CSRF (Cross-Site Request Forgery)</span> tricks a user's browser into making an unintended request to a site where they're already authenticated. Example: a malicious site includes an image tag that triggers a bank transfer on a site where you're logged in.</p>
+        <p><strong>In the OAuth/OIDC context,</strong> a CSRF attack could trick the app into exchanging a malicious authorization code — the attacker initiates an OAuth flow and somehow gets the victim's app to complete it, linking the attacker's account.</p>
+        <p><strong>Protection mechanisms:</strong></p>
+        <p>(1) <span class="qa-key">State parameter:</span> The app generates a random <code>state</code> value, includes it in the auth request, and verifies it matches when the callback returns. An attacker can't predict or forge this value.</p>
+        <p>(2) <span class="qa-key">PKCE:</span> Also prevents this — the <code>code_verifier</code> is bound to the session that started the flow.</p>
+        <p>(3) <span class="qa-key">SameSite cookies:</span> Set <code>SameSite=Strict</code> or <code>Lax</code> on auth cookies so they're not sent with cross-origin requests.</p>
+      </div></div>
+    </div>
+
+    <!-- Q12 -->
+    <div class="qa-item">
+      <div class="qa-question"><span class="qa-difficulty advanced">ADVANCED</span><h4>What is the difference between SAML and OIDC? When would you choose one over the other?</h4><span class="qa-toggle">+</span></div>
+      <div class="qa-answer"><div class="qa-answer-inner">
+        <p><span class="qa-key">SAML 2.0:</span> XML-based, enterprise SSO protocol from 2005. Uses XML assertions signed with X.509 certificates. Communicated via browser redirects and POST bindings. Heavyweight payload. Mature, battle-tested in enterprise environments.</p>
+        <p><span class="qa-key">OIDC:</span> JSON-based, modern identity protocol built on OAuth 2.0 (2014). Uses JWTs. Lightweight, designed for web, mobile, and APIs. Easier to implement and debug.</p>
+        <p><strong>Choose SAML when:</strong> Integrating with legacy enterprise systems that only support SAML (many corporate IdPs like legacy Active Directory). Federated identity across organizations (B2B). Compliance requirements that mandate SAML.</p>
+        <p><strong>Choose OIDC when:</strong> Building modern web/mobile apps. Need API authentication (SAML doesn't work well with APIs). Want simpler implementation. Working with cloud-native services. Need a lighter payload.</p>
+        <p><span class="qa-key">In practice:</span> Most modern IdPs (Azure AD, Okta, Auth0) support both. New applications almost always use OIDC. SAML remains dominant in enterprise SSO federations where switching would be costly. Some organizations use both — SAML for legacy apps, OIDC for new ones — with the same IdP.</p>
+      </div></div>
+    </div>
+
+    <!-- Q13 -->
+    <div class="qa-item">
+      <div class="qa-question"><span class="qa-difficulty advanced">ADVANCED</span><h4>A JWT's Access Token says <code>roles: ["admin"]</code> but the user was demoted 5 minutes ago. What happens and how do you handle it?</h4><span class="qa-toggle">+</span></div>
+      <div class="qa-answer"><div class="qa-answer-inner">
+        <p>The user <strong>retains admin access</strong> until the JWT expires. This is the fundamental trade-off of stateless tokens — the JWT was signed with <code>roles: ["admin"]</code> at issuance time, and no one can change it after the fact without invalidating the signature.</p>
+        <p><strong>Mitigation strategies (from least to most complex):</strong></p>
+        <p>(1) <span class="qa-key">Short token lifetimes:</span> If access tokens expire in 5 minutes, the stale role persists for at most 5 minutes. This is usually acceptable.</p>
+        <p>(2) <span class="qa-key">Force refresh:</span> When a role changes, invalidate the user's refresh token. On the next refresh cycle (within minutes), the new token will have the updated role. The old access token expires naturally.</p>
+        <p>(3) <span class="qa-key">Hybrid check:</span> For sensitive operations (delete, admin actions), the API does a real-time permission check against the database, ignoring the JWT's role claim. Regular read operations still use the JWT's cached role for performance.</p>
+        <p>(4) <span class="qa-key">Token blocklist:</span> Add the old token's <code>jti</code> to a Redis blocklist. All services check this on every request. Most invasive but provides immediate revocation.</p>
+        <p><span class="qa-key">The "right" answer:</span> It depends on your security requirements. For most systems, short TTL + forced refresh (1+2) is the sweet spot. For admin/delete operations, add the hybrid check (3) as a safety net.</p>
+      </div></div>
+    </div>
+
+    <!-- Q14 -->
+    <div class="qa-item">
+      <div class="qa-question"><span class="qa-difficulty intermediate">INTERMEDIATE</span><h4>What is Zero Trust architecture and how does auth fit into it?</h4><span class="qa-toggle">+</span></div>
+      <div class="qa-answer"><div class="qa-answer-inner">
+        <p><span class="qa-key">Zero Trust</span> is a security model based on the principle: <strong>"never trust, always verify."</strong> Unlike traditional security (trust everything inside the network perimeter), Zero Trust assumes every request could be malicious — regardless of whether it comes from inside or outside the network.</p>
+        <p><strong>How auth supports Zero Trust:</strong></p>
+        <p>(1) <span class="qa-key">Every request is authenticated:</span> No implicit trust based on network location. Even internal microservice-to-microservice calls must carry valid tokens (mTLS or OAuth client credentials).</p>
+        <p>(2) <span class="qa-key">Every request is authorized:</span> Fine-grained, context-aware access control. Not just "is this a valid user?" but "should this user access this resource, from this device, at this time, from this location?"</p>
+        <p>(3) <span class="qa-key">Least privilege:</span> Tokens carry only the minimum scopes needed. A service that only needs to read data should never receive a token with write permissions.</p>
+        <p>(4) <span class="qa-key">Continuous verification:</span> Don't just authenticate once — re-verify throughout the session. Short-lived tokens force periodic re-validation. Step-up auth for sensitive actions.</p>
+        <p><span class="qa-key">Practical examples:</span> Google's BeyondCorp is a Zero Trust implementation. Azure AD Conditional Access evaluates device compliance, location, and risk level on every sign-in — even for users inside the corporate network.</p>
+      </div></div>
+    </div>
+
+    <!-- Q15 -->
+    <div class="qa-item">
+      <div class="qa-question"><span class="qa-difficulty advanced">ADVANCED</span><h4>How would you secure service-to-service communication in a microservices architecture?</h4><span class="qa-toggle">+</span></div>
+      <div class="qa-answer"><div class="qa-answer-inner">
+        <p>When there's no user involved (e.g., Service A calls Service B on a schedule), you need <strong>machine-to-machine authentication</strong>. The main approaches:</p>
+        <p>(1) <span class="qa-key">OAuth 2.0 Client Credentials flow:</span> Each service has its own <code>client_id</code> and <code>client_secret</code> (or certificate). It authenticates directly with the IdP and receives an access token scoped to what that service needs. The receiving service validates the JWT as normal. This is the most common approach in cloud environments.</p>
+        <p>(2) <span class="qa-key">Mutual TLS (mTLS):</span> Both sides present TLS certificates. The connection itself is authenticated — you know which service is calling at the transport layer. Often used in service meshes (Istio, Linkerd). Can be combined with JWT for authorization claims.</p>
+        <p>(3) <span class="qa-key">API Keys:</span> Simplest but weakest. A shared secret sent as a header. No expiry, no scoping, difficult to rotate. Acceptable only for low-risk internal services or as a supplementary check alongside other mechanisms.</p>
+        <p><strong>Best practices:</strong> Use client credentials flow with short-lived JWTs. Each service gets its own identity (not a shared account). Apply least-privilege scoping — Service A's token only grants access to the specific endpoints it needs on Service B. Rotate credentials regularly. Log all service-to-service calls for audit trails.</p>
+      </div></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <p>Auth & Security — Quick Reference Guide | March 2026</p>
+</div>
+
+<script>
+// Smooth scroll + active nav
+document.querySelectorAll('.nav a').forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
+    link.classList.add('active');
+    document.querySelector(link.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
+  });
+});
+
+// ============ ANIMATED WORKFLOW ENGINE ============
+(function() {
+  const scenarios = {
+    login: {
+      title: "Full Login Flow (OIDC Authorization Code + PKCE)",
+      steps: [
+        { nodes: ['nodeUser','nodeApp'], arrows: [{ from: 'nodeUser', to: 'nodeApp', color: '#3b82f6', label: 'Clicks "Login"' }], badges: [], log: { type: '', text: '<strong>User opens the web application</strong> and clicks "Login". The app detects no active session and begins the OIDC Authorization Code flow.' }, logClass: '' },
+        { nodes: ['nodeApp'], arrows: [], badges: [], log: { type: 'AUTH', text: '<strong>App generates PKCE pair</strong> (this happens inside the Client App, before any redirect): Creates a random <code>code_verifier</code> (secret string, kept locally) and computes <code>code_challenge = SHA256(code_verifier)</code>. PKCE prevents authorization code interception — even if an attacker steals the auth code, they can\'t exchange it without the original verifier.' }, logClass: 'auth' },
+        { nodes: ['nodeApp','nodeIdp'], arrows: [{ from: 'nodeApp', to: 'nodeIdp', color: '#8b5cf6', label: 'Redirect + code_challenge' }], badges: [], log: { type: 'AUTH', text: 'App <strong>redirects</strong> user\'s browser to the Identity Provider with: <code>response_type=code</code>, <code>scope=openid profile email</code>, <code>code_challenge=SHA256(verifier)</code>, <code>code_challenge_method=S256</code>. The IdP stores the challenge for later verification.' }, logClass: 'auth' },
+        { nodes: ['nodeUser','nodeIdp'], arrows: [{ from: 'nodeIdp', to: 'nodeUser', color: '#f59e0b', label: 'Login + MFA' }], badges: [], log: { type: 'AUTH', text: 'IdP shows <strong>login page</strong>. User enters credentials + MFA (something they know + have). IdP verifies identity against its directory. This is <strong>Authentication</strong> — proving "who are you?"' }, logClass: 'auth' },
+        { nodes: ['nodeIdp','nodeApp'], arrows: [{ from: 'nodeIdp', to: 'nodeApp', color: '#22c55e', label: 'Auth Code' }], badges: ['badgeCode'], log: { type: 'TOKEN', text: 'IdP <strong>issues Authorization Code</strong> and redirects back to app: <code>redirect_uri?code=abc123</code>. Code is short-lived (60 sec) and single-use. Not a token — just a temporary receipt.' }, logClass: 'token' },
+        { nodes: ['nodeApp','nodeIdp'], arrows: [{ from: 'nodeApp', to: 'nodeIdp', color: '#8b5cf6', label: 'Code + code_verifier' }], badges: ['badgeCode'], log: { type: 'TOKEN', text: 'App sends auth code + the original <code>code_verifier</code> (kept secret until now) to IdP\'s <strong>/token endpoint</strong>. IdP computes <code>SHA256(code_verifier)</code> and checks it matches the <code>code_challenge</code> from Step 3. This proves the same app that started the flow is finishing it — <strong>PKCE complete!</strong>' }, logClass: 'token' },
+        { nodes: ['nodeIdp','nodeApp'], arrows: [{ from: 'nodeIdp', to: 'nodeApp', color: '#f59e0b', label: 'ID + Access + Refresh' }], badges: ['badgeId','badgeAccess','badgeRefresh'], log: { type: 'TOKEN', text: 'PKCE verified! IdP returns <strong>3 tokens</strong>: <span class="jwt-mini">ID Token</span> (JWT with user identity), <span class="jwt-mini-p">Access Token</span> (JWT, 15 min TTL), <span class="jwt-mini-s">Refresh Token</span> (opaque, 7-day TTL).' }, logClass: 'token' },
+        { nodes: ['nodeApp','nodeApi'], arrows: [{ from: 'nodeApp', to: 'nodeApi', color: '#3b82f6', label: 'Bearer <Access Token>' }], badges: ['badgeAccess'], log: { type: 'API', text: 'App calls <strong>API Gateway</strong> with <code>Authorization: Bearer &lt;access_token&gt;</code>. Gateway <strong>validates JWT</strong> — checks signature, expiry, issuer, audience. This is <strong>Authorization</strong>.' }, logClass: 'api' },
+        { nodes: ['nodeApi','nodeDb'], arrows: [{ from: 'nodeApi', to: 'nodeDb', color: '#22c55e', label: 'RBAC + ABAC Check' }], badges: ['badgeAccess'], log: { type: 'API', text: 'JWT claims include <code>roles: ["editor"]</code> and <code>scope: ["project_42"]</code>. API uses <strong>RBAC + ABAC</strong> to grant access only to this user\'s authorized resources.' }, logClass: 'api' },
+        { nodes: ['nodeDb','nodeApi','nodeApp','nodeUser'], arrows: [{ from: 'nodeDb', to: 'nodeApp', color: '#22c55e', label: 'Client Data' }, { from: 'nodeApp', to: 'nodeUser', color: '#3b82f6', label: 'Dashboard' }], badges: [], log: { type: 'API', text: '<strong>Success!</strong> Data flows back: Resources → API → App → User. Full flow: AuthN (IdP) → Tokens → AuthZ (API) → Data served.' }, logClass: 'api' }
+      ]
+    },
+    api: {
+      title: "API Call — JWT Validation in Detail",
+      steps: [
+        { nodes: ['nodeApp','nodeApi'], arrows: [{ from: 'nodeApp', to: 'nodeApi', color: '#3b82f6', label: 'Bearer JWT' }], badges: ['badgeAccess'], log: { type: '', text: 'App makes API request with <code>Authorization: Bearer eyJhbG...</code>. The access token is a <strong>JWT</strong>: <span class="jwt-mini">Header</span>.<span class="jwt-mini-p">Payload</span>.<span class="jwt-mini-s">Signature</span>' }, logClass: '' },
+        { nodes: ['nodeApi'], arrows: [], badges: ['badgeAccess'], log: { type: 'API', text: '<strong>Step 1 — Decode Header:</strong> API reads <code>{"alg":"RS256","kid":"key-1"}</code>. Knows to use RSA public key from IdP\'s JWKS endpoint.' }, logClass: 'api' },
+        { nodes: ['nodeApi'], arrows: [], badges: ['badgeAccess'], log: { type: 'API', text: '<strong>Step 2 — Verify Signature:</strong> Computes <code>RS256(header.payload, public_key)</code> and compares with signature. Match → authentic. Mismatch → <strong>401</strong>.' }, logClass: 'api' },
+        { nodes: ['nodeApi'], arrows: [], badges: ['badgeAccess'], log: { type: 'API', text: '<strong>Step 3 — Validate Claims:</strong> Check <code>exp</code> (expired?), <code>iss</code> (trusted IdP?), <code>aud</code> (for this API?), <code>nbf</code> (valid time?). Failure → reject.' }, logClass: 'api' },
+        { nodes: ['nodeApi'], arrows: [], badges: ['badgeAccess'], log: { type: 'TOKEN', text: '<strong>Step 4 — Extract AuthZ:</strong> Read <code>roles: ["editor"]</code>, <code>scope: "data.read projects.view"</code>. No DB lookup needed — stateless!' }, logClass: 'token' },
+        { nodes: ['nodeApi','nodeDb'], arrows: [{ from: 'nodeApi', to: 'nodeDb', color: '#22c55e', label: 'Authorized Request' }], badges: [], log: { type: 'API', text: '<strong>Step 5 — Enforce AuthZ:</strong> Scope allows endpoint. ABAC checks user is assigned to client. All pass → forward to resource.' }, logClass: 'api' },
+        { nodes: ['nodeDb','nodeApp'], arrows: [{ from: 'nodeDb', to: 'nodeApp', color: '#22c55e', label: 'Response Data' }], badges: [], log: { type: 'API', text: '<strong>Key:</strong> API validated identity + permissions from JWT alone — no call to IdP or session store. Perfect for microservices. Trade-off: can\'t revoke mid-flight.' }, logClass: 'api' }
+      ]
+    },
+    refresh: {
+      title: "Token Refresh — Silent Re-authentication",
+      steps: [
+        { nodes: ['nodeApp','nodeApi'], arrows: [{ from: 'nodeApp', to: 'nodeApi', color: '#3b82f6', label: 'Expired Access Token' }], badges: ['badgeAccess'], log: { type: '', text: 'App calls API with the <strong>Access Token</strong>. But 15 minutes have passed since login...' }, logClass: '' },
+        { nodes: ['nodeApi','nodeApp'], arrows: [{ from: 'nodeApi', to: 'nodeApp', color: '#ef4444', label: '401 Unauthorized' }], badges: ['badgeAccess'], log: { type: 'EXPIRE', text: 'API checks JWT <code>exp</code> → <strong>expired!</strong> Returns <code>401</code>. User would need to login again... but we have a Refresh Token.' }, logClass: 'refresh' },
+        { nodes: ['nodeApp','nodeIdp'], arrows: [{ from: 'nodeApp', to: 'nodeIdp', color: '#f59e0b', label: 'Refresh Token' }], badges: ['badgeRefresh'], log: { type: 'REFRESH', text: 'App silently sends <strong>Refresh Token</strong> to IdP\'s <code>/token</code> endpoint. User sees nothing.' }, logClass: 'refresh' },
+        { nodes: ['nodeIdp'], arrows: [], badges: ['badgeRefresh'], log: { type: 'AUTH', text: 'IdP validates: token in store? Not revoked? User still active? (Deactivated account → <strong>rejected</strong> — instant revocation!)' }, logClass: 'auth' },
+        { nodes: ['nodeIdp','nodeApp'], arrows: [{ from: 'nodeIdp', to: 'nodeApp', color: '#22c55e', label: 'New Access + New Refresh' }], badges: ['badgeAccess','badgeRefresh'], log: { type: 'TOKEN', text: 'IdP issues <strong>new Access Token</strong> + <strong>new Refresh Token</strong> (rotation!). Old refresh invalidated. Reuse detected → entire family revoked.' }, logClass: 'token' },
+        { nodes: ['nodeApp','nodeApi'], arrows: [{ from: 'nodeApp', to: 'nodeApi', color: '#3b82f6', label: 'New Access Token' }], badges: ['badgeAccess'], log: { type: 'API', text: 'App <strong>retries original call</strong> with new Access Token. Validates → succeeds. User never noticed.' }, logClass: 'api' },
+        { nodes: ['nodeApi','nodeDb','nodeApp','nodeUser'], arrows: [{ from: 'nodeApi', to: 'nodeApp', color: '#22c55e', label: 'Data Response' }], badges: [], log: { type: 'API', text: '<strong>Key takeaway:</strong> Short access tokens (5-15 min) limit blast radius if stolen. Rotation detects theft. Refresh tokens are revocable server-side. Result: secure AND convenient.' }, logClass: 'api' }
+      ]
+    }
+  };
+
+  let currentScenario = 'login';
+  let currentStep = -1;
+  let isPlaying = false;
+  let playTimer = null;
+  const speed = 1500;
+
+  const canvas = document.getElementById('animCanvas');
+  const svg = document.getElementById('animSvg');
+  const logEntries = document.getElementById('logEntries');
+  const stepIndicator = document.getElementById('stepIndicator');
+  const btnPlay = document.getElementById('btnPlay');
+  const btnStep = document.getElementById('btnStep');
+  const btnReset = document.getElementById('btnReset');
+
+  // Get real node center position relative to canvas
+  function getNodeCenter(nodeId) {
+    const node = document.getElementById(nodeId);
+    const cr = canvas.getBoundingClientRect();
+    const nr = node.getBoundingClientRect();
+    return {
+      x: nr.left - cr.left + nr.width / 2,
+      y: nr.top - cr.top + nr.height / 2
+    };
+  }
+
+  // Get edge point on node box facing toward a target point
+  function getEdgePoint(nodeId, targetPt) {
+    const node = document.getElementById(nodeId);
+    const cr = canvas.getBoundingClientRect();
+    const nr = node.getBoundingClientRect();
+    const cx = nr.left - cr.left + nr.width / 2;
+    const cy = nr.top - cr.top + nr.height / 2;
+    const hw = nr.width / 2 + 6; // small padding
+    const hh = nr.height / 2 + 6;
+    const dx = targetPt.x - cx;
+    const dy = targetPt.y - cy;
+    if (dx === 0 && dy === 0) return { x: cx, y: cy };
+    // Scale to hit the box edge
+    const sx = hw / Math.abs(dx || 0.001);
+    const sy = hh / Math.abs(dy || 0.001);
+    const s = Math.min(sx, sy);
+    return { x: cx + dx * s, y: cy + dy * s };
+  }
+
+  function ensureDefs() {
+    let defs = svg.querySelector('defs');
+    if (!defs) { defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs'); svg.prepend(defs); }
+    return defs;
+  }
+
+  function ensureArrowhead(color) {
+    const cid = color.replace('#', '');
+    const id = 'ah-' + cid;
+    if (document.getElementById(id)) return;
+    const defs = ensureDefs();
+    const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+    marker.setAttribute('id', id);
+    marker.setAttribute('markerWidth', '14');
+    marker.setAttribute('markerHeight', '10');
+    marker.setAttribute('refX', '12');
+    marker.setAttribute('refY', '5');
+    marker.setAttribute('orient', 'auto');
+    marker.setAttribute('markerUnits', 'userSpaceOnUse');
+    const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    poly.setAttribute('points', '0 0, 14 5, 0 10');
+    poly.setAttribute('fill', color);
+    marker.appendChild(poly);
+    defs.appendChild(marker);
+  }
+
+  function drawArrow(fromId, toId, color, label, idx) {
+    const fromCenter = getNodeCenter(fromId);
+    const toCenter = getNodeCenter(toId);
+    const fromPt = getEdgePoint(fromId, toCenter);
+    const toPt = getEdgePoint(toId, fromCenter);
+
+    // Curved path: offset control point perpendicular to the line
+    const mx = (fromPt.x + toPt.x) / 2;
+    const my = (fromPt.y + toPt.y) / 2;
+    const dx = toPt.x - fromPt.x;
+    const dy = toPt.y - fromPt.y;
+    const len = Math.sqrt(dx * dx + dy * dy) || 1;
+
+    // Detect arrows that cross behind the IdP box (App↔API, App↔Db, User↔API, User↔Db)
+    // These need the curve to go DOWNWARD (positive Y) to avoid overlapping the IdP node
+    const horizontalPairs = [
+      ['nodeApp','nodeApi'], ['nodeApi','nodeApp'],
+      ['nodeApp','nodeDb'], ['nodeDb','nodeApp'],
+      ['nodeUser','nodeApi'], ['nodeApi','nodeUser'],
+      ['nodeUser','nodeDb'], ['nodeDb','nodeUser']
+    ];
+    const isHorizontalCross = horizontalPairs.some(([a, b]) => a === fromId && b === toId);
+
+    let curveSign, curvature;
+    if (isHorizontalCross) {
+      // Force curve DOWNWARD (positive Y direction) with stronger curvature to clear the IdP box
+      curveSign = 1;  // positive = downward for horizontal lines (perpendicular points down)
+      curvature = Math.min(len * 0.35, 120);
+    } else {
+      curveSign = (idx % 2 === 0) ? -1 : 1;
+      curvature = Math.min(len * 0.2, 50);
+    }
+    const cx = mx + (-dy / len) * curvature * curveSign;
+    const cy = my + (dx / len) * curvature * curveSign;
+
+    ensureArrowhead(color);
+
+    // Create group
+    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.classList.add('arrow-group');
+
+    // Shadow / glow line
+    const shadow = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    shadow.setAttribute('d', `M${fromPt.x},${fromPt.y} Q${cx},${cy} ${toPt.x},${toPt.y}`);
+    shadow.setAttribute('stroke', color);
+    shadow.setAttribute('stroke-opacity', '0.15');
+    shadow.setAttribute('stroke-width', '10');
+    shadow.setAttribute('fill', 'none');
+    shadow.setAttribute('stroke-linecap', 'round');
+    g.appendChild(shadow);
+
+    // Main line
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    const d = `M${fromPt.x},${fromPt.y} Q${cx},${cy} ${toPt.x},${toPt.y}`;
+    path.setAttribute('d', d);
+    path.setAttribute('stroke', color);
+    path.classList.add('arrow-line', 'glow');
+    path.setAttribute('marker-end', `url(#ah-${color.replace('#', '')})`);
+    // Animate draw-in
+    const pathLen = Math.sqrt((toPt.x-fromPt.x)**2 + (toPt.y-fromPt.y)**2) * 1.3;
+    path.style.strokeDasharray = pathLen;
+    path.style.strokeDashoffset = pathLen;
+    g.appendChild(path);
+
+    // Label
+    if (label) {
+      const lbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      // Position label at midpoint of curve, offset away
+      const labelOffset = 16 * curveSign;
+      lbl.setAttribute('x', cx + (-dy / len) * labelOffset);
+      lbl.setAttribute('y', cy + (dx / len) * labelOffset);
+      lbl.setAttribute('text-anchor', 'middle');
+      lbl.setAttribute('dominant-baseline', 'middle');
+      lbl.classList.add('arrow-label');
+      lbl.style.fill = color;
+      lbl.textContent = label;
+      // Background rect for readability
+      const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      g.appendChild(lbl);
+      // We'll size bg after appending
+      setTimeout(() => {
+        try {
+          const bb = lbl.getBBox();
+          bg.setAttribute('x', bb.x - 5);
+          bg.setAttribute('y', bb.y - 2);
+          bg.setAttribute('width', bb.width + 10);
+          bg.setAttribute('height', bb.height + 4);
+          bg.setAttribute('rx', '4');
+          bg.setAttribute('fill', '#0f172a');
+          bg.setAttribute('fill-opacity', '0.85');
+          g.insertBefore(bg, lbl);
+        } catch(e) {}
+      }, 10);
+    }
+
+    // Traveling dot
+    const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    dot.setAttribute('r', '5');
+    dot.setAttribute('fill', color);
+    dot.classList.add('travel-dot');
+    dot.style.color = color;
+    const animMotion = document.createElementNS('http://www.w3.org/2000/svg', 'animateMotion');
+    animMotion.setAttribute('dur', '0.9s');
+    animMotion.setAttribute('repeatCount', '1');
+    animMotion.setAttribute('fill', 'freeze');
+    animMotion.setAttribute('path', d);
+    dot.appendChild(animMotion);
+    g.appendChild(dot);
+    // Remove dot after animation
+    setTimeout(() => { try { dot.remove(); } catch(e){} }, 1100);
+
+    svg.appendChild(g);
+
+    // Trigger draw-in
+    requestAnimationFrame(() => { path.classList.add('drawing'); });
+
+    return path;
+  }
+
+  function buildStepIndicator() {
+    const steps = scenarios[currentScenario].steps;
+    stepIndicator.innerHTML = '';
+    for (let i = 0; i < steps.length; i++) {
+      const sp = document.createElement('span');
+      sp.textContent = i + 1;
+      if (i < currentStep) sp.classList.add('done');
+      if (i === currentStep) sp.classList.add('active');
+      stepIndicator.appendChild(sp);
+    }
+  }
+
+  function resetAnim() {
+    currentStep = -1;
+    isPlaying = false;
+    if (playTimer) clearTimeout(playTimer);
+    btnPlay.textContent = '\u25B6 Play';
+    svg.innerHTML = '';
+    document.querySelectorAll('.anim-node').forEach(n => { n.classList.remove('active', 'done'); });
+    document.querySelectorAll('.token-badge').forEach(b => { b.classList.remove('visible'); });
+    logEntries.innerHTML = '';
+    buildStepIndicator();
+  }
+
+  function advanceStep() {
+    const steps = scenarios[currentScenario].steps;
+    if (currentStep >= steps.length - 1) {
+      isPlaying = false;
+      btnPlay.textContent = '\u25B6 Replay';
+      return false;
+    }
+    currentStep++;
+    const step = steps[currentStep];
+
+    // Dim previous arrows and remove glow
+    svg.querySelectorAll('.arrow-group').forEach(g => {
+      g.querySelectorAll('.arrow-line').forEach(p => { p.classList.add('dim'); p.classList.remove('glow'); });
+      g.querySelectorAll('.arrow-label').forEach(l => l.style.opacity = '0.2');
+      g.querySelectorAll('rect').forEach(r => r.style.opacity = '0.2');
+      // Remove glow shadow on old arrows
+      const shadow = g.querySelector('path[stroke-opacity]');
+      if (shadow) shadow.setAttribute('stroke-opacity', '0');
+    });
+
+    // Update nodes
+    document.querySelectorAll('.anim-node').forEach(n => { n.classList.remove('active'); if (currentStep > 0) n.classList.add('done'); });
+    step.nodes.forEach(nid => {
+      const el = document.getElementById(nid);
+      if (el) { el.classList.add('active'); el.classList.remove('done'); }
+    });
+
+    // Draw new arrows
+    step.arrows.forEach((a, i) => {
+      drawArrow(a.from, a.to, a.color, a.label, i);
+    });
+
+    // Show/hide badges
+    document.querySelectorAll('.token-badge').forEach(b => b.classList.remove('visible'));
+    step.badges.forEach(bid => {
+      const el = document.getElementById(bid);
+      if (el) el.classList.add('visible');
+    });
+
+    // Log entry
+    const entry = document.createElement('div');
+    entry.className = 'log-entry';
+    const stepLabel = step.log.type || ('STEP ' + (currentStep + 1));
+    entry.innerHTML = '<span class="log-step ' + step.logClass + '">' + stepLabel + '</span><span class="log-text">' + step.log.text + '</span>';
+    logEntries.appendChild(entry);
+    requestAnimationFrame(() => entry.classList.add('visible'));
+    entry.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    buildStepIndicator();
+    return true;
+  }
+
+  function playAll() {
+    if (isPlaying) {
+      isPlaying = false;
+      if (playTimer) clearTimeout(playTimer);
+      btnPlay.textContent = '\u25B6 Resume';
+      return;
+    }
+    if (currentStep >= scenarios[currentScenario].steps.length - 1) resetAnim();
+    isPlaying = true;
+    btnPlay.textContent = '\u23F8 Pause';
+    function tick() {
+      if (!isPlaying) return;
+      const more = advanceStep();
+      if (more) { playTimer = setTimeout(tick, speed); }
+      else { btnPlay.textContent = '\u25B6 Replay'; isPlaying = false; }
+    }
+    tick();
+  }
+
+  btnPlay.addEventListener('click', playAll);
+  btnStep.addEventListener('click', () => {
+    if (isPlaying) { isPlaying = false; if (playTimer) clearTimeout(playTimer); btnPlay.textContent = '\u25B6 Resume'; }
+    if (currentStep >= scenarios[currentScenario].steps.length - 1) resetAnim();
+    advanceStep();
+  });
+  btnReset.addEventListener('click', resetAnim);
+
+  document.querySelectorAll('.scenario-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.scenario-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentScenario = tab.dataset.scenario;
+      resetAnim();
+    });
+  });
+
+  // Redraw arrows on resize
+  window.addEventListener('resize', () => { if (currentStep >= 0) { /* Arrows are position-dependent; simplest: reset */ resetAnim(); } });
+
+  resetAnim();
+})();
+
+// Update active nav on scroll
+const sections = document.querySelectorAll('.section');
+const navLinks = document.querySelectorAll('.nav a');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(section => {
+    if (window.scrollY >= section.offsetTop - 120) current = section.getAttribute('id');
+  });
+  navLinks.forEach(link => {
+    link.classList.remove('active');
+    if (link.getAttribute('href') === '#' + current) link.classList.add('active');
+  });
+});
+
+// Interview Q&A accordion
+document.querySelectorAll('.qa-question').forEach(q => {
+  q.addEventListener('click', () => {
+    const item = q.parentElement;
+    const wasOpen = item.classList.contains('open');
+    // Close all others
+    document.querySelectorAll('.qa-item.open').forEach(i => i.classList.remove('open'));
+    // Toggle clicked
+    if (!wasOpen) item.classList.add('open');
+  });
+});
+</script>
+</body>
+</html>
