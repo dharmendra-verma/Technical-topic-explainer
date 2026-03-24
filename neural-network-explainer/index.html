@@ -225,6 +225,43 @@
   .df-arrow{color:var(--dim);font-size:1.1rem;margin:0 2px}
 
   footer{text-align:center;padding:36px 20px;color:var(--dim);font-size:.78rem;border-top:1px solid var(--border);margin-top:36px}
+
+  /* ── Clickable Term Indicator ── */
+  .cblock[data-popup]{cursor:pointer;position:relative}
+  .cblock[data-popup] h3::after{content:'  ↗ Click for deep dive';font-size:.7rem;color:var(--accent);font-weight:500;opacity:.6;margin-left:8px;transition:.2s}
+  .cblock[data-popup]:hover h3::after{opacity:1}
+  .cblock[data-popup]:hover{border-color:var(--accent);box-shadow:0 4px 24px rgba(99,102,241,.18)}
+
+  /* ── Modal / Popup ── */
+  .nn-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;animation:fadeIn .2s ease}
+  .nn-modal-overlay.show{display:flex}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+  .nn-modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;max-width:780px;width:100%;max-height:85vh;overflow-y:auto;position:relative;animation:modalSlide .25s ease}
+  @keyframes modalSlide{from{opacity:0;transform:translateY(24px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+  .nn-modal-header{position:sticky;top:0;background:var(--surface);padding:22px 28px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;z-index:2;border-radius:20px 20px 0 0}
+  .nn-modal-header h2{font-size:1.2rem;font-weight:700;display:flex;align-items:center;gap:10px}
+  .nn-modal-header h2 .modal-step{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;flex-shrink:0}
+  .nn-modal-close{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--surface2);color:var(--dim);font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s;flex-shrink:0}
+  .nn-modal-close:hover{background:var(--accent);color:#fff;border-color:transparent}
+
+  .nn-modal-body{padding:24px 28px 28px}
+  .nn-modal-body h3{font-size:1.02rem;font-weight:700;margin:18px 0 8px;color:var(--accent)}
+  .nn-modal-body h3:first-child{margin-top:0}
+  .nn-modal-body p{font-size:.88rem;color:var(--dim);line-height:1.7;margin-bottom:10px}
+  .nn-modal-body p strong{color:var(--text)}
+  .nn-modal-body .modal-formula{margin:12px 0;padding:12px 16px;background:var(--bg);border-radius:10px;font-family:'Courier New',monospace;font-size:.86rem;color:var(--green);overflow-x:auto;line-height:1.6}
+  .nn-modal-body .modal-example{margin:12px 0;padding:14px 18px;background:rgba(96,165,250,.06);border:1px solid rgba(96,165,250,.12);border-radius:12px;font-size:.86rem;color:var(--dim);line-height:1.7}
+  .nn-modal-body .modal-example strong{color:var(--blue)}
+  .nn-modal-body .modal-analogy{margin:12px 0;padding:14px 18px;background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.12);border-radius:12px;font-size:.86rem;color:var(--orange);line-height:1.7}
+  .nn-modal-body .modal-keypoint{margin:12px 0;padding:14px 18px;background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.12);border-radius:12px;font-size:.86rem;color:var(--green);line-height:1.7}
+  .nn-modal-body .modal-keypoint strong{color:var(--green)}
+  .nn-modal-body .modal-comparison{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+  @media(max-width:600px){.nn-modal-body .modal-comparison{grid-template-columns:1fr}}
+  .nn-modal-body .modal-comp-card{padding:14px;background:var(--surface2);border-radius:10px;font-size:.84rem;line-height:1.6}
+  .nn-modal-body .modal-comp-card h4{font-size:.9rem;margin-bottom:6px}
+  .nn-modal-body .modal-comp-card p{color:var(--dim);margin:0}
 </style>
 </head>
 <body>
@@ -533,15 +570,15 @@
     </div>
     <div class="connector"></div><div class="arrow-down"></div>
 
-    <div class="cblock" onclick="this.classList.toggle('open')">
+    <div class="cblock" data-popup="weighted-sum" onclick="openNNPopup('weighted-sum')">
       <h3><span class="step-num" style="background:var(--green);color:#000">2</span> Weighted Sum — Multiply &amp; Add</h3>
-      <div class="detail">Each connection has a <strong>weight</strong> (importance). The neuron multiplies each input by its weight, sums them up, and adds a <strong>bias</strong> (baseline shift).</div>
+      <div class="detail">Each connection has a <strong>weight</strong> (importance). The neuron multiplies each input by its weight, sums them up, and adds a <strong style="color:var(--accent);cursor:pointer;text-decoration:underline dotted" onclick="event.stopPropagation();openNNPopup('bias')">bias</strong> (baseline shift).</div>
       <div class="formula">z = (w₁·x₁) + (w₂·x₂) + ... + (wₙ·xₙ) + b</div>
       <div class="memory-tip">💡 Remember: Weight = volume knob. Bias = the default volume when nobody's playing music.</div>
     </div>
     <div class="connector"></div><div class="arrow-down"></div>
 
-    <div class="cblock" onclick="this.classList.toggle('open')">
+    <div class="cblock" data-popup="activation-function" onclick="openNNPopup('activation-function')">
       <h3><span class="step-num" style="background:var(--orange);color:#000">3</span> Activation Function — Decide</h3>
       <div class="detail">The weighted sum goes through an activation function that introduces <strong>non-linearity</strong>. Without it, stacking layers would just be linear math — no learning of complex patterns.</div>
       <div class="formula">a = σ(z)  — where σ is ReLU, Sigmoid, Tanh, etc.</div>
@@ -556,7 +593,7 @@
     </div>
     <div class="connector"></div><div class="arrow-down"></div>
 
-    <div class="cblock" onclick="this.classList.toggle('open')">
+    <div class="cblock" data-popup="loss-function" onclick="openNNPopup('loss-function')">
       <h3><span class="step-num" style="background:var(--red);color:#000">5</span> Loss Function — Measure Error</h3>
       <div class="detail">Compare the network's prediction to the actual answer. The <strong>loss function</strong> produces a single number representing "how wrong" the network was.</div>
       <div class="formula">Loss = (1/n) Σ (predicted - actual)²  ← MSE example</div>
@@ -564,7 +601,7 @@
     </div>
     <div class="connector"></div><div class="arrow-down"></div>
 
-    <div class="cblock" onclick="this.classList.toggle('open')">
+    <div class="cblock" data-popup="backpropagation" onclick="openNNPopup('backpropagation')">
       <h3><span class="step-num" style="background:var(--accent2);color:#000">6</span> Backpropagation — Blame Game</h3>
       <div class="detail">The error flows <strong>backward</strong> through the network. Using the chain rule of calculus, each weight learns exactly how much it contributed to the error. This is the gradient.</div>
       <div class="formula">∂Loss/∂w = ∂Loss/∂a · ∂a/∂z · ∂z/∂w  ← chain rule</div>
@@ -2064,6 +2101,295 @@ function drawTfmMultiHead(){
   x.fillText('Each head learns a DIFFERENT type of relationship — then they combine for full understanding',W/2,H-8);
 }
 
+// ── Popup / Modal System ──
+const nnPopupData = {
+  'weighted-sum': {
+    title: 'Weighted Sum',
+    step: '2',
+    stepColor: 'var(--green)',
+    stepTextColor: '#000',
+    html: `
+      <h3>What Happens Inside a Neuron?</h3>
+      <p>In a <strong>fully-connected (dense) network</strong>, every input passes through every neuron. Each neuron receives ALL inputs from the previous layer.</p>
+      <p>But not all inputs are equally important. That's where <strong>weights</strong> come in.</p>
+
+      <h3>The Weight = Importance</h3>
+      <p>Each connection between neurons carries a <strong>weight (w)</strong> — a number that says <strong>"how much should I care about this input?"</strong></p>
+      <div class="modal-keypoint">
+        <strong>Key Insight:</strong> If a weight is close to 0, the neuron effectively ignores that input. If the weight is large (positive or negative), that input strongly influences the neuron's output.
+      </div>
+
+      <h3>The Formula</h3>
+      <div class="modal-formula">z = (w₁ × x₁) + (w₂ × x₂) + (w₃ × x₃) + ... + (wₙ × xₙ) + b</div>
+      <p>Where <strong>x</strong> = inputs, <strong>w</strong> = weights, <strong>b</strong> = bias (explained in Bias popup)</p>
+
+      <h3>Concrete Example</h3>
+      <div class="modal-example">
+        <p>Imagine predicting whether a bank should approve a loan. The neuron receives 3 inputs:</p>
+        <p><strong>x₁ = Age (35)</strong>, <strong>x₂ = Salary (75,000)</strong>, <strong>x₃ = Years of experience (10)</strong></p>
+        <p>The neuron learns weights during training:</p>
+        <p><strong>w₁ = 0.2</strong> (age matters a little)<br>
+        <strong>w₂ = 0.7</strong> (salary matters a lot)<br>
+        <strong>w₃ = 0.5</strong> (experience matters moderately)</p>
+        <p><strong>Weighted Sum:</strong><br>
+        z = (0.2 × 35) + (0.7 × 75,000) + (0.5 × 10) + bias<br>
+        z = 7 + 52,500 + 5 + bias<br>
+        z = 52,512 + bias</p>
+        <p>Notice how salary <strong>dominates</strong> the output because its weight (0.7) combined with a large value produces the biggest contribution. The network <strong>learned</strong> that salary is the most important factor.</p>
+      </div>
+
+      <h3>Why "Weighted" Sum — Not Just Sum?</h3>
+      <p>A plain sum would treat all inputs equally: 35 + 75,000 + 10 = 75,045. The network would have no way to say "salary matters more than age." <strong>Weights are what give the network the ability to learn.</strong></p>
+
+      <div class="modal-analogy">
+        <strong>Analogy:</strong> Think of a music mixing board. Each input channel (vocals, guitar, drums) has its own volume slider. The weighted sum is like mixing all channels together — but each slider (weight) controls how loud that channel is in the final mix. The network learns the perfect slider positions during training.
+      </div>
+    `
+  },
+  'bias': {
+    title: 'Bias',
+    step: 'b',
+    stepColor: 'var(--orange)',
+    stepTextColor: '#000',
+    html: `
+      <h3>What Is Bias?</h3>
+      <p>Bias (<strong>b</strong>) is a simple number added to the weighted sum <strong>before</strong> the activation function. It's a <strong>baseline value</strong> — the neuron's output when all inputs are zero.</p>
+      <div class="modal-formula">z = (w₁ × x₁) + (w₂ × x₂) + ... + b<br><br>Without bias: z = Σ(wᵢ × xᵢ)     ← forced through origin<br>With bias:    z = Σ(wᵢ × xᵢ) + b  ← can shift the line up/down</div>
+
+      <h3>Why Do We Need It?</h3>
+      <p>Without bias, when all inputs are 0, the weighted sum is always 0 — the neuron can never "fire" from a resting state. Bias gives the neuron a <strong>starting point</strong>, allowing it to activate even when inputs are zero.</p>
+      <p>Mathematically, bias lets the neuron <strong>shift its activation function left or right</strong>, which is essential for fitting the data correctly.</p>
+
+      <h3>Concrete Example — Student Pass/Fail</h3>
+      <div class="modal-example">
+        <p>Imagine a neuron deciding if a student passes or fails, based on <strong>hours studied (x₁)</strong> and <strong>hours slept (x₂)</strong>:</p>
+        <p><strong>z = (w₁ × x₁) + (w₂ × x₂) + b</strong><br>
+        <strong>z = (2 × hours_studied) + (1 × hours_slept) + (-6)</strong></p>
+        <p>The bias <strong>b = -6</strong> means: "By default, you fail (negative z). You need enough study + sleep to overcome -6 and push z positive."</p>
+        <p>If a student studied <strong>3 hours</strong> and slept <strong>7 hours</strong>:<br>
+        z = (2 × 3) + (1 × 7) + (-6) = 6 + 7 - 6 = <strong>7</strong> (positive → PASS)</p>
+        <p>If a student studied <strong>1 hour</strong> and slept <strong>2 hours</strong>:<br>
+        z = (2 × 1) + (1 × 2) + (-6) = 2 + 2 - 6 = <strong>-2</strong> (negative → FAIL)</p>
+        <p>The bias (-6) acts as a <strong>threshold</strong>: you need at least a certain combination of study and sleep to pass.</p>
+      </div>
+
+      <h3>Bias vs. Weights — Quick Comparison</h3>
+      <div class="modal-comparison">
+        <div class="modal-comp-card">
+          <h4 style="color:var(--accent)">Weights (w)</h4>
+          <p>Control the <strong>slope/direction</strong> — how much each input matters. They multiply inputs.</p>
+        </div>
+        <div class="modal-comp-card">
+          <h4 style="color:var(--orange)">Bias (b)</h4>
+          <p>Controls the <strong>shift/offset</strong> — where the decision boundary starts. It's added as a constant.</p>
+        </div>
+      </div>
+
+      <div class="modal-keypoint">
+        <strong>Key Insight:</strong> Both weights AND bias are learned during training. The network automatically discovers the best bias values through backpropagation — you don't set them manually.
+      </div>
+
+      <div class="modal-analogy">
+        <strong>Analogy:</strong> Think of a thermostat. The weight is like the sensitivity knob (how much temperature change triggers action). The bias is the baseline temperature setting (e.g., 20°C). Without a baseline, the system would only react relative to zero — not very useful!
+      </div>
+    `
+  },
+  'activation-function': {
+    title: 'Activation Function',
+    step: '3',
+    stepColor: 'var(--orange)',
+    stepTextColor: '#000',
+    html: `
+      <h3>Why Do We Need Activation Functions?</h3>
+      <p>After computing the weighted sum (z = Wx + b), we pass it through an <strong>activation function</strong>. This is the step that gives neural networks their power.</p>
+      <p><strong>Without an activation function</strong>, stacking layers of linear operations (multiply + add) still produces... a linear operation. No matter how many layers you stack, the network can only learn straight-line relationships.</p>
+      <div class="modal-keypoint">
+        <strong>Key Insight:</strong> Activation functions introduce <strong>non-linearity</strong> — the ability to learn curves, bends, and complex decision boundaries. This is what allows neural networks to learn patterns like "if input is between 3 and 7, output high; otherwise, output low."
+      </div>
+
+      <h3>How It Works — Spam Detection Example</h3>
+      <div class="modal-example">
+        <p><strong>Input features:</strong> Number of exclamation marks (x₁), presence of "free" (x₂), number of links (x₃)</p>
+        <p><strong>Step 1 — Weighted sum:</strong><br>
+        z = (0.5 × 10) + (0.8 × 1) + (0.3 × 5) + (-2) = 5 + 0.8 + 1.5 - 2 = <strong>5.3</strong></p>
+        <p><strong>Step 2 — Apply Sigmoid activation:</strong><br>
+        a = sigmoid(5.3) = 1 / (1 + e⁻⁵·³) = <strong>0.995</strong></p>
+        <p><strong>Result:</strong> 99.5% probability this email is spam.</p>
+        <p>The Sigmoid function <strong>squashed</strong> the raw score of 5.3 into a probability between 0 and 1. Without activation, the raw 5.3 has no bounded meaning.</p>
+      </div>
+
+      <h3>The Two Most Important Activation Functions</h3>
+      <div class="modal-comparison">
+        <div class="modal-comp-card">
+          <h4 style="color:var(--blue)">Sigmoid — The Probability Maker</h4>
+          <p><strong>Formula:</strong> σ(z) = 1 / (1 + e⁻ᶻ)</p>
+          <p><strong>Output range:</strong> 0 to 1</p>
+          <p><strong>Used for:</strong> Binary classification output (yes/no, spam/not-spam)</p>
+          <p><strong>Problem:</strong> Vanishing gradients — for very large or small z, the gradient becomes nearly 0, making learning very slow in deep networks.</p>
+        </div>
+        <div class="modal-comp-card">
+          <h4 style="color:var(--green)">ReLU — The Modern Default</h4>
+          <p><strong>Formula:</strong> ReLU(z) = max(0, z)</p>
+          <p><strong>Output range:</strong> 0 to infinity</p>
+          <p><strong>Used for:</strong> Hidden layers in almost all modern networks</p>
+          <p><strong>Why it won:</strong> Super fast to compute, doesn't saturate for positive values, and largely solved the vanishing gradient problem.</p>
+        </div>
+      </div>
+
+      <h3>Quick Decision Guide</h3>
+      <div class="modal-formula">Hidden layers?     → ReLU (default choice)<br>Binary output?     → Sigmoid (outputs probability 0-1)<br>Multi-class output? → Softmax (outputs distribution summing to 1)<br>Transformer models? → GELU (smooth, probabilistic gating)</div>
+
+      <div class="modal-analogy">
+        <strong>Analogy — The Bouncer:</strong> Think of the activation function as a bouncer at a nightclub. The weighted sum (z) is like your "VIP score." The bouncer (activation function) decides: Do you get in? And how enthusiastically?
+        <br><br>
+        <strong>Sigmoid bouncer:</strong> "Everyone gets a score from 0% to 100%. Above 50%? You're probably in."<br>
+        <strong>ReLU bouncer:</strong> "Negative score? You're OUT (0). Positive score? Come right in, the higher the better!"
+      </div>
+    `
+  },
+  'loss-function': {
+    title: 'Loss Function',
+    step: '5',
+    stepColor: 'var(--red)',
+    stepTextColor: '#000',
+    html: `
+      <h3>What Is a Loss Function?</h3>
+      <p>A loss function (also called cost function or objective function) is the <strong>report card</strong> of your neural network. It takes the network's prediction and the actual correct answer, and produces a <strong>single number</strong> that tells you: "How wrong were you?"</p>
+      <div class="modal-keypoint">
+        <strong>Key Insight:</strong> The entire goal of training is to <strong>minimize this number</strong>. Every weight update, every epoch, every gradient descent step — all driven by reducing the loss.
+      </div>
+
+      <h3>MSE — Mean Squared Error (The Most Common)</h3>
+      <div class="modal-formula">MSE = (1/n) × Σ (predicted - actual)²<br><br>For a single prediction:<br>Loss = (predicted - actual)²</div>
+
+      <h3>Concrete Example — House Price Prediction</h3>
+      <div class="modal-example">
+        <p>Your network predicts house prices. For 3 houses:</p>
+        <p><strong>House 1:</strong> Predicted $300K, Actual $310K → Error = ($300K - $310K)² = <strong>$100M</strong> (squared units)<br>
+        <strong>House 2:</strong> Predicted $500K, Actual $480K → Error = ($500K - $480K)² = <strong>$400M</strong><br>
+        <strong>House 3:</strong> Predicted $200K, Actual $210K → Error = ($200K - $210K)² = <strong>$100M</strong></p>
+        <p><strong>MSE = (100M + 400M + 100M) / 3 = $200M</strong></p>
+      </div>
+
+      <h3>Why Squaring? Why Not Just the Difference?</h3>
+      <p><strong>Squaring does three critical things:</strong></p>
+      <p>1. <strong>Makes all errors positive</strong> — a prediction that's $10K too high and $10K too low would cancel to 0 without squaring. Squaring ensures both are punished.</p>
+      <p>2. <strong>Punishes big errors MORE</strong> — an error of 2 becomes 4, but an error of 10 becomes 100. This forces the network to fix its worst predictions first, because large errors contribute disproportionately to the loss.</p>
+      <p>3. <strong>Smooth gradient</strong> — the squared function has a nice, continuous derivative that makes gradient descent work smoothly.</p>
+
+      <h3>Common Loss Functions</h3>
+      <div class="modal-comparison">
+        <div class="modal-comp-card">
+          <h4 style="color:var(--blue)">MSE (Regression)</h4>
+          <p>Predicting continuous numbers (price, temperature, age). Squares the errors.</p>
+        </div>
+        <div class="modal-comp-card">
+          <h4 style="color:var(--pink)">Cross-Entropy (Classification)</h4>
+          <p>Predicting categories (spam/not-spam, cat/dog/bird). Measures probability divergence.</p>
+        </div>
+      </div>
+
+      <div class="modal-analogy">
+        <strong>Analogy — The Teacher's Grading:</strong> Imagine a teacher grading essays on a scale of 0-100. The loss function is like the teacher's red pen — marking how far off each answer is from perfect. MSE is like a strict teacher who gets progressively angrier at bigger mistakes: getting 1 point wrong costs you 1 penalty point, but getting 10 points wrong costs you 100 penalty points (squared!). This forces you to prioritize fixing your biggest mistakes first.
+      </div>
+    `
+  },
+  'backpropagation': {
+    title: 'Backpropagation',
+    step: '6',
+    stepColor: 'var(--accent2)',
+    stepTextColor: '#000',
+    html: `
+      <h3>What Is Backpropagation?</h3>
+      <p>Backpropagation (backprop) is the algorithm that makes neural networks <strong>learn</strong>. After the forward pass produces a prediction and the loss function measures the error, backprop answers the critical question: <strong>"How much did each weight contribute to this error?"</strong></p>
+      <p>It works by flowing the error signal <strong>backward</strong> through the network — from the output layer back to the input layer — using the <strong>chain rule of calculus</strong> to compute the gradient (partial derivative) of the loss with respect to every single weight.</p>
+
+      <h3>The Chain Rule — The Mathematical Engine</h3>
+      <div class="modal-formula">∂Loss/∂w = ∂Loss/∂a × ∂a/∂z × ∂z/∂w<br><br>Where:<br>  ∂Loss/∂a = How does the loss change when the activation changes?<br>  ∂a/∂z    = How does the activation change when the weighted sum changes?<br>  ∂z/∂w    = How does the weighted sum change when the weight changes?</div>
+      <p>The chain rule lets us <strong>decompose</strong> a complex relationship into a chain of simpler, computable steps. Even in a network with millions of weights, each gradient is computed by multiplying a chain of local derivatives.</p>
+
+      <h3>Concrete Example — Walking Through the Math</h3>
+      <div class="modal-example">
+        <p>Suppose a simple network:<br>
+        <strong>Input:</strong> x = 2<br>
+        <strong>Weight:</strong> w = 0.5<br>
+        <strong>Bias:</strong> b = 1<br>
+        <strong>Activation:</strong> ReLU</p>
+
+        <p><strong>Forward pass:</strong><br>
+        z = w × x + b = 0.5 × 2 + 1 = <strong>2</strong><br>
+        a = ReLU(2) = <strong>2</strong> (positive, so passes through)<br>
+        Suppose actual = 3, so Loss = (2 - 3)² = <strong>1</strong></p>
+
+        <p><strong>Backward pass (chain rule):</strong><br>
+        ∂Loss/∂a = 2 × (predicted - actual) = 2 × (2 - 3) = <strong>-2</strong><br>
+        ∂a/∂z = 1 (ReLU derivative for positive z) = <strong>1</strong><br>
+        ∂z/∂w = x = <strong>2</strong></p>
+
+        <p><strong>Final gradient:</strong><br>
+        ∂Loss/∂w = (-2) × (1) × (2) = <strong>-4</strong></p>
+
+        <p><strong>Meaning:</strong> The gradient -4 tells us that increasing w would decrease the loss (because the gradient is negative). So gradient descent will <strong>increase</strong> w to reduce the error:<br>
+        w_new = 0.5 - learning_rate × (-4) = 0.5 + 0.04 = <strong>0.54</strong> (if learning_rate = 0.01)</p>
+      </div>
+
+      <h3>How It Propagates Through Layers</h3>
+      <p>In a deep network with many layers, backprop works layer by layer, starting from the output:</p>
+      <p>1. <strong>Compute loss gradient</strong> at the output layer<br>
+      2. <strong>Pass gradient backward</strong> to the last hidden layer (using chain rule)<br>
+      3. <strong>Each layer</strong> computes its local gradient and passes the error signal further back<br>
+      4. <strong>Every weight</strong> in every layer receives its specific gradient — its "share of the blame"</p>
+
+      <div class="modal-keypoint">
+        <strong>Key Insight:</strong> Backprop doesn't just say "the network was wrong." It says <strong>exactly how much each individual weight</strong> was responsible for the error, and <strong>in which direction</strong> to adjust it. This surgical precision is what makes neural networks trainable.
+      </div>
+
+      <h3>Two Powerful Analogies</h3>
+      <div class="modal-comparison">
+        <div class="modal-comp-card">
+          <h4 style="color:var(--orange)">The Restaurant Analogy</h4>
+          <p>A customer complains the food is too salty. The manager (loss function) traces the problem backward: Was it the chef who added too much salt? The sous chef who over-seasoned the sauce? The supplier who delivered salty ingredients? Each person (weight) gets specific feedback on what to fix.</p>
+        </div>
+        <div class="modal-comp-card">
+          <h4 style="color:var(--accent2)">The Detective Analogy</h4>
+          <p>A crime (bad prediction) occurred. The detective (backprop) works backward from the scene: What was the last action before the crime (output layer)? Who influenced that action (hidden layer)? Who influenced <em>them</em> (earlier layers)? Each suspect (weight) gets a precise "blame score" (gradient).</p>
+        </div>
+      </div>
+
+      <div class="modal-analogy">
+        <strong>Remember:</strong> Forward pass = making a prediction. Loss = measuring how wrong it was. Backpropagation = figuring out who's to blame. Gradient descent = fixing the weights. Together, they form the complete learning loop.
+      </div>
+    `
+  }
+};
+
+function openNNPopup(id) {
+  const data = nnPopupData[id];
+  if (!data) return;
+  const overlay = document.getElementById('nnModalOverlay');
+  const header = overlay.querySelector('.nn-modal-header h2');
+  const body = overlay.querySelector('.nn-modal-body');
+  header.innerHTML = '<span class="modal-step" style="background:' + data.stepColor + ';color:' + data.stepTextColor + '">' + data.step + '</span> ' + data.title;
+  body.innerHTML = data.html;
+  overlay.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeNNPopup() {
+  const overlay = document.getElementById('nnModalOverlay');
+  overlay.classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+// Close on overlay click (outside modal)
+document.addEventListener('click', function(e) {
+  if (e.target && e.target.id === 'nnModalOverlay') closeNNPopup();
+});
+// Close on Escape key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeNNPopup();
+});
+
 function drawTfmEncDec(){
   const c=document.getElementById('cvTfmEncDec'); if(!c) return;
   const x=c.getContext('2d'),W=c.width,H=c.height;
@@ -2118,5 +2444,17 @@ function drawTfmEncDec(){
   x.fillText('Attention grids: bright = token CAN attend, dim = token CANNOT attend (masked)',W/2,H-8);
 }
 </script>
+
+<!-- Modal Overlay -->
+<div class="nn-modal-overlay" id="nnModalOverlay">
+  <div class="nn-modal">
+    <div class="nn-modal-header">
+      <h2></h2>
+      <button class="nn-modal-close" onclick="closeNNPopup()" title="Close (Esc)">&times;</button>
+    </div>
+    <div class="nn-modal-body"></div>
+  </div>
+</div>
+
 </body>
 </html>
