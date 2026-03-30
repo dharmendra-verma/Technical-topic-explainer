@@ -1,0 +1,1608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Governance & Responsible AI — Complete Quick Reference Guide</title>
+<style>
+  /* ===== RESET & BASE ===== */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f1117; --surface: #1a1d27; --surface2: #242837;
+    --border: #2e3348; --text: #e2e4ed; --text-dim: #9ca0b0;
+    --accent: #6c63ff; --accent2: #00d4aa; --accent3: #ff6b6b;
+    --accent4: #ffa726; --accent5: #42a5f5; --accent6: #ab47bc;
+    --grad1: linear-gradient(135deg, #6c63ff 0%, #00d4aa 100%);
+    --grad2: linear-gradient(135deg, #ff6b6b 0%, #ffa726 100%);
+    --grad3: linear-gradient(135deg, #42a5f5 0%, #ab47bc 100%);
+    --radius: 12px; --shadow: 0 4px 24px rgba(0,0,0,.35);
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.7;
+    font-size: 15px;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ===== HERO ===== */
+  .hero {
+    position: relative; overflow: hidden;
+    background: linear-gradient(135deg, #0d0f18 0%, #1a1040 50%, #0d1a2e 100%);
+    padding: 80px 40px 60px; text-align: center;
+  }
+  .hero::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(circle at 30% 50%, rgba(108,99,255,.15) 0%, transparent 60%),
+                radial-gradient(circle at 70% 30%, rgba(0,212,170,.1) 0%, transparent 50%);
+  }
+  .hero h1 {
+    font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 800;
+    background: var(--grad1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; position: relative;
+  }
+  .hero .subtitle {
+    color: var(--text-dim); font-size: 1.1rem; margin-top: 12px; position: relative;
+  }
+  .hero .badge-row { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 20px; position: relative; }
+  .badge {
+    display: inline-block; padding: 4px 14px; border-radius: 20px;
+    font-size: .78rem; font-weight: 600; letter-spacing: .3px;
+  }
+  .badge-purple { background: rgba(108,99,255,.2); color: #a29bfe; border: 1px solid rgba(108,99,255,.3); }
+  .badge-green  { background: rgba(0,212,170,.15); color: #00d4aa; border: 1px solid rgba(0,212,170,.25); }
+  .badge-red    { background: rgba(255,107,107,.15); color: #ff6b6b; border: 1px solid rgba(255,107,107,.25); }
+  .badge-blue   { background: rgba(66,165,245,.15); color: #42a5f5; border: 1px solid rgba(66,165,245,.25); }
+
+  /* ===== FLOATING PARTICLES (CSS only) ===== */
+  .particle {
+    position: absolute; border-radius: 50%; opacity: .3;
+    animation: floaty 8s ease-in-out infinite;
+  }
+  .particle:nth-child(1) { width:6px;height:6px;background:var(--accent);top:20%;left:10%;animation-delay:0s; }
+  .particle:nth-child(2) { width:4px;height:4px;background:var(--accent2);top:60%;left:80%;animation-delay:2s; }
+  .particle:nth-child(3) { width:8px;height:8px;background:var(--accent4);top:40%;left:50%;animation-delay:4s; }
+  .particle:nth-child(4) { width:5px;height:5px;background:var(--accent5);top:70%;left:25%;animation-delay:1s; }
+  .particle:nth-child(5) { width:3px;height:3px;background:var(--accent6);top:30%;left:70%;animation-delay:3s; }
+  @keyframes floaty {
+    0%,100%{transform:translateY(0) scale(1)}
+    50%{transform:translateY(-30px) scale(1.3)}
+  }
+
+  /* ===== LAYOUT ===== */
+  .container { max-width: 1320px; margin: 0 auto; padding: 0 24px; }
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 24px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+
+  /* ===== TABLE OF CONTENTS ===== */
+  .toc-bar {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(15,17,23,.92); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border); padding: 12px 0;
+  }
+  .toc-inner {
+    max-width: 1320px; margin: 0 auto; padding: 0 24px;
+    display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
+  }
+  .toc-inner::-webkit-scrollbar { display: none; }
+  .toc-link {
+    white-space: nowrap; padding: 6px 16px; border-radius: 20px;
+    font-size: .8rem; font-weight: 600; color: var(--text-dim);
+    border: 1px solid transparent; transition: all .2s;
+  }
+  .toc-link:hover { color: var(--accent); background: rgba(108,99,255,.1); border-color: rgba(108,99,255,.3); text-decoration: none; }
+
+  /* ===== SECTION ===== */
+  section { padding: 56px 0; }
+  .section-header {
+    margin-bottom: 36px; padding-bottom: 16px;
+    border-bottom: 2px solid var(--border);
+  }
+  .section-header h2 {
+    font-size: 1.75rem; font-weight: 700; display: flex; align-items: center; gap: 12px;
+  }
+  .section-header h2 .icon {
+    width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem;
+  }
+  .section-header .hint {
+    margin-top: 8px; font-size: .88rem; color: var(--accent2);
+    padding: 6px 14px; background: rgba(0,212,170,.08); border-radius: 8px;
+    border-left: 3px solid var(--accent2); display: inline-block;
+  }
+
+  /* ===== CARD ===== */
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow);
+    transition: transform .2s, border-color .2s;
+  }
+  .card:hover { transform: translateY(-3px); border-color: var(--accent); }
+  .card h3 { font-size: 1.1rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .card h3 .num {
+    min-width: 28px; height: 28px; border-radius: 50%; display: flex;
+    align-items: center; justify-content: center; font-size: .8rem; font-weight: 700;
+    background: var(--grad1); color: #fff;
+  }
+  .card p, .card li { color: var(--text-dim); font-size: .92rem; }
+  .card ul { list-style: none; padding-left: 0; }
+  .card ul li { padding: 4px 0; padding-left: 18px; position: relative; }
+  .card ul li::before { content: '▸'; position: absolute; left: 0; color: var(--accent); }
+
+  /* ===== TABLES ===== */
+  .table-wrap { overflow-x: auto; margin: 16px 0; }
+  table {
+    width: 100%; border-collapse: collapse; font-size: .88rem;
+    background: var(--surface);
+  }
+  th {
+    background: var(--surface2); color: var(--accent);
+    padding: 12px 16px; text-align: left; font-weight: 700;
+    border-bottom: 2px solid var(--accent);
+    position: sticky; top: 52px;
+  }
+  td {
+    padding: 10px 16px; border-bottom: 1px solid var(--border);
+    color: var(--text-dim); vertical-align: top;
+  }
+  tr:hover td { background: rgba(108,99,255,.04); }
+
+  /* ===== RISK PYRAMID ===== */
+  .pyramid { display: flex; flex-direction: column; align-items: center; gap: 6px; margin: 30px 0; }
+  .pyramid-level {
+    padding: 14px 20px; text-align: center; border-radius: 8px;
+    font-weight: 600; font-size: .9rem; position: relative;
+    animation: fadeSlideUp .6s ease-out backwards;
+  }
+  .pyramid-level:nth-child(1) { width: 45%; animation-delay: .1s; }
+  .pyramid-level:nth-child(2) { width: 60%; animation-delay: .2s; }
+  .pyramid-level:nth-child(3) { width: 75%; animation-delay: .3s; }
+  .pyramid-level:nth-child(4) { width: 90%; animation-delay: .4s; }
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .risk-banned { background: linear-gradient(135deg, #d32f2f, #b71c1c); color: #fff; }
+  .risk-high   { background: linear-gradient(135deg, #f57c00, #e65100); color: #fff; }
+  .risk-limited { background: linear-gradient(135deg, #ffa726, #ff9800); color: #1a1d27; }
+  .risk-minimal { background: linear-gradient(135deg, #66bb6a, #43a047); color: #1a1d27; }
+
+  /* ===== TIMELINE ===== */
+  .timeline { position: relative; padding: 20px 0; }
+  .timeline::before {
+    content: ''; position: absolute; left: 20px; top: 0; bottom: 0;
+    width: 3px; background: var(--grad1); border-radius: 2px;
+  }
+  .tl-item {
+    position: relative; padding: 0 0 32px 56px;
+    animation: fadeSlideUp .5s ease-out backwards;
+  }
+  .tl-item:nth-child(1) { animation-delay: .1s; }
+  .tl-item:nth-child(2) { animation-delay: .2s; }
+  .tl-item:nth-child(3) { animation-delay: .3s; }
+  .tl-item:nth-child(4) { animation-delay: .4s; }
+  .tl-item:nth-child(5) { animation-delay: .5s; }
+  .tl-item:nth-child(6) { animation-delay: .6s; }
+  .tl-dot {
+    position: absolute; left: 12px; top: 4px;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--accent); border: 3px solid var(--bg);
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+  .tl-item .date { font-weight: 700; color: var(--accent); font-size: .85rem; }
+  .tl-item .desc { color: var(--text-dim); font-size: .9rem; margin-top: 4px; }
+
+  /* ===== MNEMONIC BOXES ===== */
+  .mnemonic {
+    background: linear-gradient(135deg, rgba(108,99,255,.1), rgba(0,212,170,.08));
+    border: 1px dashed var(--accent); border-radius: var(--radius);
+    padding: 20px 24px; margin: 16px 0;
+  }
+  .mnemonic .title { font-weight: 700; color: var(--accent); margin-bottom: 8px; }
+  .mnemonic .letters { display: flex; flex-wrap: wrap; gap: 8px; }
+  .mnemonic .letter-box {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 12px; background: rgba(108,99,255,.15);
+    border-radius: 8px; font-size: .85rem;
+  }
+  .mnemonic .letter-box .big {
+    font-size: 1.3rem; font-weight: 800; color: var(--accent);
+  }
+
+  /* ===== COMPARISON BARS ===== */
+  .bar-chart { margin: 16px 0; }
+  .bar-row { display: flex; align-items: center; gap: 12px; margin: 8px 0; }
+  .bar-label { min-width: 120px; font-size: .85rem; color: var(--text-dim); text-align: right; }
+  .bar-track { flex: 1; height: 24px; background: var(--surface2); border-radius: 12px; overflow: hidden; }
+  .bar-fill {
+    height: 100%; border-radius: 12px; display: flex; align-items: center;
+    padding-left: 10px; font-size: .75rem; font-weight: 700; color: #fff;
+    animation: barGrow 1.2s ease-out backwards;
+  }
+  @keyframes barGrow { from { width: 0 !important; } }
+
+  /* ===== PILLAR CARDS ===== */
+  .pillar-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 24px; text-align: center; position: relative; overflow: hidden;
+    transition: transform .2s, border-color .2s;
+  }
+  .pillar-card:hover { transform: translateY(-4px); border-color: var(--accent); }
+  .pillar-card .pillar-icon {
+    width: 56px; height: 56px; border-radius: 16px; margin: 0 auto 14px;
+    display: flex; align-items: center; justify-content: center; font-size: 1.6rem;
+  }
+  .pillar-card h4 { font-size: 1rem; margin-bottom: 10px; }
+  .pillar-card p { font-size: .85rem; color: var(--text-dim); }
+
+  /* ===== ACCORDION ===== */
+  details { margin-bottom: 8px; }
+  details summary {
+    padding: 14px 20px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); cursor: pointer; font-weight: 600; font-size: .95rem;
+    list-style: none; display: flex; align-items: center; gap: 10px;
+    transition: background .2s, border-color .2s;
+  }
+  details summary::-webkit-details-marker { display: none; }
+  details summary::after {
+    content: '+'; margin-left: auto; font-size: 1.2rem; color: var(--accent);
+    transition: transform .2s;
+  }
+  details[open] summary::after { content: '−'; }
+  details[open] summary { border-color: var(--accent); background: var(--surface2); border-radius: var(--radius) var(--radius) 0 0; }
+  details .detail-content {
+    padding: 16px 20px; background: var(--surface);
+    border: 1px solid var(--border); border-top: none;
+    border-radius: 0 0 var(--radius) var(--radius);
+    color: var(--text-dim); font-size: .9rem;
+  }
+  details .detail-content ul { list-style: none; padding: 0; }
+  details .detail-content li { padding: 4px 0 4px 18px; position: relative; }
+  details .detail-content li::before { content: '▸'; position: absolute; left: 0; color: var(--accent2); }
+
+  /* ===== TAGS ===== */
+  .tag {
+    display: inline-block; padding: 3px 10px; border-radius: 6px;
+    font-size: .75rem; font-weight: 600; margin: 2px;
+  }
+  .tag-red { background: rgba(255,107,107,.15); color: #ff6b6b; }
+  .tag-orange { background: rgba(255,167,38,.15); color: #ffa726; }
+  .tag-green { background: rgba(0,212,170,.15); color: #00d4aa; }
+  .tag-blue { background: rgba(66,165,245,.15); color: #42a5f5; }
+  .tag-purple { background: rgba(171,71,188,.15); color: #ce93d8; }
+
+  /* ===== CALLOUT ===== */
+  .callout {
+    padding: 16px 20px; border-radius: var(--radius);
+    margin: 16px 0; font-size: .9rem;
+  }
+  .callout-warn { background: rgba(255,167,38,.1); border-left: 4px solid var(--accent4); }
+  .callout-info { background: rgba(66,165,245,.1); border-left: 4px solid var(--accent5); }
+  .callout-danger { background: rgba(255,107,107,.1); border-left: 4px solid var(--accent3); }
+  .callout-success { background: rgba(0,212,170,.1); border-left: 4px solid var(--accent2); }
+  .callout strong { color: var(--text); }
+
+  /* ===== FLOW DIAGRAM (CSS) ===== */
+  .flow { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 20px 0; justify-content: center; }
+  .flow-step {
+    padding: 10px 18px; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; font-size: .85rem; font-weight: 600; text-align: center;
+    min-width: 100px;
+  }
+  .flow-arrow { color: var(--accent); font-size: 1.2rem; }
+
+  /* ===== CHECKLIST ===== */
+  .checklist { list-style: none; padding: 0; }
+  .checklist li {
+    padding: 8px 0 8px 30px; position: relative; color: var(--text-dim); font-size: .9rem;
+    border-bottom: 1px solid rgba(46,51,72,.5);
+  }
+  .checklist li::before {
+    content: '☐'; position: absolute; left: 0; top: 8px;
+    color: var(--accent); font-size: 1.1rem;
+  }
+
+  /* ===== STAT CARDS ===== */
+  .stat-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px; text-align: center;
+  }
+  .stat-card .stat-num {
+    font-size: 2rem; font-weight: 800;
+    background: var(--grad1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .stat-card .stat-label { font-size: .8rem; color: var(--text-dim); margin-top: 4px; }
+
+  /* ===== PRINT ===== */
+  @media print {
+    body { background: #fff; color: #222; }
+    .toc-bar { display: none; }
+    .card, .pillar-card, .stat-card { box-shadow: none; border-color: #ccc; }
+    .hero { background: #f5f5f5; }
+    .hero h1 { -webkit-text-fill-color: #333; }
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    .hero { padding: 50px 20px 40px; }
+    .pyramid-level:nth-child(1) { width: 70%; }
+    .pyramid-level:nth-child(2) { width: 80%; }
+    .pyramid-level:nth-child(3) { width: 90%; }
+    .pyramid-level:nth-child(4) { width: 100%; }
+    .flow { flex-direction: column; }
+    .flow-arrow { transform: rotate(90deg); }
+  }
+
+  /* ===== PULSE ANIMATION ===== */
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+  .pulse { animation: pulse 2s ease-in-out infinite; }
+
+  /* ===== COMPARISON TABLE ===== */
+  .cmp-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; font-size: .82rem; }
+  .cmp-grid > div { padding: 12px 14px; border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); }
+  .cmp-grid > div:nth-child(4n) { border-right: none; }
+  .cmp-header { background: var(--surface2); font-weight: 700; color: var(--accent); }
+  .cmp-label { background: var(--surface); font-weight: 600; color: var(--text); }
+
+  /* === SCROLL-REVEAL === */
+  .reveal {
+    opacity: 0; transform: translateY(24px);
+    transition: opacity .6s ease, transform .6s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- ==================== HERO ==================== -->
+<div class="hero">
+  <div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div>
+  <h1>AI Governance & Responsible AI</h1>
+  <p class="subtitle">The Definitive Quick Reference for Product Managers & Security Experts</p>
+  <div class="badge-row">
+    <span class="badge badge-purple">EU AI Act</span>
+    <span class="badge badge-green">NIST AI RMF</span>
+    <span class="badge badge-blue">ISO/IEC 42001</span>
+    <span class="badge badge-red">Risk Management</span>
+  </div>
+</div>
+
+<!-- ==================== NAV ==================== -->
+<nav class="toc-bar">
+  <div class="toc-inner">
+    <a class="toc-link" href="#foundations">🏛 Foundations</a>
+    <a class="toc-link" href="#principles">⚖️ 6 Pillars</a>
+    <a class="toc-link" href="#frameworks">📐 Frameworks</a>
+    <a class="toc-link" href="#eu-ai-act">🇪🇺 EU AI Act</a>
+    <a class="toc-link" href="#risk">⚠️ Risk Mgmt</a>
+    <a class="toc-link" href="#bias">🎯 Bias & Fairness</a>
+    <a class="toc-link" href="#explainability">🔍 Explainability</a>
+    <a class="toc-link" href="#security">🔒 Security</a>
+    <a class="toc-link" href="#privacy">🛡 Privacy</a>
+    <a class="toc-link" href="#lifecycle">🔄 Lifecycle</a>
+    <a class="toc-link" href="#roles">👥 Roles</a>
+    <a class="toc-link" href="#global">🌍 Global Regs</a>
+    <a class="toc-link" href="#genai">🤖 GenAI</a>
+    <a class="toc-link" href="#tools">🛠 Tools</a>
+    <a class="toc-link" href="#checklist">✅ Checklist</a>
+    <a class="toc-link" href="#glossary">📖 Glossary</a>
+  </div>
+</nav>
+
+<div class="container">
+
+<!-- ==================== 1. FOUNDATIONS ==================== -->
+<section id="foundations" class="reveal">
+  <div class="section-header">
+    <h2><span class="icon" style="background:rgba(108,99,255,.15);color:var(--accent);">🏛</span> 1. What Is AI Governance?</h2>
+    <div class="hint">💡 Remember: AI Governance = Rules + Processes + People + Technology to manage AI responsibly</div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3>Definition</h3>
+      <p>AI Governance is the <strong style="color:var(--accent)">system of rules, practices, processes, and technological tools</strong> that ensure an organization's use of AI technologies aligns with its strategies, objectives, legal obligations, and societal values.</p>
+      <p style="margin-top:12px;">It encompasses <strong>policies, oversight structures, accountability mechanisms, and technical guardrails</strong> across the entire AI lifecycle — from ideation to decommissioning.</p>
+    </div>
+    <div class="card">
+      <h3>Why It Matters (Business Case)</h3>
+      <ul>
+        <li><strong>Regulatory Compliance</strong> — Avoid fines up to €35M or 7% global turnover (EU AI Act)</li>
+        <li><strong>Trust & Reputation</strong> — 85% of consumers say trust influences AI product adoption</li>
+        <li><strong>Risk Mitigation</strong> — AI incidents rose 56.4% from 2023→2024</li>
+        <li><strong>Competitive Advantage</strong> — Governed AI = faster enterprise adoption</li>
+        <li><strong>Liability Protection</strong> — Documented governance creates legal defensibility</li>
+        <li><strong>Innovation Enablement</strong> — Clear boundaries accelerate safe experimentation</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="mnemonic" style="margin-top:24px;">
+    <div class="title">🧠 Mnemonic: "GREAT AI" — The 7 Dimensions of AI Governance</div>
+    <div class="letters">
+      <div class="letter-box"><span class="big">G</span>overnance Structure</div>
+      <div class="letter-box"><span class="big">R</span>isk Management</div>
+      <div class="letter-box"><span class="big">E</span>thics & Fairness</div>
+      <div class="letter-box"><span class="big">A</span>ccountability</div>
+      <div class="letter-box"><span class="big">T</span>ransparency</div>
+      <div class="letter-box"><span class="big">A</span>uditability</div>
+      <div class="letter-box"><span class="big">I</span>nclusion & Privacy</div>
+    </div>
+  </div>
+
+  <div class="grid-4" style="margin-top:24px;">
+    <div class="stat-card">
+      <div class="stat-num">€35M</div>
+      <div class="stat-label">Max EU AI Act fine</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">56%</div>
+      <div class="stat-label">YoY AI incident increase</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">127+</div>
+      <div class="stat-label">Countries with AI policies</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">Aug 2026</div>
+      <div class="stat-label">EU AI Act full enforcement</div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 2. SIX PILLARS ==================== -->
+<section id="principles" class="reveal">
+  <div class="section-header">
+    <h2><span class="icon" style="background:rgba(0,212,170,.15);color:var(--accent2);">⚖️</span> 2. The Six Pillars of Responsible AI</h2>
+    <div class="hint">💡 Remember: "FRIST-A" → Fairness, Reliability, Inclusiveness, Security, Transparency, Accountability</div>
+  </div>
+
+  <div class="grid-3">
+    <div class="pillar-card">
+      <div class="pillar-icon" style="background:rgba(108,99,255,.15);">⚖️</div>
+      <h4 style="color:var(--accent);">1. Fairness</h4>
+      <p>AI systems should treat all people equitably, avoiding discrimination based on race, gender, age, disability, or other protected characteristics. Includes equal quality of service and equitable impact assessment.</p>
+      <div style="margin-top:10px;">
+        <span class="tag tag-purple">Bias Testing</span>
+        <span class="tag tag-purple">Demographic Parity</span>
+        <span class="tag tag-purple">Equal Opportunity</span>
+      </div>
+    </div>
+    <div class="pillar-card">
+      <div class="pillar-icon" style="background:rgba(66,165,245,.15);">🛡️</div>
+      <h4 style="color:var(--accent5);">2. Reliability & Safety</h4>
+      <p>AI systems must perform reliably and safely under expected and unexpected conditions. Includes robustness testing, fail-safes, graceful degradation, and continuous monitoring.</p>
+      <div style="margin-top:10px;">
+        <span class="tag tag-blue">Robustness</span>
+        <span class="tag tag-blue">Fail-safes</span>
+        <span class="tag tag-blue">Stress Testing</span>
+      </div>
+    </div>
+    <div class="pillar-card">
+      <div class="pillar-icon" style="background:rgba(171,71,188,.15);">🤝</div>
+      <h4 style="color:var(--accent6);">3. Inclusiveness</h4>
+      <p>AI systems should be designed to engage and empower everyone, addressing potential barriers and ensuring accessibility across diverse populations, abilities, and contexts.</p>
+      <div style="margin-top:10px;">
+        <span class="tag tag-purple">Accessibility</span>
+        <span class="tag tag-purple">Diverse Teams</span>
+        <span class="tag tag-purple">Universal Design</span>
+      </div>
+    </div>
+    <div class="pillar-card">
+      <div class="pillar-icon" style="background:rgba(255,107,107,.15);">🔐</div>
+      <h4 style="color:var(--accent3);">4. Privacy & Security</h4>
+      <p>AI systems must protect user data, ensure confidentiality, prevent unauthorized access, and resist adversarial attacks. Data minimization and purpose limitation are core.</p>
+      <div style="margin-top:10px;">
+        <span class="tag tag-red">Data Minimization</span>
+        <span class="tag tag-red">Encryption</span>
+        <span class="tag tag-red">Access Control</span>
+      </div>
+    </div>
+    <div class="pillar-card">
+      <div class="pillar-icon" style="background:rgba(0,212,170,.15);">👁️</div>
+      <h4 style="color:var(--accent2);">5. Transparency</h4>
+      <p>People should understand how AI systems work, what data they use, and how decisions are made. Includes documentation, model cards, and clear communication to all stakeholders.</p>
+      <div style="margin-top:10px;">
+        <span class="tag tag-green">Model Cards</span>
+        <span class="tag tag-green">Data Sheets</span>
+        <span class="tag tag-green">Explainability</span>
+      </div>
+    </div>
+    <div class="pillar-card">
+      <div class="pillar-icon" style="background:rgba(255,167,38,.15);">📋</div>
+      <h4 style="color:var(--accent4);">6. Accountability</h4>
+      <p>Organizations and individuals must be answerable for AI systems they design, develop, and deploy. Requires clear ownership, audit trails, redress mechanisms, and governance committees.</p>
+      <div style="margin-top:10px;">
+        <span class="tag tag-orange">Audit Trails</span>
+        <span class="tag tag-orange">Governance Board</span>
+        <span class="tag tag-orange">Redress</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-info" style="margin-top:24px;">
+    <strong>🏢 Industry Alignment:</strong> Microsoft uses all 6 pillars. Google emphasizes "Social Benefit" + "Avoiding Harm." IBM focuses on "Trust, Fairness, Robustness, Transparency, Privacy." Despite naming differences, the core principles converge across all major tech companies and international bodies (OECD, UNESCO, G7).
+  </div>
+</section>
+
+<!-- ==================== 3. FRAMEWORKS ==================== -->
+<section id="frameworks" class="reveal">
+  <div class="section-header">
+    <h2><span class="icon" style="background:rgba(66,165,245,.15);color:var(--accent5);">📐</span> 3. Key Governance Frameworks Compared</h2>
+    <div class="hint">💡 Remember: "NIE" — NIST (voluntary US), ISO (certifiable intl), EU AI Act (mandatory law)</div>
+  </div>
+
+  <!-- Comparison Grid -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:16%;">Dimension</th>
+          <th style="width:28%;">🇺🇸 NIST AI RMF 1.0</th>
+          <th style="width:28%;">🌐 ISO/IEC 42001</th>
+          <th style="width:28%;">🇪🇺 EU AI Act</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Type</strong></td>
+          <td>Voluntary framework / guidelines</td>
+          <td>Certifiable international standard</td>
+          <td>Binding legislation (regulation)</td>
+        </tr>
+        <tr>
+          <td><strong>Scope</strong></td>
+          <td>All AI systems; any organization</td>
+          <td>AI management system (AIMS) for any org</td>
+          <td>AI systems placed on or used in EU market</td>
+        </tr>
+        <tr>
+          <td><strong>Structure</strong></td>
+          <td><strong>4 Functions:</strong> Govern → Map → Measure → Manage</td>
+          <td><strong>PDCA cycle:</strong> Plan → Do → Check → Act (ISO management system)</td>
+          <td><strong>Risk-based tiers:</strong> Prohibited → High → Limited → Minimal</td>
+        </tr>
+        <tr>
+          <td><strong>Risk Approach</strong></td>
+          <td>Context-dependent risk profiles</td>
+          <td>Formal risk assessment aligned to ISO 31000</td>
+          <td>Pre-defined risk categories with obligations</td>
+        </tr>
+        <tr>
+          <td><strong>Enforcement</strong></td>
+          <td>None (voluntary), but referenced by regulators</td>
+          <td>Third-party certification audits</td>
+          <td>Fines: up to €35M or 7% global turnover</td>
+        </tr>
+        <tr>
+          <td><strong>Best For</strong></td>
+          <td>Building internal AI risk culture & processes</td>
+          <td>Demonstrating maturity to clients & regulators</td>
+          <td>Legal compliance for EU market</td>
+        </tr>
+        <tr>
+          <td><strong>Relationship</strong></td>
+          <td colspan="2" style="text-align:center;"><em>NIST maps to ISO 42001 — <a href="https://airc.nist.gov/docs/NIST_AI_RMF_to_ISO_IEC_42001_Crosswalk.pdf" target="_blank">official crosswalk exists</a></em></td>
+          <td><em>ISO 42001 + NIST help satisfy EU AI Act conformity</em></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- NIST 4 Functions Detail -->
+  <h3 style="margin-top:30px; margin-bottom:16px; color:var(--accent);">NIST AI RMF — The Four Core Functions</h3>
+  <div class="flow">
+    <div class="flow-step" style="border-color:var(--accent);color:var(--accent);">🏛 GOVERN<br><small style="color:var(--text-dim);">Culture, policies, roles</small></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-step" style="border-color:var(--accent5);color:var(--accent5);">🗺 MAP<br><small style="color:var(--text-dim);">Context & risk identification</small></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-step" style="border-color:var(--accent4);color:var(--accent4);">📏 MEASURE<br><small style="color:var(--text-dim);">Assess & quantify risks</small></div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-step" style="border-color:var(--accent2);color:var(--accent2);">⚙️ MANAGE<br><small style="color:var(--text-dim);">Treat, monitor, improve</small></div>
+  </div>
+  <div class="grid-2" style="margin-top:16px;">
+    <div class="card">
+      <h3>🏛 GOVERN (Cross-cutting)</h3>
+      <ul>
+        <li>Establish AI governance structure & committee</li>
+        <li>Define risk tolerances & organizational values</li>
+        <li>Assign roles: AI Risk Owner, Ethics Lead, Data Steward</li>
+        <li>Create policies for the full AI lifecycle</li>
+        <li>Foster a culture of responsible AI development</li>
+        <li>Ensure third-party/vendor AI governance alignment</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>🗺 MAP (Contextualize)</h3>
+      <ul>
+        <li>Identify AI system purpose, context, and stakeholders</li>
+        <li>Catalog all AI systems (AI inventory/registry)</li>
+        <li>Determine potential impacts (positive & negative)</li>
+        <li>Assess interdependencies with other systems</li>
+        <li>Identify legal/regulatory requirements per system</li>
+        <li>Document data lineage and model provenance</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>📏 MEASURE (Quantify)</h3>
+      <ul>
+        <li>Define metrics for trustworthiness characteristics</li>
+        <li>Test for bias, fairness, accuracy, robustness</li>
+        <li>Conduct adversarial testing & red-teaming</li>
+        <li>Perform privacy attack simulations</li>
+        <li>Evaluate explainability of outputs</li>
+        <li>Benchmark against established thresholds</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>⚙️ MANAGE (Act)</h3>
+      <ul>
+        <li>Prioritize and treat identified risks</li>
+        <li>Implement controls & guardrails</li>
+        <li>Deploy continuous monitoring & alerting</li>
+        <li>Establish incident response procedures</li>
+        <li>Track risk metrics over time (drift, decay)</li>
+        <li>Feed learnings back into Govern → Map cycle</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 4. EU AI ACT ==================== -->
+<section id="eu-ai-act" class="reveal">
+  <div class="section-header">
+    <h2><span class="icon" style="background:rgba(255,107,107,.15);color:var(--accent3);">🇪🇺</span> 4. EU AI Act — Deep Dive</h2>
+    <div class="hint">💡 Remember the risk pyramid: "BAN → HIGH → LIMITED → MINIMAL" — strictness flows top-down</div>
+  </div>
+
+  <!-- Risk Pyramid -->
+  <div class="pyramid">
+    <div class="pyramid-level risk-banned">🚫 UNACCEPTABLE RISK — <strong>BANNED</strong><br><small>Social scoring, subliminal manipulation, real-time biometric in public, emotion recognition at work/school</small></div>
+    <div class="pyramid-level risk-high">⚠️ HIGH RISK — <strong>Strict Obligations</strong><br><small>Critical infrastructure, education, employment, law enforcement, migration, justice, credit scoring, medical devices</small></div>
+    <div class="pyramid-level risk-limited">ℹ️ LIMITED RISK — <strong>Transparency Required</strong><br><small>Chatbots, deepfakes, emotion detection, AI-generated content must be labeled</small></div>
+    <div class="pyramid-level risk-minimal">✅ MINIMAL RISK — <strong>No Obligations</strong><br><small>Spam filters, recommendation engines, video games, inventory management</small></div>
+  </div>
+
+  <!-- Prohibited Practices -->
+  <h3 style="margin-top:30px; margin-bottom:12px; color:var(--accent3);">🚫 Prohibited AI Practices (Banned since Feb 2025)</h3>
+  <div class="grid-2">
+    <div class="card" style="border-color: rgba(255,107,107,.3);">
+      <ul>
+        <li><strong>Cognitive manipulation</strong> exploiting vulnerabilities (age, disability)</li>
+        <li><strong>Social scoring</strong> by governments (Chinese-style citizen rating)</li>
+        <li><strong>Real-time remote biometric identification</strong> in public spaces by law enforcement (with narrow exceptions)</li>
+        <li><strong>Biometric categorization</strong> inferring sensitive attributes (race, sexuality, political views)</li>
+      </ul>
+    </div>
+    <div class="card" style="border-color: rgba(255,107,107,.3);">
+      <ul>
+        <li><strong>Predictive policing</strong> based solely on profiling or personality traits</li>
+        <li><strong>Untargeted facial image scraping</strong> from internet/CCTV for facial recognition databases</li>
+        <li><strong>Emotion recognition</strong> in workplaces and educational institutions</li>
+        <li><strong>Exploitation of vulnerabilities</strong> of specific groups to materially distort behavior</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- High-Risk Obligations -->
+  <h3 style="margin-top:30px; margin-bottom:12px; color:var(--accent4);">⚠️ High-Risk AI System Obligations</h3>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Obligation</th><th>What It Requires</th><th>Who Is Responsible</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Risk Management System</strong></td><td>Continuous identification, analysis, estimation & treatment of risks throughout lifecycle</td><td>Provider</td></tr>
+        <tr><td><strong>Data Governance</strong></td><td>Training data must be relevant, representative, free of errors; documented data lineage</td><td>Provider</td></tr>
+        <tr><td><strong>Technical Documentation</strong></td><td>Detailed docs on system design, development, capabilities, limitations before market placement</td><td>Provider</td></tr>
+        <tr><td><strong>Record-Keeping</strong></td><td>Automatic logging of events for traceability (minimum retention periods apply)</td><td>Provider + Deployer</td></tr>
+        <tr><td><strong>Transparency</strong></td><td>Clear instructions for deployers; users informed they are interacting with AI</td><td>Provider + Deployer</td></tr>
+        <tr><td><strong>Human Oversight</strong></td><td>Human-in-the-loop or human-on-the-loop controls; ability to override/shut down</td><td>Deployer</td></tr>
+        <tr><td><strong>Accuracy & Robustness</strong></td><td>Appropriate levels of accuracy; resilience to errors, faults, adversarial attacks</td><td>Provider</td></tr>
+        <tr><td><strong>Cybersecurity</strong></td><td>Protection against unauthorized access, data poisoning, model manipulation</td><td>Provider</td></tr>
+        <tr><td><strong>Conformity Assessment</strong></td><td>Self-assessment or third-party audit before market placement</td><td>Provider</td></tr>
+        <tr><td><strong>Post-Market Monitoring</strong></td><td>Ongoing surveillance; serious incident reporting to authorities</td><td>Provider</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- GPAI -->
+  <h3 style="margin-top:30px; margin-bottom:12px; color:var(--accent5);">🤖 General-Purpose AI (GPAI) Model Rules</h3>
+  <div class="grid-2">
+    <div class="card">
+      <h3>All GPAI Models</h3>
+      <ul>
+        <li>Maintain up-to-date technical documentation</li>
+        <li>Provide information & documentation to downstream providers</li>
+        <li>Comply with EU copyright law (including training data transparency)</li>
+        <li>Publish detailed summary of training data content</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>GPAI with Systemic Risk (>10²⁵ FLOPs)</h3>
+      <ul>
+        <li>All above + model evaluation including adversarial testing</li>
+        <li>Assess and mitigate systemic risks</li>
+        <li>Track & report serious incidents to EU AI Office</li>
+        <li>Ensure adequate cybersecurity protections</li>
+        <li>Report energy consumption of the model</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Timeline -->
+  <h3 style="margin-top:30px; margin-bottom:12px; color:var(--accent2);">📅 EU AI Act Enforcement Timeline</h3>
+  <div class="timeline">
+    <div class="tl-item"><div class="tl-dot"></div><div class="date">Aug 1, 2024</div><div class="desc">AI Act enters into force (20 days after publication)</div></div>
+    <div class="tl-item"><div class="tl-dot" style="background:var(--accent3);box-shadow:0 0 0 2px var(--accent3);"></div><div class="date">Feb 2, 2025 ✅ PASSED</div><div class="desc"><strong>Prohibited AI practices banned + AI Literacy obligations apply</strong></div></div>
+    <div class="tl-item"><div class="tl-dot" style="background:var(--accent4);box-shadow:0 0 0 2px var(--accent4);"></div><div class="date">Aug 2, 2025 ✅ PASSED</div><div class="desc"><strong>GPAI transparency rules + governance structure operational</strong></div></div>
+    <div class="tl-item"><div class="tl-dot" style="background:var(--accent5);box-shadow:0 0 0 2px var(--accent5);"></div><div class="date">Aug 2, 2026 ⏳ UPCOMING</div><div class="desc"><strong>FULL ENFORCEMENT: High-risk AI systems must comply; full penalty regime active</strong></div></div>
+    <div class="tl-item"><div class="tl-dot"></div><div class="date">Aug 2, 2027</div><div class="desc">Legacy high-risk AI in already-regulated products must comply</div></div>
+  </div>
+</section>
+
+<!-- ==================== 5. RISK MANAGEMENT ==================== -->
+<section id="risk" class="reveal">
+  <div class="section-header">
+    <h2><span class="icon" style="background:rgba(255,167,38,.15);color:var(--accent4);">⚠️</span> 5. AI Risk Management</h2>
+    <div class="hint">💡 Remember: "IMPACT" — Identify, Measure, Prioritize, Act, Control, Track</div>
+  </div>
+
+  <h3 style="margin-bottom:16px;">AI Risk Taxonomy</h3>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Risk Category</th><th>Examples</th><th>Impact</th><th>Mitigation Strategy</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="tag tag-red">Technical</span></td>
+          <td>Model drift, data quality degradation, adversarial attacks, hallucinations</td>
+          <td>Wrong decisions, safety failures</td>
+          <td>Continuous monitoring, retraining triggers, adversarial testing</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-orange">Ethical</span></td>
+          <td>Bias, discrimination, unfair outcomes, manipulation</td>
+          <td>Legal liability, reputational damage, societal harm</td>
+          <td>Fairness audits, diverse datasets, ethics review boards</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-blue">Legal & Regulatory</span></td>
+          <td>Non-compliance with EU AI Act, GDPR violations, IP infringement</td>
+          <td>Fines, lawsuits, market bans</td>
+          <td>Compliance mapping, legal review, regulatory monitoring</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-purple">Operational</span></td>
+          <td>Over-reliance on AI, loss of human expertise, single point of failure</td>
+          <td>Business disruption, skill atrophy</td>
+          <td>Human-in-the-loop, fallback procedures, skills training</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-green">Reputational</span></td>
+          <td>Public controversy, biased outputs reported by media, user backlash</td>
+          <td>Brand damage, customer churn</td>
+          <td>Crisis communication plans, proactive transparency</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-red">Security</span></td>
+          <td>Data poisoning, model theft, prompt injection, data exfiltration</td>
+          <td>Breach, data loss, compromised integrity</td>
+          <td>Security testing, access controls, input validation</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-orange">Societal</span></td>
+          <td>Job displacement, misinformation at scale, concentration of power</td>
+          <td>Social instability, inequality</td>
+          <td>Impact assessments, stakeholder engagement, policy advocacy</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mnemonic" style="margin-top:20px;">
+    <div class="title">🧠 AI Risk Assessment Matrix (Severity × Likelihood)</div>
+    <div style="display:grid;grid-template-columns:auto repeat(4,1fr);gap:2px;font-size:.8rem;margin-top:10px;">
+      <div style="padding:8px;"></div>
+      <div style="padding:8px;text-align:center;font-weight:700;color:var(--accent5);">Low Likelihood</div>
+      <div style="padding:8px;text-align:center;font-weight:700;color:var(--accent5);">Medium</div>
+      <div style="padding:8px;text-align:center;font-weight:700;color:var(--accent5);">High</div>
+      <div style="padding:8px;text-align:center;font-weight:700;color:var(--accent5);">Very High</div>
+
+      <div style="padding:8px;font-weight:700;color:var(--accent3);">Critical Severity</div>
+      <div style="padding:8px;background:rgba(255,167,38,.2);border-radius:6px;text-align:center;">🟠 High</div>
+      <div style="padding:8px;background:rgba(255,107,107,.2);border-radius:6px;text-align:center;">🔴 Critical</div>
+      <div style="padding:8px;background:rgba(255,107,107,.3);border-radius:6px;text-align:center;">🔴 Critical</div>
+      <div style="padding:8px;background:rgba(255,107,107,.4);border-radius:6px;text-align:center;">🔴 Critical</div>
+
+      <div style="padding:8px;font-weight:700;color:var(--accent4);">High Severity</div>
+      <div style="padding:8px;background:rgba(255,167,38,.12);border-radius:6px;text-align:center;">🟡 Medium</div>
+      <div style="padding:8px;background:rgba(255,167,38,.2);border-radius:6px;text-align:center;">🟠 High</div>
+      <div style="padding:8px;background:rgba(255,107,107,.2);border-radius:6px;text-align:center;">🔴 Critical</div>
+      <div style="padding:8px;background:rgba(255,107,107,.3);border-radius:6px;text-align:center;">🔴 Critical</div>
+
+      <div style="padding:8px;font-weight:700;color:var(--accent2);">Medium Severity</div>
+      <div style="padding:8px;background:rgba(0,212,170,.1);border-radius:6px;text-align:center;">🟢 Low</div>
+      <div style="padding:8px;background:rgba(255,167,38,.12);border-radius:6px;text-align:center;">🟡 Medium</div>
+      <div style="padding:8px;background:rgba(255,167,38,.2);border-radius:6px;text-align:center;">🟠 High</div>
+      <div style="padding:8px;background:rgba(255,107,107,.2);border-radius:6px;text-align:center;">🔴 Critical</div>
+
+      <div style="padding:8px;font-weight:700;color:var(--accent);">Low Severity</div>
+      <div style="padding:8px;background:rgba(0,212,170,.08);border-radius:6px;text-align:center;">🟢 Low</div>
+      <div style="padding:8px;background:rgba(0,212,170,.1);border-radius:6px;text-align:center;">🟢 Low</div>
+      <div style="padding:8px;background:rgba(255,167,38,.12);border-radius:6px;text-align:center;">🟡 Medium</div>
+      <div style="padding:8px;background:rgba(255,167,38,.2);border-radius:6px;text-align:center;">🟠 High</div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 6. BIAS & FAIRNESS ==================== -->
+<section id="bias" class="reveal">
+  <div class="section-header">
+    <h2><span class="icon" style="background:rgba(171,71,188,.15);color:var(--accent6);">🎯</span> 6. AI Bias & Fairness — The Complete Guide</h2>
+    <div class="hint">💡 Remember: Bias can enter at EVERY stage — Data → Algorithm → Deployment → Feedback Loop</div>
+  </div>
+
+  <h3 style="margin-bottom:16px;">Types of AI Bias</h3>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Bias Type</th><th>Description</th><th>Real-World Example</th><th>Stage</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Selection Bias</strong></td><td>Training data not representative of real-world population</td><td>Medical AI trained mostly on Caucasian patient data misdiagnoses for darker skin</td><td><span class="tag tag-blue">Data</span></td></tr>
+        <tr><td><strong>Historical Bias</strong></td><td>Data reflects past societal prejudices</td><td>Amazon recruiting tool penalized resumes with "women's" — trained on 10 yrs of male-dominated hiring</td><td><span class="tag tag-blue">Data</span></td></tr>
+        <tr><td><strong>Measurement Bias</strong></td><td>Proxy variables correlate with protected attributes</td><td>Using zip code as proxy for creditworthiness discriminates by race</td><td><span class="tag tag-blue">Data</span></td></tr>
+        <tr><td><strong>Label Bias</strong></td><td>Inconsistent or subjective labeling of training data</td><td>Annotators labeling African-American Vernacular English as "toxic" more often</td><td><span class="tag tag-blue">Data</span></td></tr>
+        <tr><td><strong>Aggregation Bias</strong></td><td>Single model for diverse subgroups</td><td>Diabetes prediction models optimized for majority population fail for minorities</td><td><span class="tag tag-purple">Algorithm</span></td></tr>
+        <tr><td><strong>Algorithmic Bias</strong></td><td>Model architecture or optimization amplifies disparities</td><td>COMPAS recidivism tool: higher false positive rate for Black defendants</td><td><span class="tag tag-purple">Algorithm</span></td></tr>
+        <tr><td><strong>Confirmation Bias</strong></td><td>System reinforces existing patterns</td><td>Content recommendation creating filter bubbles and radicalization pathways</td><td><span class="tag tag-orange">Deployment</span></td></tr>
+        <tr><td><strong>Automation Bias</strong></td><td>Humans over-trust AI decisions</td><td>Clinicians accepting AI diagnosis without independent verification</td><td><span class="tag tag-orange">Deployment</span></td></tr>
+        <tr><td><strong>Feedback Loop Bias</strong></td><td>Biased outputs reinforce biased inputs over time</td><td>Predictive policing: more patrols → more arrests → "validates" model → more patrols</td><td><span class="tag tag-red">Feedback</span></td></tr>
+        <tr><td><strong>Representation Bias</strong></td><td>Underrepresentation in dev teams leads to blind spots</td><td>Voice assistants performing poorly for non-native English speakers</td><td><span class="tag tag-green">Process</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="margin-top:30px; margin-bottom:16px;">Fairness Metrics — Know These!</h3>
+  <div class="grid-2">
+    <div class="card">
+      <h3>Group Fairness Metrics</h3>
+      <ul>
+        <li><strong>Demographic Parity:</strong> P(Ŷ=1|A=0) = P(Ŷ=1|A=1) — Equal positive prediction rates across groups</li>
+        <li><strong>Equalized Odds:</strong> Equal TPR and FPR across groups — same accuracy for each group</li>
+        <li><strong>Equal Opportunity:</strong> Equal TPR across groups — qualified people from all groups equally likely to be selected</li>
+        <li><strong>Predictive Parity:</strong> Equal PPV across groups — positive predictions equally accurate</li>
+        <li><strong>Calibration:</strong> Predicted probabilities match actual outcomes within each group</li>
+      </ul>
+      <div class="callout callout-warn" style="margin-top:12px;">
+        <strong>⚠️ Impossibility Theorem:</strong> You generally CANNOT satisfy all fairness metrics simultaneously (Chouldechova, 2017). Choose based on your use case context!
+      </div>
+    </div>
+    <div class="card">
+      <h3>Bias Mitigation Techniques</h3>
+      <ul>
+        <li><strong>Pre-processing:</strong> Reweighting, resampling, relabeling training data; removing or transforming sensitive features</li>
+        <li><strong>In-processing:</strong> Fairness constraints during training (adversarial debiasing, fair regularization); constrained optimization</li>
+        <li><strong>Post-processing:</strong> Threshold adjustment per group; calibrated equalized odds; reject-option classification</li>
+        <li><strong>Organizational:</strong> Diverse development teams, external audits, community engagement, bias bounty programs</li>
+      </ul>
+      <div class="callout callout-success" style="margin-top:12px;">
+        <strong>🛠 Key Tools:</strong> IBM AI Fairness 360, Google What-If Tool, Microsoft Fairlearn, Aequitas, Amazon SageMaker Clarify
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 7. EXPLAINABILITY ==================== -->
+<section id="explainability" class="reveal">
+  <div class="section-header">
+    <h2><span class="icon" style="background:rgba(0,212,170,.15);color:var(--accent2);">🔍</span> 7. Explainability & Interpretability (XAI)</h2>
+    <div class="hint">💡 Remember: "SLICE" — SHAP, LIME, Intrinsic models, Counterfactuals, Execution graphs</div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Technique</th><th>Type</th><th>How It Works</th><th>Scope</th><th>Best For</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>SHAP</strong><br><small>(SHapley Additive exPlanations)</small></td>
+          <td>Model-agnostic</td>
+          <td>Uses game theory (Shapley values) to assign contribution of each feature to prediction</td>
+          <td>Local + Global</td>
+          <td>Feature importance, regulatory explanations, any ML model</td>
+        </tr>
+        <tr>
+          <td><strong>LIME</strong><br><small>(Local Interpretable Model-agnostic Explanations)</small></td>
+          <td>Model-agnostic</td>
+          <td>Creates local linear approximation around a specific prediction by perturbing inputs</td>
+          <td>Local only</td>
+          <td>Explaining individual predictions to end-users</td>
+        </tr>
+        <tr>
+          <td><strong>Attention Maps</strong></td>
+          <td>Model-specific</td>
+          <td>Visualizes which parts of input the model "attends to" (transformers, CNNs)</td>
+          <td>Local</td>
+          <td>NLP, image classification, debugging</td>
+        </tr>
+        <tr>
+          <td><strong>Counterfactual Explanations</strong></td>
+          <td>Model-agnostic</td>
+          <td>"What would need to change for a different outcome?" — smallest change to flip the decision</td>
+          <td>Local</td>
+          <td>Loan denials, job rejections — actionable feedback</td>
+        </tr>
+        <tr>
+          <td><strong>Partial Dependence Plots</strong></td>
+          <td>Model-agnostic</td>
+          <td>Shows marginal effect of one or two features on predicted outcome</td>
+          <td>Global</td>
+          <td>Understanding feature relationships</td>
+        </tr>
+        <tr>
+          <td><strong>Decision Trees / Rule Lists</strong></td>
+          <td>Intrinsically interpretable</td>
+          <td>Model itself is human-readable — series of if-then rules</td>
+          <td>Global</td>
+          <td>High-stakes domains requiring full transparency</td>
+        </tr>
+        <tr>
+          <td><strong>Model Cards</strong></td>
+          <td>Documentation</td>
+          <td>Standardized disclosure of model purpose, performance, limitations, ethical considerations</td>
+          <td>Global</td>
+          <td>Transparency for all stakeholders</td>
+        </tr>
+        <tr>
+          <td><strong>Confidence Scores</strong></td>
+          <td>Output-level</td>
+          <td>Probability or certainty level attached to each prediction</td>
+          <td>Local</td>
+          <td>Enabling human override when confidence is low</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout callout-info" style="margin-top:16px;">
+    <strong>📋 When to Use What:</strong> Use <strong>SHAP</strong> for regulatory/audit explanations (mathematically grounded). Use <strong>LIME</strong> for quick end-user explanations. Use <strong>Counterfactuals</strong> when users need actionable feedback. Use <strong>Intrinsic models</strong> (decision trees, linear models) for highest-stakes decisions where full transparency is non-negotiable.
+  </div>
+
+  <!-- Comparison bars -->
+  <h3 style="margin-top:24px; margin-bottom:12px;">SHAP vs LIME — Feature Comparison</h3>
+  <div class="grid-2">
+    <div class="card">
+      <h3>SHAP Strengths</h3>
+      <div class="bar-chart">
+        <div class="bar-row"><span class="bar-label">Mathematical rigor</span><div class="bar-track"><div class="bar-fill" style="width:95%;background:var(--grad1);">95%</div></div></div>
+        <div class="bar-row"><span class="bar-label">Global explanations</span><div class="bar-track"><div class="bar-fill" style="width:90%;background:var(--grad1);">90%</div></div></div>
+        <div class="bar-row"><span class="bar-label">Consistency</span><div class="bar-track"><div class="bar-fill" style="width:95%;background:var(--grad1);">95%</div></div></div>
+        <div class="bar-row"><span class="bar-label">Computation speed</span><div class="bar-track"><div class="bar-fill" style="width:40%;background:var(--grad2);">40%</div></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>LIME Strengths</h3>
+      <div class="bar-chart">
+        <div class="bar-row"><span class="bar-label">Simplicity</span><div class="bar-track"><div class="bar-fill" style="width:90%;background:var(--grad3);">90%</div></div></div>
+        <div class="bar-row"><span class="bar-label">Speed</span><div class="bar-track"><div class="bar-fill" style="width:85%;background:var(--grad3);">85%</div></div></div>
+        <div class="bar-row"><span class="bar-label">User-friendly</span><div class="bar-track"><div class="bar-fill" style="width:88%;background:var(--grad3);">88%</div></div></div>
+        <div class="bar-row"><span class="bar-label">Stability</span><div class="bar-track"><div class="bar-fill" style="width:50%;background:var(--grad2);">50%</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 8. SECURITY ==================== -->
+<section id="security" class="reveal">
+  <div class="section-header">
+    <h2><span class="icon" style="background:rgba(255,107,107,.15);color:var(--accent3);">🔒</span> 8. AI Security Threats & Defenses</h2>
+    <div class="hint">💡 Remember: "PADME" — Poisoning, Adversarial inputs, Data exfiltration, Model theft, Evasion</div>
+  </div>
+
+  <div class="callout callout-danger">
+    <strong>🚨 OWASP 2025 Top 10 for LLM Applications:</strong> #1 Prompt Injection, #2 Sensitive Information Disclosure, #3 Supply Chain Vulnerabilities, #4 Data and Model Poisoning, #5 Improper Output Handling, #6 Excessive Agency, #7 System Prompt Leakage, #8 Vector and Embedding Weaknesses, #9 Misinformation, #10 Unbounded Consumption
+  </div>
+
+  <div class="table-wrap" style="margin-top:16px;">
+    <table>
+      <thead>
+        <tr><th>Threat</th><th>Description</th><th>Attack Vector</th><th>Defense</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Prompt Injection</strong><br><span class="tag tag-red">#1 OWASP</span></td>
+          <td>Attacker crafts inputs to override system instructions or extract sensitive info</td>
+          <td>Direct (user input) or indirect (poisoned content the model reads)</td>
+          <td>Input sanitization, instruction hierarchies, output filtering, canary tokens, system prompt hardening</td>
+        </tr>
+        <tr>
+          <td><strong>Data Poisoning</strong></td>
+          <td>Corrupting training data to introduce backdoors or degrade model performance</td>
+          <td>Compromised training pipelines, web scraping of adversarial content</td>
+          <td>Data provenance tracking, anomaly detection on training data, robust training methods</td>
+        </tr>
+        <tr>
+          <td><strong>Adversarial Examples</strong></td>
+          <td>Subtle perturbations to inputs that cause misclassification</td>
+          <td>Pixel-level image changes, word substitutions in text</td>
+          <td>Adversarial training, input preprocessing, ensemble methods, certified defenses</td>
+        </tr>
+        <tr>
+          <td><strong>Model Inversion</strong></td>
+          <td>Extracting training data or sensitive info from model outputs</td>
+          <td>Querying model repeatedly to reconstruct private training examples</td>
+          <td>Differential privacy, output perturbation, rate limiting, membership inference detection</td>
+        </tr>
+        <tr>
+          <td><strong>Model Theft / Extraction</strong></td>
+          <td>Replicating a model's behavior through API queries</td>
+          <td>Systematic querying to build a surrogate model</td>
+          <td>Rate limiting, watermarking, query monitoring, response perturbation</td>
+        </tr>
+        <tr>
+          <td><strong>Supply Chain Attack</strong></td>
+          <td>Compromised pre-trained models, libraries, or datasets</td>
+          <td>Trojanized models on Hugging Face, malicious pip/npm packages</td>
+          <td>Model scanning, SBOM (Software Bill of Materials), verified model sources</td>
+        </tr>
+        <tr>
+          <td><strong>Data Exfiltration</strong></td>
+          <td>LLM reveals PII, credentials, or proprietary info from training data or context</td>
+          <td>Crafted prompts, jailbreaks, context window exploitation</td>
+          <td>PII detection/masking, output scanning, DLP integration, context isolation</td>
+        </tr>
+        <tr>
+          <td><strong>Excessive Agency</strong></td>
+          <td>AI system takes unauthorized actions beyond intended scope</td>
+          <td>Tool-calling without proper constraints, autonomous code execution</td>
+          <td>Least privilege, action approval gates, sandboxing, human-in-the-loop</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="margin-top:24px; margin-bottom:12px;">Defense-in-Depth Architecture for AI Systems</h3>
+  <div class="flow">
+    <div class="flow-step" style="border-color:var(--accent3);">🧱 Input<br>Validation</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-step" style="border-color:var(--accent4);">🔐 Auth &<br>Access Control</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-step" style="border-color:var(--accent);">🛡 Model<br>Guardrails</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-step" style="border-color:var(--accent5);">📊 Output<br>Filtering</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-step" style="border-color:var(--accent2);">📝 Logging &<br>Monitoring</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-step" style="border-color:var(--accent6);">🚨 Incident<br>Response</div>
+  </div>
+</section>
+
+<!-- ==================== 9. PRIVACY ==================== -->
+<section id="privacy" class="reveal">
+  <div class="section-header">
+    <h2><span class="icon" style="background:rgba(66,165,245,.15);color:var(--accent5);">🛡</span> 9. AI Privacy & Data Protection</h2>
+    <div class="hint">💡 Remember: "CLIP-D" — Consent, Lawful basis, Information minimization, Purpose limitation, Data subject rights</div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3>GDPR & AI — Key Intersections</h3>
+      <ul>
+        <li><strong>Art. 22 — Automated Decision-Making:</strong> Right not to be subject to solely automated decisions with legal/significant effects; right to human intervention & explanation</li>
+        <li><strong>Art. 13-14 — Transparency:</strong> Must inform data subjects about AI processing logic, significance, and consequences</li>
+        <li><strong>Art. 5(1)(c) — Data Minimization:</strong> Only collect data necessary for the AI system's purpose</li>
+        <li><strong>Art. 5(1)(b) — Purpose Limitation:</strong> Data collected for one purpose cannot be freely repurposed for AI training</li>
+        <li><strong>Art. 35 — DPIA Required:</strong> Data Protection Impact Assessment mandatory for high-risk AI processing</li>
+        <li><strong>Art. 17 — Right to Erasure:</strong> "Machine unlearning" — removing data from trained models is technically challenging</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Privacy-Preserving AI Techniques</h3>
+      <ul>
+        <li><strong>Differential Privacy:</strong> Adding calibrated noise to data or outputs to prevent identification of individuals (used by Apple, Google Census)</li>
+        <li><strong>Federated Learning:</strong> Training models across decentralized devices without sharing raw data (used by Google Keyboard, Apple Siri)</li>
+        <li><strong>Homomorphic Encryption:</strong> Computing on encrypted data without decrypting it — ultimate privacy but very slow</li>
+        <li><strong>Secure Multi-Party Computation (SMPC):</strong> Multiple parties jointly compute a function without revealing their inputs</li>
+        <li><strong>Synthetic Data Generation:</strong> Creating artificial data that preserves statistical properties without real PII</li>
+        <li><strong>Data Anonymization & Pseudonymization:</strong> K-anonymity, L-diversity, T-closeness techniques</li>
+        <li><strong>Trusted Execution Environments (TEE):</strong> Hardware-isolated secure enclaves for sensitive AI computation</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout callout-warn" style="margin-top:16px;">
+    <strong>⚠️ Key Precedent:</strong> In early 2025, OpenAI was fined €15M by Italy's DPA for training models on personal data without clear legal basis and lacking age verification. This signals aggressive enforcement of GDPR against AI companies.
+  </div>
+</section>
+
+<!-- ==================== 10. AI LIFECYCLE ==================== -->
+<section id="lifecycle" class="reveal">
+  <div class="section-header">
+    <h2><span class="icon" style="background:rgba(108,99,255,.15);color:var(--accent);">🔄</span> 10. AI Governance Across the Lifecycle</h2>
+    <div class="hint">💡 Remember: "DDTDM-D" — Design, Data, Train, Deploy, Monitor, Decommission</div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Phase</th><th>Governance Activities</th><th>Key Artifacts</th><th>Responsible Roles</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>1. Problem Formulation & Design</strong></td>
+          <td>
+            Purpose assessment, stakeholder impact analysis, risk classification (EU AI Act tier), ethics review, necessity & proportionality check, defining fairness criteria
+          </td>
+          <td>AI Use Case Assessment, Ethics Review Form, Risk Classification Report</td>
+          <td>Product Manager, Ethics Board, Legal</td>
+        </tr>
+        <tr>
+          <td><strong>2. Data Collection & Preparation</strong></td>
+          <td>
+            Data lineage documentation, consent verification, bias auditing of datasets, DPIA (if high-risk), data quality assessment, representativeness check
+          </td>
+          <td>Data Card / Datasheet, DPIA Report, Consent Records, Data Lineage Map</td>
+          <td>Data Engineer, DPO, Data Scientist</td>
+        </tr>
+        <tr>
+          <td><strong>3. Model Development & Training</strong></td>
+          <td>
+            Fairness-aware training, adversarial testing, privacy-preserving techniques, explainability method selection, experiment tracking, IP/copyright compliance
+          </td>
+          <td>Model Card, Training Report, Fairness Assessment, Experiment Logs</td>
+          <td>ML Engineer, Data Scientist, Security Engineer</td>
+        </tr>
+        <tr>
+          <td><strong>4. Testing & Validation</strong></td>
+          <td>
+            Red-teaming, bias testing across subgroups, robustness evaluation, security penetration testing, performance benchmarking, human evaluation
+          </td>
+          <td>Test Reports, Red Team Findings, Conformity Assessment (EU AI Act)</td>
+          <td>QA, Security Team, Ethics Reviewer</td>
+        </tr>
+        <tr>
+          <td><strong>5. Deployment</strong></td>
+          <td>
+            Human oversight mechanisms, user disclosure (AI transparency), monitoring setup, rollback procedures, incident response readiness, access controls
+          </td>
+          <td>Deployment Checklist, Monitoring Dashboard, Incident Response Plan, User Disclosure</td>
+          <td>DevOps/MLOps, Product Manager, Legal</td>
+        </tr>
+        <tr>
+          <td><strong>6. Monitoring & Maintenance</strong></td>
+          <td>
+            Performance drift detection, fairness metric tracking, adversarial monitoring, user feedback analysis, incident logging, periodic re-assessment
+          </td>
+          <td>Monitoring Reports, Drift Alerts, Incident Logs, Periodic Review Reports</td>
+          <td>MLOps, Data Scientist, AI Risk Owner</td>
+        </tr>
+        <tr>
+          <td><strong>7. Decommissioning</strong></td>
+          <td>
+            Sunsetting plan, data deletion/archival (GDPR compliance), user notification, documentation archival, model artifact disposal, knowledge transfer
+          </td>
+          <td>Decommissioning Report, Data Disposal Certificate, Archive Records</td>
+          <td>Product Manager, DPO, Engineering</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ==================== 11. ROLES ==================== -->
+<section id="roles" class="reveal">
+  <div class="section-header">
+    <h2><span class="icon" style="background:rgba(255,167,38,.15);color:var(--accent4);">👥</span> 11. Governance Roles & Responsibilities (RACI)</h2>
+    <div class="hint">💡 A strong governance org has: Board oversight → Ethics committee → Cross-functional working groups</div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Role</th>
+          <th>Key Responsibilities</th>
+          <th>Governance Focus</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Chief AI Officer (CAIO)</strong></td><td>Overall AI strategy, governance oversight, board reporting</td><td>Strategic direction, risk appetite, resource allocation</td></tr>
+        <tr><td><strong>AI Ethics Board</strong></td><td>Review high-risk use cases, set ethical guidelines, handle escalations</td><td>Ethics policies, use case approvals, societal impact</td></tr>
+        <tr><td><strong>Product Manager</strong></td><td>Define AI product requirements, manage stakeholder expectations, ensure responsible use cases</td><td>Use case justification, user impact, fairness requirements, labeling/transparency</td></tr>
+        <tr><td><strong>Data Protection Officer (DPO)</strong></td><td>GDPR/privacy compliance, DPIAs, data subject rights</td><td>Privacy by design, consent, data minimization, erasure</td></tr>
+        <tr><td><strong>AI Risk Manager</strong></td><td>Identify, assess, and track AI risks; maintain risk register</td><td>Risk taxonomy, mitigation tracking, incident management</td></tr>
+        <tr><td><strong>Security Engineer</strong></td><td>Secure AI pipelines, adversarial defense, access controls</td><td>Threat modeling, penetration testing, supply chain security</td></tr>
+        <tr><td><strong>ML Engineer / Data Scientist</strong></td><td>Model development, fairness testing, explainability implementation</td><td>Bias mitigation, model cards, experiment reproducibility</td></tr>
+        <tr><td><strong>Legal / Compliance</strong></td><td>Regulatory mapping, contractual obligations, liability assessment</td><td>EU AI Act classification, GDPR compliance, IP rights</td></tr>
+        <tr><td><strong>Internal Audit</strong></td><td>Independent verification of governance controls</td><td>Audit trails, conformity assessments, effectiveness reviews</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mnemonic" style="margin-top:20px;">
+    <div class="title">🧠 PM's AI Governance Checklist (What YOU Own)</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:10px; font-size:.88rem;">
+      <div>☐ Is this use case ethically justified?</div>
+      <div>☐ Have we classified the risk tier (EU AI Act)?</div>
+      <div>☐ Who are the affected stakeholders?</div>
+      <div>☐ What fairness criteria apply?</div>
+      <div>☐ Is there human oversight built in?</div>
+      <div>☐ Are users informed they're interacting with AI?</div>
+      <div>☐ What happens when the model is wrong?</div>
+      <div>☐ Is there a redress mechanism?</div>
+      <div>☐ Have we done an impact assessment?</div>
+      <div>☐ Is the model card / documentation complete?</div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 12. GLOBAL REGULATIONS ==================== -->
+<section id="global" class="reveal">
+  <div class="section-header">
+    <h2><span class="icon" style="background:rgba(0,212,170,.15);color:var(--accent2);">🌍</span> 12. Global AI Regulatory Landscape</h2>
+    <div class="hint">💡 Remember: EU = Regulation-first, US = Sector-specific, China = State-controlled, UK = Pro-innovation</div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Region / Country</th><th>Key Framework</th><th>Approach</th><th>Status (2026)</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>🇪🇺 <strong>European Union</strong></td>
+          <td>EU AI Act + GDPR + AI Liability Directive</td>
+          <td>Risk-based, comprehensive regulation with strict enforcement</td>
+          <td><span class="tag tag-red">Enforcing</span> Full high-risk rules from Aug 2026</td>
+        </tr>
+        <tr>
+          <td>🇺🇸 <strong>United States</strong></td>
+          <td>NIST AI RMF + Executive Orders + State laws (CO, IL, CA)</td>
+          <td>Voluntary frameworks + sector-specific rules + state-level legislation</td>
+          <td><span class="tag tag-orange">Evolving</span> Patchwork of federal + state regulations</td>
+        </tr>
+        <tr>
+          <td>🇬🇧 <strong>United Kingdom</strong></td>
+          <td>Pro-Innovation AI Framework + AI Safety Institute</td>
+          <td>Principles-based, sector regulators apply existing rules to AI</td>
+          <td><span class="tag tag-blue">Active</span> AI Safety Institute operational</td>
+        </tr>
+        <tr>
+          <td>🇨🇳 <strong>China</strong></td>
+          <td>Generative AI Measures + Algorithm Recommendation Rules + Deep Synthesis Rules</td>
+          <td>Specific regulations per AI type; state content control; mandatory registration</td>
+          <td><span class="tag tag-red">Enforcing</span> Multiple specific laws active</td>
+        </tr>
+        <tr>
+          <td>🇨🇦 <strong>Canada</strong></td>
+          <td>AIDA (Artificial Intelligence and Data Act) — Bill C-27</td>
+          <td>Risk-based classification similar to EU; criminal penalties for reckless AI</td>
+          <td><span class="tag tag-orange">Pending</span> Still in legislative process</td>
+        </tr>
+        <tr>
+          <td>🇮🇳 <strong>India</strong></td>
+          <td>Digital India Act (proposed) + DPDP Act 2023</td>
+          <td>Balancing innovation with data protection; no dedicated AI law yet</td>
+          <td><span class="tag tag-blue">Developing</span> Advisory-based approach</td>
+        </tr>
+        <tr>
+          <td>🇧🇷 <strong>Brazil</strong></td>
+          <td>AI Bill (PL 2338/2023)</td>
+          <td>Risk-based framework inspired by EU AI Act</td>
+          <td><span class="tag tag-orange">Advancing</span> Expected passage soon</td>
+        </tr>
+        <tr>
+          <td>🇯🇵 <strong>Japan</strong></td>
+          <td>AI Guidelines for Business + Hiroshima AI Process</td>
+          <td>Soft law / voluntary guidelines; industry self-regulation</td>
+          <td><span class="tag tag-green">Active</span> Voluntary guidelines in effect</td>
+        </tr>
+        <tr>
+          <td>🌐 <strong>International Bodies</strong></td>
+          <td>OECD AI Principles, UNESCO Recommendation, G7 Hiroshima Process, ISO/IEC 42001</td>
+          <td>Setting global norms, principles, and standards for harmonization</td>
+          <td><span class="tag tag-green">Active</span> Influencing national laws globally</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ==================== 13. GENERATIVE AI GOVERNANCE ==================== -->
+<section id="genai" class="reveal">
+  <div class="section-header">
+    <h2><span class="icon" style="background:rgba(171,71,188,.15);color:var(--accent6);">🤖</span> 13. Generative AI — Special Governance Considerations</h2>
+    <div class="hint">💡 GenAI multiplies governance challenges: hallucinations, copyright, deepfakes, prompt attacks</div>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      <h3 style="margin-bottom:16px;">Unique GenAI Risks</h3>
+      <details>
+        <summary>🎭 Hallucinations & Confabulation</summary>
+        <div class="detail-content">
+          <p>GenAI models confidently generate false, fabricated, or nonsensical information. This is especially dangerous in healthcare, legal, and financial domains.</p>
+          <ul>
+            <li>Implement retrieval-augmented generation (RAG) for grounding</li>
+            <li>Add confidence scoring and uncertainty quantification</li>
+            <li>Require human review for high-stakes outputs</li>
+            <li>Provide source citations and traceability</li>
+          </ul>
+        </div>
+      </details>
+      <details>
+        <summary>©️ Intellectual Property & Copyright</summary>
+        <div class="detail-content">
+          <p>Models trained on copyrighted content raise legal questions about training data use and generated output ownership.</p>
+          <ul>
+            <li>Track and document training data sources</li>
+            <li>Implement content provenance (C2PA standard)</li>
+            <li>Monitor for verbatim reproduction of copyrighted text</li>
+            <li>EU AI Act requires training data summary publication</li>
+            <li>NYT v. OpenAI (2023) — landmark lawsuit still evolving</li>
+          </ul>
+        </div>
+      </details>
+      <details>
+        <summary>🎬 Deepfakes & Synthetic Media</summary>
+        <div class="detail-content">
+          <p>AI-generated video, audio, and images that are indistinguishable from real content.</p>
+          <ul>
+            <li>EU AI Act mandates labeling AI-generated content</li>
+            <li>Implement digital watermarking (SynthID, C2PA)</li>
+            <li>Deploy detection tools for synthetic media</li>
+            <li>Establish clear usage policies and terms of service</li>
+          </ul>
+        </div>
+      </details>
+      <details>
+        <summary>💉 Prompt Injection & Jailbreaking</summary>
+        <div class="detail-content">
+          <p>Users craft inputs to bypass safety controls, extract system prompts, or make the model produce harmful content.</p>
+          <ul>
+            <li>Multi-layered prompt defenses (system > user instruction hierarchy)</li>
+            <li>Input and output content filters</li>
+            <li>Red-team testing before deployment</li>
+            <li>Continuous monitoring for novel attack patterns</li>
+            <li>Rate limiting and abuse detection</li>
+          </ul>
+        </div>
+      </details>
+      <details>
+        <summary>📊 Environmental Impact</summary>
+        <div class="detail-content">
+          <p>Training large models consumes enormous energy and water resources.</p>
+          <ul>
+            <li>EU AI Act requires energy consumption reporting for GPAI with systemic risk</li>
+            <li>Track carbon footprint of training and inference</li>
+            <li>Consider model efficiency (distillation, quantization, smaller models)</li>
+            <li>Use renewable energy-powered data centers where possible</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+
+    <div>
+      <h3 style="margin-bottom:16px;">GenAI Governance Framework</h3>
+      <div class="card" style="margin-bottom:16px;">
+        <h3>Acceptable Use Policy (Must-Have)</h3>
+        <ul>
+          <li>Define approved use cases and prohibited uses</li>
+          <li>Set data input restrictions (no PII, confidential data without controls)</li>
+          <li>Require human review thresholds by risk level</li>
+          <li>Mandate output verification for external-facing content</li>
+          <li>Establish vendor assessment criteria for third-party AI</li>
+          <li>Define data retention and deletion policies</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>AI Content Labeling Requirements</h3>
+        <ul>
+          <li><strong>EU AI Act (Art. 50):</strong> Users must be informed when interacting with AI; deepfakes must be labeled; AI-generated text for public info must be labeled</li>
+          <li><strong>C2PA Standard:</strong> Content Credentials for provenance tracking — "nutrition label" for digital content</li>
+          <li><strong>Watermarking:</strong> Google SynthID, Meta's invisible watermark for AI-generated images</li>
+          <li><strong>Internal tagging:</strong> All AI-generated artifacts should carry metadata indicating AI involvement</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 14. TOOLS ==================== -->
+<section id="tools" class="reveal">
+  <div class="section-header">
+    <h2><span class="icon" style="background:rgba(66,165,245,.15);color:var(--accent5);">🛠</span> 14. AI Governance Tools & Platforms</h2>
+    <div class="hint">💡 No single tool does everything — build a governance stack aligned to your framework</div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Category</th><th>Tool / Platform</th><th>Provider</th><th>Key Capabilities</th></tr>
+      </thead>
+      <tbody>
+        <tr><td rowspan="3"><strong>Fairness & Bias</strong></td><td>AI Fairness 360</td><td>IBM (Open Source)</td><td>70+ fairness metrics, 11 bias mitigation algorithms</td></tr>
+        <tr><td>Fairlearn</td><td>Microsoft (Open Source)</td><td>Fairness assessment, bias mitigation for classification & regression</td></tr>
+        <tr><td>What-If Tool</td><td>Google (Open Source)</td><td>Visual interface for exploring model fairness without code</td></tr>
+        <tr><td rowspan="3"><strong>Explainability</strong></td><td>SHAP Library</td><td>Open Source</td><td>Shapley-based explanations for any ML model</td></tr>
+        <tr><td>LIME Library</td><td>Open Source</td><td>Local interpretable explanations via surrogate models</td></tr>
+        <tr><td>AI Explainability 360</td><td>IBM (Open Source)</td><td>8 explainability algorithms + tutorials</td></tr>
+        <tr><td rowspan="3"><strong>Governance Platforms</strong></td><td>ModelOp Center</td><td>ModelOp</td><td>Enterprise AI governance, model inventory, risk scoring</td></tr>
+        <tr><td>Credo AI</td><td>Credo AI</td><td>AI governance platform with policy packs for EU AI Act, NIST</td></tr>
+        <tr><td>Holistic AI</td><td>Holistic AI</td><td>Auditing, risk management, compliance automation</td></tr>
+        <tr><td rowspan="2"><strong>Security</strong></td><td>Garak</td><td>NVIDIA (Open Source)</td><td>LLM vulnerability scanner — prompt injection, data leakage</td></tr>
+        <tr><td>Rebuff</td><td>Open Source</td><td>Prompt injection detection framework</td></tr>
+        <tr><td rowspan="2"><strong>Monitoring</strong></td><td>Evidently AI</td><td>Open Source</td><td>ML model monitoring — drift, performance, data quality</td></tr>
+        <tr><td>Fiddler AI</td><td>Fiddler</td><td>Model performance management + explainability</td></tr>
+        <tr><td rowspan="2"><strong>Privacy</strong></td><td>PySyft</td><td>OpenMined (Open Source)</td><td>Federated learning, differential privacy, encrypted computation</td></tr>
+        <tr><td>Opacus</td><td>Meta (Open Source)</td><td>Differential privacy for PyTorch model training</td></tr>
+        <tr><td><strong>Documentation</strong></td><td>Model Card Toolkit</td><td>Google (Open Source)</td><td>Standardized model documentation generation</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ==================== 15. MASTER CHECKLIST ==================== -->
+<section id="checklist" class="reveal">
+  <div class="section-header">
+    <h2><span class="icon" style="background:rgba(0,212,170,.15);color:var(--accent2);">✅</span> 15. AI Governance Master Checklist</h2>
+    <div class="hint">💡 Use this as a go/no-go gate before deploying any AI system</div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3>🏛 Governance & Organization</h3>
+      <ul class="checklist">
+        <li>AI governance committee / ethics board established</li>
+        <li>AI policy and acceptable use policy documented</li>
+        <li>Roles & responsibilities clearly assigned (RACI)</li>
+        <li>AI system registry / inventory maintained</li>
+        <li>Third-party AI vendor assessment process in place</li>
+        <li>AI literacy training program for all employees</li>
+        <li>Escalation and exception handling procedures defined</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>⚖️ Ethics & Fairness</h3>
+      <ul class="checklist">
+        <li>Use case ethics review completed</li>
+        <li>Stakeholder impact assessment performed</li>
+        <li>Fairness metrics defined and measured</li>
+        <li>Bias testing across protected groups completed</li>
+        <li>Diverse development team involved</li>
+        <li>Feedback and redress mechanism available to users</li>
+        <li>Regular fairness re-assessment scheduled</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>📋 Compliance & Legal</h3>
+      <ul class="checklist">
+        <li>AI system risk classification completed (EU AI Act tier)</li>
+        <li>DPIA conducted (if required by GDPR)</li>
+        <li>Conformity assessment done (if high-risk)</li>
+        <li>Technical documentation prepared</li>
+        <li>User transparency/disclosure implemented</li>
+        <li>Copyright & IP review of training data completed</li>
+        <li>Post-market monitoring plan established</li>
+        <li>Incident reporting procedures in place</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>🔒 Security & Privacy</h3>
+      <ul class="checklist">
+        <li>Threat model created for AI system</li>
+        <li>Adversarial testing / red-teaming completed</li>
+        <li>Prompt injection defenses implemented (for LLMs)</li>
+        <li>Data encryption at rest and in transit</li>
+        <li>Access controls and audit logging enabled</li>
+        <li>Privacy-preserving techniques applied where needed</li>
+        <li>Supply chain security (model provenance verified)</li>
+        <li>Incident response plan specific to AI scenarios</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>🔍 Transparency & Explainability</h3>
+      <ul class="checklist">
+        <li>Model Card published with performance + limitations</li>
+        <li>Data Card / Datasheet documenting training data</li>
+        <li>Explainability method selected and implemented</li>
+        <li>Human oversight mechanism (HITL/HOTL) operational</li>
+        <li>Override/shutdown capability tested</li>
+        <li>AI-generated content labeled where required</li>
+        <li>Confidence scores available for predictions</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>📊 Monitoring & Operations</h3>
+      <ul class="checklist">
+        <li>Model performance monitoring dashboards live</li>
+        <li>Data drift and concept drift detection enabled</li>
+        <li>Fairness metrics tracked over time</li>
+        <li>Retraining triggers defined and automated</li>
+        <li>User feedback collection and analysis loop</li>
+        <li>Regular governance review cadence established</li>
+        <li>Decommissioning plan documented</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 16. GLOSSARY ==================== -->
+<section id="glossary" class="reveal">
+  <div class="section-header">
+    <h2><span class="icon" style="background:rgba(255,167,38,.15);color:var(--accent4);">📖</span> 16. Glossary of Key Terms</h2>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th style="width:25%;">Term</th><th>Definition</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>AI System</strong></td><td>A machine-based system that generates outputs (predictions, decisions, recommendations, content) that can influence environments. The EU AI Act defines it as a system designed to operate with varying levels of autonomy.</td></tr>
+        <tr><td><strong>Algorithmic Impact Assessment (AIA)</strong></td><td>A systematic evaluation of the potential impacts of an AI system on individuals, groups, and society before deployment.</td></tr>
+        <tr><td><strong>Adversarial Attack</strong></td><td>Intentionally crafted inputs designed to cause an AI model to make errors or behave unexpectedly.</td></tr>
+        <tr><td><strong>Bias (Algorithmic)</strong></td><td>Systematic and repeatable errors in AI output that create unfair outcomes for particular groups.</td></tr>
+        <tr><td><strong>Conformity Assessment</strong></td><td>The process of verifying that an AI system complies with regulatory requirements (EU AI Act requires this for high-risk systems).</td></tr>
+        <tr><td><strong>Data Lineage</strong></td><td>The complete tracking of data from its origin through all transformations to its use in model training and inference.</td></tr>
+        <tr><td><strong>Deepfake</strong></td><td>AI-generated synthetic media (video, audio, images) designed to appear authentic. Must be labeled under EU AI Act.</td></tr>
+        <tr><td><strong>Differential Privacy</strong></td><td>A mathematical framework that provides provable guarantees that individual data points cannot be identified in aggregate datasets.</td></tr>
+        <tr><td><strong>DPIA</strong></td><td>Data Protection Impact Assessment — required under GDPR Art. 35 for processing likely to result in high risk to individuals.</td></tr>
+        <tr><td><strong>Explainability (XAI)</strong></td><td>The degree to which the internal mechanics and outputs of an AI system can be understood by humans.</td></tr>
+        <tr><td><strong>Federated Learning</strong></td><td>A machine learning approach where models are trained across decentralized data sources without exchanging raw data.</td></tr>
+        <tr><td><strong>GPAI</strong></td><td>General-Purpose AI — AI models capable of performing a wide range of tasks (e.g., GPT-4, Claude, Gemini). Subject to specific EU AI Act obligations.</td></tr>
+        <tr><td><strong>Hallucination</strong></td><td>When a generative AI model produces content that is factually incorrect, fabricated, or inconsistent with training data, presented with false confidence.</td></tr>
+        <tr><td><strong>Human-in-the-Loop (HITL)</strong></td><td>A system design where a human must approve or intervene in AI decisions before they take effect.</td></tr>
+        <tr><td><strong>Human-on-the-Loop (HOTL)</strong></td><td>A system design where a human monitors AI decisions and can intervene or override, but AI acts autonomously by default.</td></tr>
+        <tr><td><strong>Model Card</strong></td><td>A standardized document describing a model's intended use, performance metrics, limitations, and ethical considerations.</td></tr>
+        <tr><td><strong>Model Drift</strong></td><td>The degradation of model performance over time as real-world data distributions change from training data.</td></tr>
+        <tr><td><strong>Prompt Injection</strong></td><td>An attack where malicious instructions are embedded in inputs to override an LLM's intended behavior.</td></tr>
+        <tr><td><strong>RAG</strong></td><td>Retrieval-Augmented Generation — technique that grounds LLM responses in retrieved factual documents to reduce hallucinations.</td></tr>
+        <tr><td><strong>Red-Teaming</strong></td><td>Adversarial testing where a team actively tries to find failures, biases, and security vulnerabilities in an AI system.</td></tr>
+        <tr><td><strong>Responsible AI</strong></td><td>The practice of designing, developing, deploying, and operating AI systems in a manner consistent with ethical principles, legal requirements, and societal values.</td></tr>
+        <tr><td><strong>Shadow AI</strong></td><td>Unauthorized or ungoverned use of AI tools by employees outside of IT/governance oversight — a major organizational risk.</td></tr>
+        <tr><td><strong>Systemic Risk (GPAI)</strong></td><td>Under EU AI Act, a GPAI model has systemic risk if trained with >10²⁵ FLOPs or designated by EU AI Office, triggering additional obligations.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ==================== FOOTER ==================== -->
+<section style="padding:40px 0; text-align:center; border-top:1px solid var(--border);">
+  <p style="color:var(--text-dim);font-size:.85rem;">
+    AI Governance & Responsible AI — Quick Reference Guide<br>
+    Prepared for Product Managers & Security Experts · Last Updated: March 2026<br>
+    <span style="color:var(--accent);font-weight:600;">Frameworks covered: EU AI Act · NIST AI RMF · ISO/IEC 42001 · OECD AI Principles · GDPR</span>
+  </p>
+  <p style="color:var(--text-dim);font-size:.75rem;margin-top:12px;">
+    This document is for educational reference. Consult legal professionals for specific compliance advice.
+  </p>
+</section>
+
+</div><!-- /container -->
+
+<!-- ===== SCROLL REVEAL SCRIPT ===== -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.08 });
+  reveals.forEach(function(el) { observer.observe(el); });
+});
+</script>
+
+</body>
+</html>
