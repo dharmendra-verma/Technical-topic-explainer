@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stakeholder Management Toolkit — PM Guide</title>
+<style>
+  :root {
+    --bg: #0f172a; --surface: #1e293b; --card: #334155;
+    --accent: #3b82f6; --accent2: #8b5cf6; --accent3: #10b981;
+    --warn: #f59e0b; --danger: #ef4444;
+    --text: #f1f5f9; --muted: #94a3b8; --border: #475569;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+  h1 { font-size: 1.8rem; margin-bottom: 6px; }
+  h2 { font-size: 1.3rem; margin-bottom: 12px; color: var(--accent); }
+  h3 { font-size: 1.05rem; margin-bottom: 8px; }
+  .subtitle { color: var(--muted); margin-bottom: 30px; font-size: 0.95rem; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 4px; margin-bottom: 24px; flex-wrap: wrap; }
+  .tab { padding: 10px 20px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface);
+         color: var(--muted); cursor: pointer; font-size: 0.9rem; transition: all 0.2s; }
+  .tab:hover { border-color: var(--accent); color: var(--text); }
+  .tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* Cards */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
+
+  /* Power/Interest Grid */
+  .grid-container { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 3px;
+                    width: 100%; max-width: 800px; margin: 20px auto; aspect-ratio: 4/3; }
+  .grid-cell { border-radius: 10px; padding: 16px; position: relative; }
+  .grid-cell h3 { font-size: 0.95rem; margin-bottom: 4px; }
+  .grid-cell .strategy { font-size: 0.8rem; color: var(--muted); margin-bottom: 10px; }
+  .grid-cell ul { list-style: none; padding: 0; }
+  .grid-cell li { font-size: 0.85rem; padding: 4px 8px; margin: 3px 0; background: rgba(0,0,0,0.25); border-radius: 6px; }
+  .q1 { background: linear-gradient(135deg, #1e3a5f, #1a365d); border: 1px solid #2563eb; }
+  .q2 { background: linear-gradient(135deg, #2d1b4e, #312e81); border: 1px solid #7c3aed; }
+  .q3 { background: linear-gradient(135deg, #1a332e, #14532d); border: 1px solid #16a34a; }
+  .q4 { background: linear-gradient(135deg, #2a2215, #422006); border: 1px solid #d97706; }
+  .axis-label { text-align: center; color: var(--muted); font-size: 0.85rem; margin-top: 8px; }
+  .y-label { writing-mode: vertical-rl; transform: rotate(180deg); position: absolute; left: -30px;
+             top: 50%; color: var(--muted); font-size: 0.85rem; }
+  .grid-wrapper { position: relative; padding-left: 40px; }
+
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+  th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.88rem; }
+  th { background: var(--card); color: var(--accent); font-weight: 600; }
+  tr:hover { background: rgba(59,130,246,0.05); }
+
+  /* Tags */
+  .tag { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; margin: 2px; }
+  .tag-high { background: rgba(239,68,68,0.2); color: #fca5a5; }
+  .tag-med { background: rgba(245,158,11,0.2); color: #fcd34d; }
+  .tag-low { background: rgba(16,185,129,0.2); color: #6ee7b7; }
+  .tag-role { background: rgba(139,92,246,0.2); color: #c4b5fd; }
+
+  /* Framework cards */
+  .fw-card { background: var(--card); border-radius: 10px; padding: 16px; margin: 8px 0; border-left: 4px solid var(--accent); }
+  .fw-card h4 { color: var(--accent); margin-bottom: 6px; font-size: 0.95rem; }
+  .fw-card p { font-size: 0.87rem; color: var(--muted); }
+
+  /* Comm Plan */
+  .comm-row { display: grid; grid-template-columns: 150px 1fr 120px 120px 1fr; gap: 8px; align-items: start;
+              padding: 12px; border-bottom: 1px solid var(--border); }
+  .comm-header { font-weight: 600; color: var(--accent); font-size: 0.82rem; text-transform: uppercase; }
+
+  /* Tips */
+  .tip { background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.3); border-radius: 8px;
+         padding: 14px; margin: 12px 0; font-size: 0.88rem; }
+  .tip::before { content: '💡 '; }
+  .anti { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); }
+  .anti::before { content: '⚠️ '; }
+
+  /* Scenario section */
+  .scenario { background: var(--card); border-radius: 10px; padding: 16px; margin: 10px 0; }
+  .scenario h4 { color: var(--warn); margin-bottom: 8px; }
+  .scenario p { font-size: 0.87rem; color: var(--muted); }
+  .scenario .response { margin-top: 8px; padding: 10px; background: rgba(16,185,129,0.1); border-radius: 6px;
+                        border-left: 3px solid var(--accent3); font-size: 0.87rem; color: var(--text); }
+
+  /* Checklist */
+  .checklist { list-style: none; }
+  .checklist li { padding: 6px 0; font-size: 0.9rem; }
+  .checklist li::before { content: '☐ '; color: var(--accent); }
+
+  @media (max-width: 768px) {
+    .grid-container { grid-template-columns: 1fr; grid-template-rows: auto; }
+    .comm-row { grid-template-columns: 1fr; }
+    .card-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Stakeholder Management Toolkit</h1>
+  <p class="subtitle">A practical guide for Product Managers — frameworks, templates, and playbooks</p>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('mapping')">Stakeholder Map</div>
+    <div class="tab" onclick="switchTab('who')">Who Are They?</div>
+    <div class="tab" onclick="switchTab('comm')">Communication Plan</div>
+    <div class="tab" onclick="switchTab('frameworks')">Frameworks</div>
+    <div class="tab" onclick="switchTab('conflicts')">Conflict Playbook</div>
+    <div class="tab" onclick="switchTab('checklist')">Weekly Checklist</div>
+  </div>
+
+  <!-- TAB 1: STAKEHOLDER MAP -->
+  <div id="mapping" class="tab-content active">
+    <h2>Power / Interest Grid</h2>
+    <p style="color:var(--muted); font-size:0.9rem; margin-bottom:16px;">
+      Plot stakeholders based on their <strong>power</strong> (ability to block or accelerate your product) and
+      <strong>interest</strong> (how much they care about your product area). Each quadrant tells you the right engagement strategy.
+    </p>
+
+    <div class="grid-wrapper">
+      <span class="y-label">← LOW POWER &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; HIGH POWER →</span>
+      <div class="grid-container">
+        <div class="grid-cell q1">
+          <h3>Manage Closely</h3>
+          <p class="strategy">High Power × High Interest — Your inner circle</p>
+          <ul>
+            <li>VP / Director of Product</li>
+            <li>Engineering Manager / Lead</li>
+            <li>Key Executive Sponsor</li>
+            <li>Design Lead (if co-owning UX)</li>
+          </ul>
+          <div class="tip" style="margin-top:10px; font-size:0.8rem;">Weekly 1:1s, involve in key decisions, share roadmap drafts early, never surprise them</div>
+        </div>
+        <div class="grid-cell q2">
+          <h3>Keep Satisfied</h3>
+          <p class="strategy">High Power × Low Interest — Can block you if ignored</p>
+          <ul>
+            <li>CTO / CEO (unless deeply involved)</li>
+            <li>Legal / Compliance</li>
+            <li>Finance / CFO</li>
+            <li>Platform / Infra teams</li>
+          </ul>
+          <div class="tip" style="margin-top:10px; font-size:0.8rem;">Monthly updates, escalate only what matters to them, respect their time, get sign-offs early</div>
+        </div>
+        <div class="grid-cell q3">
+          <h3>Keep Informed</h3>
+          <p class="strategy">Low Power × High Interest — Champions & advocates</p>
+          <ul>
+            <li>Customer Success / Support</li>
+            <li>Sales / Account Managers</li>
+            <li>QA / Testing team</li>
+            <li>Data / Analytics team</li>
+          </ul>
+          <div class="tip" style="margin-top:10px; font-size:0.8rem;">Biweekly updates, invite to demos, leverage their user insights, give them talking points</div>
+        </div>
+        <div class="grid-cell q4">
+          <h3>Monitor</h3>
+          <p class="strategy">Low Power × Low Interest — Minimal effort</p>
+          <ul>
+            <li>Other PMs (adjacent products)</li>
+            <li>HR / Operations</li>
+            <li>External vendors</li>
+            <li>Wider org (all-hands updates)</li>
+          </ul>
+          <div class="tip" style="margin-top:10px; font-size:0.8rem;">Quarterly newsletters, all-hands mentions, Slack channel updates — minimal direct engagement</div>
+        </div>
+      </div>
+      <p class="axis-label">← LOW INTEREST &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; HIGH INTEREST →</p>
+    </div>
+
+    <div class="card" style="margin-top: 20px;">
+      <h3>How to Use This Grid</h3>
+      <p style="font-size:0.9rem; color:var(--muted);">
+        1. List every person (not role) who touches your product decisions.<br>
+        2. Score each on Power (1–5) and Interest (1–5).<br>
+        3. Plot them into quadrants. Review monthly — people shift quadrants as projects evolve.<br>
+        4. Adjust your engagement strategy accordingly. Someone moving from "Monitor" to "Manage Closely" mid-project is a signal to increase communication immediately.
+      </p>
+    </div>
+  </div>
+
+  <!-- TAB 2: WHO ARE THEY -->
+  <div id="who" class="tab-content">
+    <h2>Complete Stakeholder Reference</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Stakeholder</th>
+          <th>What They Care About</th>
+          <th>What They Need From You</th>
+          <th>Priority</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Engineering Lead / Manager</strong><br><span class="tag tag-role">Core Team</span></td>
+          <td>Clear requirements, technical feasibility, team velocity, minimal scope churn</td>
+          <td>Well-written specs, stable priorities, early heads-up on changes, removing blockers</td>
+          <td><span class="tag tag-high">Critical</span></td>
+        </tr>
+        <tr>
+          <td><strong>Design Lead</strong><br><span class="tag tag-role">Core Team</span></td>
+          <td>User experience quality, research-backed decisions, design consistency</td>
+          <td>User context, problem framing (not solutions), time for exploration, design review slots</td>
+          <td><span class="tag tag-high">Critical</span></td>
+        </tr>
+        <tr>
+          <td><strong>VP / Director of Product</strong><br><span class="tag tag-role">Leadership</span></td>
+          <td>Strategy alignment, metrics progress, team health, cross-product coherence</td>
+          <td>Regular metric updates, risk flags, strategic recommendations, decision escalations</td>
+          <td><span class="tag tag-high">Critical</span></td>
+        </tr>
+        <tr>
+          <td><strong>CEO / CTO</strong><br><span class="tag tag-role">Executive</span></td>
+          <td>Business outcomes, market position, revenue growth, strategic bets</td>
+          <td>Concise impact summaries, strategic narrative, confidence in team execution</td>
+          <td><span class="tag tag-med">High</span></td>
+        </tr>
+        <tr>
+          <td><strong>Sales & Account Management</strong><br><span class="tag tag-role">GTM</span></td>
+          <td>Feature timelines for deals, competitive gaps, customer-requested features</td>
+          <td>Honest timelines, feature talking points, early access to beta, "what's coming" previews</td>
+          <td><span class="tag tag-med">High</span></td>
+        </tr>
+        <tr>
+          <td><strong>Marketing</strong><br><span class="tag tag-role">GTM</span></td>
+          <td>Launch dates, positioning, differentiators, customer stories</td>
+          <td>Launch briefs 4–6 weeks early, messaging input, access to beta users for case studies</td>
+          <td><span class="tag tag-med">High</span></td>
+        </tr>
+        <tr>
+          <td><strong>Customer Success / Support</strong><br><span class="tag tag-role">Customer</span></td>
+          <td>Feature adoption, churn risk, support ticket volume, user pain points</td>
+          <td>Release notes, known issues, migration guides, feedback loops that show you listened</td>
+          <td><span class="tag tag-med">High</span></td>
+        </tr>
+        <tr>
+          <td><strong>Data / Analytics</strong><br><span class="tag tag-role">Enabler</span></td>
+          <td>Correct instrumentation, data quality, meaningful metrics</td>
+          <td>Clear success metrics upfront, tracking requirements in specs, analysis requests with context</td>
+          <td><span class="tag tag-low">Medium</span></td>
+        </tr>
+        <tr>
+          <td><strong>Legal / Compliance</strong><br><span class="tag tag-role">Gatekeeper</span></td>
+          <td>Regulatory risk, data privacy, terms of service, IP issues</td>
+          <td>Early review requests (not last-minute), clear scope of what you're building, patience</td>
+          <td><span class="tag tag-low">Medium</span></td>
+        </tr>
+        <tr>
+          <td><strong>Finance</strong><br><span class="tag tag-role">Gatekeeper</span></td>
+          <td>Budget adherence, ROI, unit economics, cost projections</td>
+          <td>Business cases for new investments, cost impact of decisions, revenue projections</td>
+          <td><span class="tag tag-low">Medium</span></td>
+        </tr>
+        <tr>
+          <td><strong>Customers / End Users</strong><br><span class="tag tag-role">External</span></td>
+          <td>Product solves their problem, reliability, value for money, being heard</td>
+          <td>Feedback channels, transparent roadmap, consistent quality, responsive support</td>
+          <td><span class="tag tag-high">Critical</span></td>
+        </tr>
+        <tr>
+          <td><strong>Partners / Integration Teams</strong><br><span class="tag tag-role">External</span></td>
+          <td>API stability, documentation, mutual business value, joint roadmap</td>
+          <td>Stable APIs, deprecation notices, co-marketing opportunities, technical support</td>
+          <td><span class="tag tag-low">Medium</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- TAB 3: COMMUNICATION PLAN -->
+  <div id="comm" class="tab-content">
+    <h2>Communication Plan Template</h2>
+    <p style="color:var(--muted); font-size:0.9rem; margin-bottom:16px;">
+      Match cadence and format to each stakeholder's quadrant. The golden rule: <em>no one should ever be surprised by your decisions.</em>
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Stakeholder</th>
+          <th>Cadence</th>
+          <th>Format</th>
+          <th>Content Focus</th>
+          <th>Pro Tip</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Engineering Lead</strong></td>
+          <td>Daily standup + Weekly 1:1</td>
+          <td>Standup, Slack, Doc reviews</td>
+          <td>Sprint progress, blockers, upcoming spec reviews, tech debt trade-offs</td>
+          <td>Share spec drafts 2 days before review so they can think async</td>
+        </tr>
+        <tr>
+          <td><strong>Design Lead</strong></td>
+          <td>2–3x per week</td>
+          <td>Figma sessions, Slack, Syncs</td>
+          <td>User problems, research insights, design direction alignment</td>
+          <td>Frame problems, not solutions — let design explore</td>
+        </tr>
+        <tr>
+          <td><strong>VP of Product</strong></td>
+          <td>Weekly 1:1</td>
+          <td>1-pager or deck + verbal</td>
+          <td>Metrics, risks, decisions needed, strategic alignment</td>
+          <td>Lead with "what I need from you" — their time is scarce</td>
+        </tr>
+        <tr>
+          <td><strong>CEO / CTO</strong></td>
+          <td>Monthly / Quarterly</td>
+          <td>Executive summary email or brief</td>
+          <td>Business impact, strategic wins, key metrics, upcoming bets</td>
+          <td>3 bullets max. Lead with outcomes, not activities</td>
+        </tr>
+        <tr>
+          <td><strong>Sales</strong></td>
+          <td>Biweekly</td>
+          <td>Slack channel + Monthly sync</td>
+          <td>Feature releases, roadmap previews, competitive responses</td>
+          <td>Give them a "cheat sheet" they can share with prospects</td>
+        </tr>
+        <tr>
+          <td><strong>Marketing</strong></td>
+          <td>Biweekly + Launch sprints</td>
+          <td>Launch brief doc, Slack</td>
+          <td>Positioning, timelines, user stories, differentiators</td>
+          <td>Loop in 6 weeks before launch, not 6 days</td>
+        </tr>
+        <tr>
+          <td><strong>Customer Success</strong></td>
+          <td>Biweekly</td>
+          <td>Release notes, Slack, Sync</td>
+          <td>What shipped, known issues, migration impact, feedback themes</td>
+          <td>Share "what we heard and what we did about it" summaries</td>
+        </tr>
+        <tr>
+          <td><strong>Legal / Compliance</strong></td>
+          <td>As needed (early!)</td>
+          <td>Review doc + Meeting</td>
+          <td>Data handling, user terms, regulatory impact</td>
+          <td>Send review requests with 2-week lead time minimum</td>
+        </tr>
+        <tr>
+          <td><strong>Data / Analytics</strong></td>
+          <td>Per feature cycle</td>
+          <td>Tracking spec in PRD</td>
+          <td>Success metrics, event tracking requirements, analysis requests</td>
+          <td>Include tracking requirements in every spec, not as an afterthought</td>
+        </tr>
+        <tr>
+          <td><strong>Broader Org</strong></td>
+          <td>Monthly / Quarterly</td>
+          <td>Newsletter, All-hands, Wiki</td>
+          <td>Wins, learnings, what's next</td>
+          <td>Celebrate the team, share user impact stories</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="card" style="margin-top: 20px;">
+      <h3>Stakeholder Update Template (for Leadership)</h3>
+      <div style="background: var(--card); padding: 16px; border-radius: 8px; margin-top: 10px; font-size: 0.88rem; font-family: monospace; white-space: pre-line; color: var(--muted);">
+<strong style="color:var(--text);">Subject:</strong> [Product Area] — Weekly Update — [Date]
+
+<strong style="color:var(--accent);">🎯 Key Metrics This Week</strong>
+• [Metric 1]: [Value] ([trend] vs last week)
+• [Metric 2]: [Value] ([trend] vs last week)
+
+<strong style="color:var(--accent3);">✅ Shipped / Completed</strong>
+• [Feature/milestone] — [1-line impact statement]
+
+<strong style="color:var(--warn);">🔄 In Progress</strong>
+• [Feature] — [status, ETA, any risks]
+
+<strong style="color:var(--danger);">🚩 Risks & Blockers</strong>
+• [Risk] — [impact if unresolved] — [what I need]
+
+<strong style="color:var(--accent2);">📅 Next Week</strong>
+• [Key focus areas]
+
+<strong style="color:var(--text);">❓ Decisions Needed</strong>
+• [Decision] — [options] — [my recommendation]
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 4: FRAMEWORKS -->
+  <div id="frameworks" class="tab-content">
+    <h2>Stakeholder Management Frameworks</h2>
+
+    <div class="card-grid">
+      <div class="fw-card">
+        <h4>1. RACI Matrix</h4>
+        <p><strong>Responsible</strong> — does the work<br>
+        <strong>Accountable</strong> — owns the outcome (only 1 per task)<br>
+        <strong>Consulted</strong> — provides input before decision<br>
+        <strong>Informed</strong> — notified after decision</p>
+        <p style="margin-top:8px; color:var(--text); font-size:0.85rem;">
+          <em>Use when:</em> Roles are unclear, decisions are slow, or too many people think they have veto power.
+        </p>
+      </div>
+
+      <div class="fw-card" style="border-color: var(--accent2);">
+        <h4>2. Salience Model</h4>
+        <p>Classifies stakeholders on three attributes:<br>
+        <strong>Power</strong> — can they impose their will?<br>
+        <strong>Legitimacy</strong> — is their involvement appropriate?<br>
+        <strong>Urgency</strong> — do they need immediate attention?</p>
+        <p style="margin-top:8px; color:var(--text); font-size:0.85rem;">
+          <em>Use when:</em> You need to decide WHO to prioritize among many competing voices.
+        </p>
+      </div>
+
+      <div class="fw-card" style="border-color: var(--accent3);">
+        <h4>3. Influence/Impact Matrix</h4>
+        <p>Similar to Power/Interest but focuses on:<br>
+        <strong>Influence</strong> — how much they can sway others<br>
+        <strong>Impact</strong> — how much the project affects them</p>
+        <p style="margin-top:8px; color:var(--text); font-size:0.85rem;">
+          <em>Use when:</em> You need to identify hidden influencers who don't have formal authority but shape opinions.
+        </p>
+      </div>
+
+      <div class="fw-card" style="border-color: var(--warn);">
+        <h4>4. Stakeholder Onion Diagram</h4>
+        <p>Concentric circles showing proximity:<br>
+        <strong>Core</strong> — product team (PM, Eng, Design)<br>
+        <strong>Inner Ring</strong> — direct stakeholders (Sales, CS, Marketing)<br>
+        <strong>Outer Ring</strong> — indirect stakeholders (Legal, Finance, HR)<br>
+        <strong>External</strong> — customers, partners, regulators</p>
+        <p style="margin-top:8px; color:var(--text); font-size:0.85rem;">
+          <em>Use when:</em> Explaining to your team why some stakeholders get more access and influence than others.
+        </p>
+      </div>
+
+      <div class="fw-card" style="border-color: var(--danger);">
+        <h4>5. Commitment Curve</h4>
+        <p>Track where each stakeholder sits on the commitment spectrum:<br>
+        <strong>Hostile</strong> → <strong>Resistant</strong> → <strong>Neutral</strong> → <strong>Supportive</strong> → <strong>Champion</strong></p>
+        <p style="margin-top:8px; color:var(--text); font-size:0.85rem;">
+          <em>Use when:</em> You need to move specific people from resistance to support — helps you plan targeted influence strategies.
+        </p>
+      </div>
+
+      <div class="fw-card" style="border-color: #ec4899;">
+        <h4>6. RAPID Decision Framework</h4>
+        <p><strong>Recommend</strong> — proposes the decision (usually PM)<br>
+        <strong>Agree</strong> — must agree (can veto)<br>
+        <strong>Perform</strong> — executes after decision<br>
+        <strong>Input</strong> — provides info/analysis<br>
+        <strong>Decide</strong> — makes the final call</p>
+        <p style="margin-top:8px; color:var(--text); font-size:0.85rem;">
+          <em>Use when:</em> Decisions stall because nobody knows who has the final say.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 5: CONFLICT PLAYBOOK -->
+  <div id="conflicts" class="tab-content">
+    <h2>Conflict Resolution Playbook</h2>
+    <p style="color:var(--muted); font-size:0.9rem; margin-bottom:16px;">
+      Real scenarios PMs face, with tested response strategies.
+    </p>
+
+    <div class="scenario">
+      <h4>Scenario 1: Sales demands a feature for a big deal</h4>
+      <p>"We'll lose a $500K deal if we don't build X by next quarter."</p>
+      <div class="response">
+        <strong>Response:</strong> Acknowledge the revenue impact. Ask: "How many other customers need this?" and "What's the workaround today?" Frame the conversation around opportunity cost: "If we build X, we delay Y which affects [metric]. Let's look at the data together." Offer a compromise: lightweight version, configuration, or partner integration. Escalate to leadership with data if needed — never say "no" without an alternative.
+      </div>
+    </div>
+
+    <div class="scenario">
+      <h4>Scenario 2: Executive wants to add scope mid-sprint</h4>
+      <p>"I had a great idea over the weekend — can we add this to the current release?"</p>
+      <div class="response">
+        <strong>Response:</strong> Don't say "no" — say "yes, and here's the trade-off." Show the current sprint commitments and ask: "Which of these should we deprioritize to make room?" Make the cost visible without being confrontational. If they insist on adding without removing, escalate the resource constraint transparently.
+      </div>
+    </div>
+
+    <div class="scenario">
+      <h4>Scenario 3: Engineering pushes back on your spec</h4>
+      <p>"This is overengineered. We can't build this in the timeline you're proposing."</p>
+      <div class="response">
+        <strong>Response:</strong> Listen first — they might be right. Ask them to propose what IS feasible in the timeline. Separate the "must-have" from "nice-to-have" in your spec together. Frame it as: "What's the simplest version that validates our hypothesis?" Be willing to cut scope. Your credibility as a PM depends on respecting engineering's expertise.
+      </div>
+    </div>
+
+    <div class="scenario">
+      <h4>Scenario 4: Two stakeholders want opposite things</h4>
+      <p>Marketing wants a simple onboarding flow; Enterprise Sales wants extensive customization options.</p>
+      <div class="response">
+        <strong>Response:</strong> Surface the conflict explicitly — don't try to please both silently. Bring data: what do users actually do during onboarding? Propose a phased approach (simple first, progressive disclosure for power users) or segment-based solution. If truly irreconcilable, escalate with your recommendation and let the decision-maker decide.
+      </div>
+    </div>
+
+    <div class="scenario">
+      <h4>Scenario 5: A stakeholder goes around you</h4>
+      <p>An executive directly tells engineering to build something without consulting you.</p>
+      <div class="response">
+        <strong>Response:</strong> Don't react emotionally. Talk to the executive directly: "I noticed X was requested — I want to make sure I understand the priority so I can plan around it." Reestablish the process without making it about authority. If it's recurring, have a private conversation with your manager about decision-making norms. Build a relationship with that executive so they come to you first next time.
+      </div>
+    </div>
+
+    <div class="tip anti" style="margin-top: 20px;">
+      <strong>Common anti-patterns to avoid:</strong> Never say "that's not in the roadmap" as a final answer. Never CC someone's boss to force compliance. Never promise timelines you can't keep just to avoid conflict. Never ignore a stakeholder hoping they'll go away — they won't.
+    </div>
+  </div>
+
+  <!-- TAB 6: WEEKLY CHECKLIST -->
+  <div id="checklist" class="tab-content">
+    <h2>Weekly Stakeholder Management Checklist</h2>
+
+    <div class="card">
+      <h3>Monday — Set the Week</h3>
+      <ul class="checklist">
+        <li>Review stakeholder map — anyone shifted quadrants?</li>
+        <li>Check for any pending decisions or approvals needed</li>
+        <li>Prep talking points for weekly 1:1 with your manager</li>
+        <li>Review feedback from CS/Support — any escalations?</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Tuesday–Wednesday — Engage Core Stakeholders</h3>
+      <ul class="checklist">
+        <li>Hold eng/design sync — align on sprint priorities</li>
+        <li>Send async update to sales/marketing on upcoming releases</li>
+        <li>Follow up on any open decisions with "Agree" stakeholders</li>
+        <li>Check in with data team on any pending analyses</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Thursday — Broader Communication</h3>
+      <ul class="checklist">
+        <li>Draft weekly leadership update (use template above)</li>
+        <li>Share demo or progress update with "Keep Informed" group</li>
+        <li>Review and respond to any stakeholder feedback or requests</li>
+        <li>Document any decisions made this week and communicate</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Friday — Reflect & Plan</h3>
+      <ul class="checklist">
+        <li>Log any relationship risks or trust issues to address</li>
+        <li>Update your stakeholder map if anything changed</li>
+        <li>Send a "wins of the week" message to the team</li>
+        <li>Identify 1 relationship to invest in next week</li>
+      </ul>
+    </div>
+
+    <div class="tip" style="margin-top: 16px;">
+      <strong>The 10% Rule:</strong> Spend roughly 10% of your week (about 4 hours) on deliberate stakeholder management — proactive updates, relationship-building conversations, and alignment meetings. This investment prevents 40%+ of your time from being consumed by reactive firefighting later.
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function switchTab(tabId) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    document.querySelectorAll('.tab').forEach(t => {
+      if (t.textContent.toLowerCase().includes(tabId.substring(0, 4)) ||
+          (tabId === 'mapping' && t.textContent === 'Stakeholder Map') ||
+          (tabId === 'who' && t.textContent === 'Who Are They?') ||
+          (tabId === 'comm' && t.textContent === 'Communication Plan') ||
+          (tabId === 'frameworks' && t.textContent === 'Frameworks') ||
+          (tabId === 'conflicts' && t.textContent === 'Conflict Playbook') ||
+          (tabId === 'checklist' && t.textContent === 'Weekly Checklist')) {
+        t.classList.add('active');
+      }
+    });
+  }
+</script>
+</body>
+</html>
