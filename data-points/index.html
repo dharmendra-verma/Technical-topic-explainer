@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PM Data Points - Interview Quick Reference</title>
+<style>
+  :root {
+    --bg: #0f172a; --surface: #1e293b; --surface2: #334155;
+    --accent: #38bdf8; --accent2: #818cf8; --accent3: #34d399;
+    --warn: #fbbf24; --text: #e2e8f0; --muted: #94a3b8;
+    --red: #f87171; --pink: #f472b6;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+
+  /* Top Bar */
+  .topbar { position: sticky; top: 0; z-index: 100; background: rgba(15,23,42,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--surface2); padding: 12px 24px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .topbar h1 { font-size: 1.2rem; color: var(--accent); white-space: nowrap; }
+  .topbar h1 span { color: var(--muted); font-weight: 400; font-size: 0.85rem; }
+  .search-box { flex: 1; min-width: 200px; max-width: 400px; }
+  .search-box input { width: 100%; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--surface2); background: var(--surface); color: var(--text); font-size: 0.9rem; outline: none; }
+  .search-box input:focus { border-color: var(--accent); }
+  .master-toggle { cursor: pointer; padding: 6px 14px; border-radius: 6px; border: 1px solid var(--surface2); background: var(--surface); color: var(--muted); font-size: 0.8rem; }
+  .master-toggle:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* Nav */
+  .nav { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 24px; background: var(--surface); border-bottom: 1px solid var(--surface2); }
+  .nav a { padding: 5px 12px; border-radius: 6px; font-size: 0.75rem; color: var(--muted); text-decoration: none; background: var(--bg); border: 1px solid transparent; transition: all 0.2s; }
+  .nav a:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* Main */
+  .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+  /* Section */
+  .section { margin-bottom: 16px; border-radius: 12px; overflow: hidden; border: 1px solid var(--surface2); background: var(--surface); }
+  .section-header { display: flex; align-items: center; gap: 10px; padding: 14px 20px; cursor: pointer; user-select: none; transition: background 0.2s; }
+  .section-header:hover { background: var(--surface2); }
+  .section-icon { font-size: 1.3rem; }
+  .section-title { flex: 1; font-size: 1rem; font-weight: 600; }
+  .section-badge { font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; background: var(--accent); color: var(--bg); font-weight: 600; }
+  .chevron { color: var(--muted); transition: transform 0.3s; font-size: 0.8rem; }
+  .section.open .chevron { transform: rotate(180deg); }
+  .section-body { display: none; padding: 0 20px 20px; }
+  .section.open .section-body { display: block; }
+
+  /* Memory Tip */
+  .tip { background: linear-gradient(135deg, rgba(56,189,248,0.1), rgba(129,140,232,0.1)); border-left: 3px solid var(--accent); padding: 10px 14px; border-radius: 0 8px 8px 0; margin: 10px 0; font-size: 0.85rem; }
+  .tip strong { color: var(--warn); }
+  .tip .label { display: inline-block; background: var(--accent); color: var(--bg); font-size: 0.65rem; font-weight: 700; padding: 1px 6px; border-radius: 4px; margin-right: 6px; text-transform: uppercase; }
+
+  /* Mnemonic */
+  .mnemonic { background: linear-gradient(135deg, rgba(251,191,36,0.15), rgba(248,113,113,0.1)); border: 1px solid rgba(251,191,36,0.3); padding: 12px 16px; border-radius: 8px; margin: 12px 0; text-align: center; }
+  .mnemonic .big { font-size: 1.8rem; font-weight: 800; color: var(--warn); letter-spacing: 4px; }
+  .mnemonic .explain { font-size: 0.8rem; color: var(--muted); margin-top: 4px; }
+
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 0.82rem; }
+  th { background: var(--surface2); color: var(--accent); padding: 8px 10px; text-align: left; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; position: sticky; top: 0; }
+  td { padding: 7px 10px; border-bottom: 1px solid rgba(51,65,85,0.5); }
+  tr:hover td { background: rgba(56,189,248,0.05); }
+  .highlight { color: var(--accent); font-weight: 600; }
+  .highlight2 { color: var(--accent3); font-weight: 600; }
+  .highlight3 { color: var(--warn); font-weight: 600; }
+  .highlight4 { color: var(--pink); font-weight: 600; }
+
+  /* Sub-section */
+  .sub { margin-top: 16px; }
+  .sub h3 { font-size: 0.9rem; color: var(--accent2); margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid var(--surface2); }
+  .sub h4 { font-size: 0.82rem; color: var(--accent3); margin: 12px 0 6px; }
+
+  /* Cards grid */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; margin: 10px 0; }
+  .card { background: var(--bg); border: 1px solid var(--surface2); border-radius: 8px; padding: 12px; }
+  .card .val { font-size: 1.4rem; font-weight: 700; color: var(--accent); }
+  .card .lbl { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+  .card .note { font-size: 0.72rem; color: var(--accent3); margin-top: 4px; }
+
+  /* Quote */
+  .quote { font-style: italic; color: var(--muted); border-left: 2px solid var(--accent2); padding: 8px 14px; margin: 10px 0; font-size: 0.85rem; }
+  .quote .author { color: var(--accent2); font-style: normal; font-weight: 600; }
+
+  /* Interview line */
+  .interview-line { background: linear-gradient(135deg, rgba(52,211,153,0.1), rgba(129,140,232,0.1)); border: 1px solid rgba(52,211,153,0.3); padding: 10px 14px; border-radius: 8px; margin: 10px 0; font-size: 0.82rem; }
+  .interview-line::before { content: "INTERVIEW LINE"; display: block; font-size: 0.65rem; font-weight: 700; color: var(--accent3); margin-bottom: 4px; letter-spacing: 1px; }
+
+  /* Pill tags */
+  .pills { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+  .pill { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 600; }
+  .pill-blue { background: rgba(56,189,248,0.15); color: var(--accent); }
+  .pill-green { background: rgba(52,211,153,0.15); color: var(--accent3); }
+  .pill-yellow { background: rgba(251,191,36,0.15); color: var(--warn); }
+  .pill-pink { background: rgba(244,114,182,0.15); color: var(--pink); }
+
+  /* Anchor Web */
+  .anchor-cluster { background: var(--bg); border: 1px solid var(--surface2); border-radius: 10px; padding: 16px; margin: 14px 0; }
+  .anchor-num { font-size: 2rem; font-weight: 800; display: inline-block; margin-right: 8px; }
+  .anchor-num.c1 { color: var(--accent); }
+  .anchor-num.c2 { color: var(--accent3); }
+  .anchor-num.c3 { color: var(--warn); }
+  .anchor-num.c4 { color: var(--pink); }
+  .anchor-num.c5 { color: var(--accent2); }
+  .anchor-num.c6 { color: var(--red); }
+  .anchor-label { font-size: 0.8rem; color: var(--muted); }
+  .web-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid rgba(51,65,85,0.3); font-size: 0.84rem; }
+  .web-row:last-child { border-bottom: none; }
+  .web-eq { color: var(--accent2); font-weight: 700; font-size: 0.9rem; min-width: 20px; text-align: center; }
+  .web-val { color: var(--warn); font-weight: 700; min-width: 70px; }
+  .web-what { color: var(--text); flex: 1; }
+  .web-link { color: var(--muted); font-size: 0.75rem; }
+  .web-rows { padding-left: 8px; margin-top: 8px; }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .container { padding: 10px; }
+    .cards { grid-template-columns: 1fr; }
+    table { font-size: 0.75rem; }
+  }
+
+  /* Print */
+  @media print {
+    body { background: #fff; color: #000; }
+    .topbar, .nav { display: none; }
+    .section { border: 1px solid #ccc; }
+    .section-body { display: block !important; }
+    .tip { border-color: #333; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>PM Data Points <span>| Interview Quick Reference</span></h1>
+  <div class="search-box"><input type="text" id="search" placeholder="Search any data point..." oninput="filterSections(this.value)"></div>
+  <button class="master-toggle" onclick="toggleAll()">Expand / Collapse All</button>
+</div>
+
+<div class="nav" id="nav">
+  <a href="#sec-tips">Memory Tips</a>
+  <a href="#sec-web" style="border-color:var(--warn);color:var(--warn)">Number Web</a>
+  <a href="#sec-pop">Population</a>
+  <a href="#sec-digital">Digital & Internet</a>
+  <a href="#sec-metrics">Key Metrics</a>
+  <a href="#sec-india">India Deep Dive</a>
+  <a href="#sec-attention">Attention Economy</a>
+  <a href="#sec-revenue">Revenue & Companies</a>
+  <a href="#sec-social">Social Media Top 35</a>
+  <a href="#sec-nri">Indian Diaspora (US)</a>
+  <a href="#sec-car">Car Ownership</a>
+  <a href="#sec-pune" style="border-color:var(--accent3);color:var(--accent3)">Pune Facts</a>
+  <a href="#sec-itjobs" style="border-color:var(--accent2);color:var(--accent2)">India IT Jobs</a>
+  <a href="#sec-cheat">Cheat Sheet</a>
+</div>
+
+<div class="container">
+
+<!-- ============ SECTION: MEMORY TIPS ============ -->
+<div class="section open" id="sec-tips">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-icon">🧠</span>
+    <span class="section-title">How to Memorize & Apply Data Points</span>
+    <span class="section-badge">START HERE</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="section-body">
+    <div class="tip"><span class="label">Rule 1</span> <strong>Use Round Numbers.</strong> Don't memorize $8,098,730,121 — say <strong>~$8 Billion</strong>. Interviewers care about order of magnitude, not precision.</div>
+    <div class="tip"><span class="label">Rule 2</span> <strong>Anchor to a Framework.</strong> Always link the number to a core PM question. Example: <em>"With ~80% US smartphone penetration vs ~45% India, an offline-first strategy captures the other 55%."</em></div>
+    <div class="tip"><span class="label">Rule 3</span> <strong>Periodically Update.</strong> Review anchor points every 6-12 months. Tech numbers shift fast.</div>
+
+    <div class="mnemonic">
+      <div class="big">3 - 6 - 8 - 12</div>
+      <div class="explain">
+        <strong>3</strong> = Tier structure (1/2/3+) &nbsp;|&nbsp;
+        <strong>6</strong> = 60% internet, 65% rural, 60% under-35 &nbsp;|&nbsp;
+        <strong>8</strong> = 850M internet users, 80% banked &nbsp;|&nbsp;
+        <strong>12</strong> = 12B+ UPI txns/month
+      </div>
+    </div>
+
+    <div class="interview-line">"With ~850M internet users but only 60% penetration, and 12B+ UPI transactions monthly, India's digital payments have leapfrogged cards entirely — any product strategy here must be UPI-first, vernacular-first, and designed for the next 400M users coming online."</div>
+  </div>
+</div>
+
+<!-- ============ SECTION: NUMBER WEB ============ -->
+<div class="section open" id="sec-web">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-icon">🕸️</span>
+    <span class="section-title">Number Web — Cross-Reference Anchors</span>
+    <span class="section-badge">MEMORY SUPERPOWER</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="section-body">
+    <p style="font-size:0.85rem;color:var(--muted);margin-bottom:14px;">Remember <strong style="color:var(--warn)">one anchor number</strong>, then derive 5-8 others from it using simple math. This is how top PMs casually drop data in interviews.</p>
+
+    <!-- ANCHOR: ~240M (UP) -->
+    <div class="anchor-cluster">
+      <span class="anchor-num c1">~240M</span><span class="anchor-label">Anchor: Uttar Pradesh Population</span>
+      <div class="web-rows">
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">241M</span><span class="web-what">UP population — <em>a single Indian state</em></span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">~265M</span><span class="web-what">India's English speakers (UP + 25M)</span><span class="web-link">Same ballpark</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">~255M</span><span class="web-what">Pakistan's entire population (UP + 14M)</span><span class="web-link">One state = one country</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">~286M</span><span class="web-what">Indonesia's population (UP + 45M)</span><span class="web-link">UP is close to world #4</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">~235M</span><span class="web-what">Nigeria's population (UP - 6M)</span><span class="web-link">Africa's biggest = UP</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">~250M</span><span class="web-what">ShareChat users in India</span><span class="web-link">India's own social platform</span></div>
+      </div>
+      <div class="tip" style="margin-top:10px"><span class="label">Interview Drop</span> "UP alone has 241M people — that's bigger than Nigeria, almost as big as Indonesia. A single Indian state would be the world's 5th most populous country."</div>
+    </div>
+
+    <!-- ANCHOR: ~200M -->
+    <div class="anchor-cluster">
+      <span class="anchor-num c2">~200M</span><span class="anchor-label">Anchor: India's Two-Wheeler Households</span>
+      <div class="web-rows">
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">200M+</span><span class="web-what">Two-wheeler households in India</span><span class="web-link">Primary transport mode</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">200M+</span><span class="web-what">Online shoppers in India</span><span class="web-link">Same size as two-wheeler owners</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">200M+</span><span class="web-what">Tier-2 city population (~30 cities)</span><span class="web-link">The growth engine</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">200M</span><span class="web-what">Discord users globally</span><span class="web-link">= India's online shoppers</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">~214M</span><span class="web-what">Brazil's population</span><span class="web-link">India's Tier-2 = all of Brazil</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">~200M</span><span class="web-what">Washington DC metro NRI (0.2M) x 1000</span><span class="web-link">Scale trick</span></div>
+      </div>
+      <div class="tip" style="margin-top:10px"><span class="label">Interview Drop</span> "India's 200M+ online shoppers is roughly the size of Brazil's entire population — and e-commerce is still at just 7-8% retail penetration."</div>
+    </div>
+
+    <!-- ANCHOR: ~350M -->
+    <div class="anchor-cluster">
+      <span class="anchor-num c3">~350M</span><span class="anchor-label">Anchor: US Population / India Facebook & Instagram</span>
+      <div class="web-rows">
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">347M</span><span class="web-what">US population</span><span class="web-link">World's largest economy</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">350M+</span><span class="web-what">Facebook users in India</span><span class="web-link">India FB = entire US population</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">350M+</span><span class="web-what">Instagram users in India</span><span class="web-link">India IG = entire US population</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">335-350M</span><span class="web-what">Total Indian households</span><span class="web-link">US pop = Indian households</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">300-400M</span><span class="web-what">India's middle class</span><span class="web-link">India's middle class = US population</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">310M</span><span class="web-what">LinkedIn users globally</span><span class="web-link">~US population on LinkedIn</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">347M</span><span class="web-what">UP (241M) + 100M</span><span class="web-link">UP + Bihar's half = US</span></div>
+      </div>
+      <div class="tip" style="margin-top:10px"><span class="label">Interview Drop</span> "India's Facebook user base alone matches the entire US population. India's middle class — 300-400M people — is basically another America sitting inside India."</div>
+    </div>
+
+    <!-- ANCHOR: ~550M -->
+    <div class="anchor-cluster">
+      <span class="anchor-num c4">~550M</span><span class="anchor-label">Anchor: India WhatsApp Users</span>
+      <div class="web-rows">
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">550M+</span><span class="web-what">WhatsApp users in India</span><span class="web-link">Largest single-country user base</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">2 x UP</span><span class="web-what">Double Uttar Pradesh's population</span><span class="web-link">550 = 241 x 2.3</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">1.6 x US</span><span class="web-what">1.6 times the entire US population</span><span class="web-link">One app, one country, > US</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">~563M</span><span class="web-what">X (Twitter) global MAU</span><span class="web-link">India's WhatsApp = all of Twitter globally</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">~570M</span><span class="web-what">Pinterest global MAU</span><span class="web-link">Same ballpark</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">~475M</span><span class="web-what">YouTube India (WhatsApp - 75M)</span><span class="web-link">2nd biggest platform in India</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">~450M</span><span class="web-what">Mobile gamers in India (WhatsApp - 100M)</span><span class="web-link">Almost every WhatsApp user games</span></div>
+      </div>
+      <div class="tip" style="margin-top:10px"><span class="label">Interview Drop</span> "India's WhatsApp user base — 550M — is larger than the entire global MAU of Twitter. WhatsApp isn't just a messaging app in India, it's the internet's front door."</div>
+    </div>
+
+    <!-- ANCHOR: ~850M -->
+    <div class="anchor-cluster">
+      <span class="anchor-num c5">~850M</span><span class="anchor-label">Anchor: India Internet Users</span>
+      <div class="web-rows">
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">850M+</span><span class="web-what">India internet users</span><span class="web-link">60% of 1.46B</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">750M+</span><span class="web-what">India smartphone users (850 - 100M)</span><span class="web-link">100M use feature phones/desktops</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">820M</span><span class="web-what">Viber global MAU</span><span class="web-link">India's internet = Viber's world</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">900M+</span><span class="web-what">India debit card users</span><span class="web-link">More debit cards than internet users!</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">900M</span><span class="web-what">Snapchat global MAU</span><span class="web-link">India internet = Snapchat world</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">~600M</span><span class="web-what">Yet to come online (1,464 - 850)</span><span class="web-link">600M = more than all of Europe!</span></div>
+      </div>
+      <div class="tip" style="margin-top:10px"><span class="label">Interview Drop</span> "850M Indians are online, but 600M are still not — that's more than Europe's entire population. The next wave of internet users won't look like the first wave."</div>
+    </div>
+
+    <!-- ANCHOR: ~3B -->
+    <div class="anchor-cluster">
+      <span class="anchor-num c6">~3B</span><span class="anchor-label">Anchor: Facebook / WhatsApp Global MAU</span>
+      <div class="web-rows">
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">3.07B</span><span class="web-what">Facebook global MAU</span><span class="web-link">#1 social platform</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">3.0B</span><span class="web-what">WhatsApp global MAU</span><span class="web-link">Tied at the top with FB</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">2.7B</span><span class="web-what">YouTube (3B - 300M)</span><span class="web-link">Close third</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">2.0B</span><span class="web-what">Instagram (3B - 1B)</span><span class="web-link">Two-thirds of FB</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">1.84B</span><span class="web-what">TikTok (3B / 1.6)</span><span class="web-link">~60% of FB despite being newest</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">~8B</span><span class="web-what">Meta total reach (FB + WA + IG + Messenger)</span><span class="web-link">Meta touches every human on earth (with overlap)</span></div>
+      </div>
+      <div class="tip" style="margin-top:10px"><span class="label">Interview Drop</span> "Meta's combined platforms reach 8B+ MAU — essentially the entire world's population. That's why Meta generates ~$150B/year: it has no attention left to capture, just monetization to optimize."</div>
+    </div>
+
+    <!-- ANCHOR: ~90M -->
+    <div class="anchor-cluster">
+      <span class="anchor-num c1">~90M</span><span class="anchor-label">Anchor: India Credit Card Users</span>
+      <div class="web-rows">
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">90M</span><span class="web-what">Credit card users in India (~6%)</span><span class="web-link">Extremely low penetration</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">88M</span><span class="web-what">VK (Russia's social network) global MAU</span><span class="web-link">India's CC users = all of VK</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">81M</span><span class="web-what">Medium global MAU</span><span class="web-link">~same as India CC holders</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">84M</span><span class="web-what">Germany's population</span><span class="web-link">India's CC users = Germany</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">86M</span><span class="web-what">Madhya Pradesh population</span><span class="web-link">One state = all CC users</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">10x</span><span class="web-what">900M debit cards vs 90M credit cards</span><span class="web-link">10:1 debit to credit ratio!</span></div>
+      </div>
+      <div class="tip" style="margin-top:10px"><span class="label">Interview Drop</span> "Only 90M Indians have credit cards — that's 6% of the population, roughly equal to Germany's entire population. Meanwhile there are 900M debit cards. This 10:1 ratio explains why UPI won and credit cards didn't."</div>
+    </div>
+
+    <!-- ANCHOR: ~35 -->
+    <div class="anchor-cluster">
+      <span class="anchor-num c3">~35</span><span class="anchor-label">Anchor: India Cars per 1,000 / Delhi Population</span>
+      <div class="web-rows">
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">35</span><span class="web-what">Cars per 1,000 people in India</span><span class="web-link">vs US at 800 (23x more)</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">34.7M</span><span class="web-what">Delhi metro population</span><span class="web-link">Same number, different scale!</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">35M</span><span class="web-what">Kerala population</span><span class="web-link">= Delhi metro</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">~35B</span><span class="web-what">Netflix annual revenue</span><span class="web-link">$35B revenue, 35 cars/1000 — same anchor</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">30M</span><span class="web-what">Car-owning households in India (7%)</span><span class="web-link">Delhi metro > car-owning families!</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">30.2B</span><span class="web-what">TCS revenue (USD)</span><span class="web-link">India's #1 IT company</span></div>
+      </div>
+      <div class="tip" style="margin-top:10px"><span class="label">Interview Drop</span> "Delhi's metro population of 35M is larger than the number of car-owning households in all of India (30M). That tells you everything about why two-wheelers and public transit dominate."</div>
+    </div>
+
+    <!-- ANCHOR: ~12B -->
+    <div class="anchor-cluster">
+      <span class="anchor-num c2">12B</span><span class="anchor-label">Anchor: Monthly UPI Transactions</span>
+      <div class="web-rows">
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">12B+</span><span class="web-what">UPI transactions per month</span><span class="web-link">Digital payment explosion</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">~8x</span><span class="web-what">8x India's population in transactions</span><span class="web-link">Each person averages 8+ UPI txns/month</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">~400M/day</span><span class="web-what">That's 400M transactions per day</span><span class="web-link">Nearly half India's pop in daily txns</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">₹18L Cr</span><span class="web-what">Monthly UPI value (~$216B/month)</span><span class="web-link">$2.6T annualized</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">133x</span><span class="web-what">vs 90M credit card users</span><span class="web-link">12B txns from UPI vs ~90M CC users</span></div>
+      </div>
+      <div class="tip" style="margin-top:10px"><span class="label">Interview Drop</span> "12 billion UPI transactions a month means India processes more real-time digital payments than any country on earth. That's 400M transactions per day — almost half of India transacting digitally every single day."</div>
+    </div>
+
+    <!-- ANCHOR: ~150M -->
+    <div class="anchor-cluster">
+      <span class="anchor-num c4">~150M</span><span class="anchor-label">Anchor: India Edtech Users</span>
+      <div class="web-rows">
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">150M+</span><span class="web-what">Edtech users in India</span><span class="web-link">Digital learning adoption</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">~144M</span><span class="web-what">Russia's entire population</span><span class="web-link">India's edtech users > Russia</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">~132M</span><span class="web-what">Mexico's population (close)</span><span class="web-link">India's edtech = Mexico</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">~125M</span><span class="web-what">India's English speakers (125M+)</span><span class="web-link">Edtech users = English speakers</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">~150K</span><span class="web-what">NRI population in Boston/Atlanta each</span><span class="web-link">Same number, 1000x scale</span></div>
+        <div class="web-row"><span class="web-eq">=</span><span class="web-val">~164.5B</span><span class="web-what">Meta's revenue ($B) — same digits</span><span class="web-link">Memory hook: 150 = edtech AND Meta revenue</span></div>
+      </div>
+      <div class="tip" style="margin-top:10px"><span class="label">Interview Drop</span> "India has 150M+ edtech users — more people than Russia's entire population learning digitally. With a ₹70,000 crore coaching market, any edtech product tapping even 10% of this is a unicorn."</div>
+    </div>
+
+    <!-- Quick Reference: Same Number, Different Things -->
+    <div class="sub" style="margin-top:20px"><h3>Same Number, Different Worlds</h3>
+    <p style="font-size:0.82rem;color:var(--muted);margin-bottom:10px;">Numbers that match across categories — instant recall triggers.</p>
+    <table>
+      <tr><th>Number</th><th>Thing 1</th><th>Thing 2</th><th>Thing 3</th></tr>
+      <tr><td class="highlight3">~30M</td><td>Car-owning households (India)</td><td>Punjab population</td><td>TCS revenue ($30B)</td></tr>
+      <tr><td class="highlight3">~70</td><td>Gujarat pop (71M)</td><td>Healthcare OOP (70%)</td><td>Cash transactions (70%)</td></tr>
+      <tr><td class="highlight3">~100M</td><td>West Bengal population</td><td>OTT paid subscriptions (India)</td><td>Reliance revenue ($109B)</td></tr>
+      <tr><td class="highlight3">~125M</td><td>English speakers in India</td><td>Japan population (123M)</td><td>Nvidia revenue ($130B)</td></tr>
+      <tr><td class="highlight3">~265M</td><td>India English speakers</td><td>School students K-12 (265M)</td><td>Europe English speakers (257M)</td></tr>
+      <tr><td class="highlight3">~450M</td><td>Mobile gamers (India)</td><td>YouTube India (475M)</td><td>South America pop (438M)</td></tr>
+      <tr><td class="highlight3">~550M</td><td>WhatsApp India</td><td>X/Twitter global (563M)</td><td>Pinterest global (570M)</td></tr>
+      <tr><td class="highlight3">~750M</td><td>India smartphones</td><td>Douyin MAU (770M)</td><td>Europe pop (744M)</td></tr>
+      <tr><td class="highlight3">~1B</td><td>Telegram global MAU</td><td>WeChat (1.39B)</td><td>India total pop (1.46B)</td></tr>
+      <tr><td class="highlight3">~3B</td><td>Facebook global MAU</td><td>WhatsApp global MAU</td><td>YouTube (2.7B — close)</td></tr>
+    </table>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============ SECTION: POPULATION ============ -->
+<div class="section" id="sec-pop">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-icon">🌍</span>
+    <span class="section-title">Population Data</span>
+    <span class="section-badge">GLOBAL + INDIA</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="section-body">
+
+    <div class="tip"><span class="label">Memory Trick</span> <strong>"8-5-1.5"</strong> → World: <strong>8.2B</strong>, Asia: <strong>5B</strong> (62%), Africa: <strong>1.5B</strong> (19%). Asia = 6x more than Europe.</div>
+
+    <div class="sub"><h3>World Population by Continent</h3>
+    <table>
+      <tr><th>Continent</th><th>Population</th><th>% of World</th><th>Memory Anchor</th></tr>
+      <tr><td>Asia</td><td class="highlight">~4.98 Billion</td><td>~62%</td><td>6 out of 10 humans are Asian</td></tr>
+      <tr><td>Africa</td><td class="highlight">~1.55 Billion</td><td>~19%</td><td>Fastest growing — will be 2.5B by 2050</td></tr>
+      <tr><td>Europe</td><td>~744 Million</td><td>~9%</td><td>Shrinking — aging population</td></tr>
+      <tr><td>North America</td><td>~617 Million</td><td>~7.7%</td><td>US = 347M, half the continent</td></tr>
+      <tr><td>South America</td><td>~438 Million</td><td>~5.5%</td><td>Brazil = 212M, half the continent</td></tr>
+      <tr><td>Oceania</td><td>~47 Million</td><td>~0.6%</td><td>Australia = 27M</td></tr>
+    </table>
+    <p style="text-align:center;color:var(--warn);font-weight:600;margin-top:8px;">Global Total (2025): ≈ 8.23 Billion</p>
+    </div>
+
+    <div class="sub"><h3>Top 17 Countries by Population</h3>
+    <div class="tip"><span class="label">Memory Trick</span> <strong>"India passed China"</strong> → India #1 at 1.46B, China #2 at 1.42B. US is a distant #3 at 347M.</div>
+    <table>
+      <tr><th>#</th><th>Country</th><th>Population</th><th>Key Role</th></tr>
+      <tr><td>1</td><td>India</td><td class="highlight">~1,464M</td><td>Most populous; fastest-growing major economy</td></tr>
+      <tr><td>2</td><td>China</td><td class="highlight">~1,416M</td><td>2nd largest economy; manufacturing hub</td></tr>
+      <tr><td>3</td><td>United States</td><td class="highlight">~347M</td><td>Largest economy (~$30T GDP)</td></tr>
+      <tr><td>4</td><td>Indonesia</td><td>~286M</td><td>Largest Muslim-majority nation; ASEAN key</td></tr>
+      <tr><td>5</td><td>Pakistan</td><td>~255M</td><td>Nuclear power; strategic location</td></tr>
+      <tr><td>6</td><td>Nigeria</td><td>~235M</td><td>Africa's largest population & economy</td></tr>
+      <tr><td>7</td><td>Brazil</td><td>~214M</td><td>Largest in Latin America; BRICS</td></tr>
+      <tr><td>8</td><td>Bangladesh</td><td>~176M</td><td>Dense population; textile export leader</td></tr>
+      <tr><td>9</td><td>Russia</td><td>~144M</td><td>Largest land area; energy superpower</td></tr>
+      <tr><td>10</td><td>Mexico</td><td>~132M</td><td>USMCA partner</td></tr>
+      <tr><td>11</td><td>Japan</td><td>~123M</td><td>3rd/4th largest economy; G7</td></tr>
+      <tr><td>12</td><td>Germany</td><td>~84M</td><td>Europe's largest economy; EU leader</td></tr>
+      <tr><td>13</td><td>UK</td><td>~69M</td><td>Financial hub; G7</td></tr>
+      <tr><td>14</td><td>France</td><td>~68M</td><td>UNSC permanent member; G7</td></tr>
+      <tr><td>15</td><td>Italy</td><td>~58M</td><td>G7; cultural influence</td></tr>
+      <tr><td>16</td><td>South Korea</td><td>~51M</td><td>Tech giant (Samsung); 10th largest economy</td></tr>
+      <tr><td>17</td><td>Canada</td><td>~41M</td><td>G7; resource-rich</td></tr>
+    </table>
+    </div>
+
+    <div class="sub"><h3>India — Cities by Tier</h3>
+    <div class="tip"><span class="label">Memory Trick</span> <strong>"Delhi 35, Mumbai 26, Bangalore 15"</strong> — Top 3 metros. Tier-2 cities (Surat, Jaipur, Indore) are 3-9M — the real growth engines.</div>
+    <table>
+      <tr><th>Tier</th><th>City</th><th>Population (M)</th><th>In Crore</th></tr>
+      <tr><td rowspan="5" style="color:var(--accent);font-weight:700">Mega<br>(>10M)</td><td>Delhi UA</td><td class="highlight">34.7</td><td>3.47</td></tr>
+      <tr><td>Mumbai UA</td><td class="highlight">26.0</td><td>2.60</td></tr>
+      <tr><td>Kolkata UA</td><td>15.6</td><td>1.56</td></tr>
+      <tr><td>Bengaluru UA</td><td>15.0</td><td>1.50</td></tr>
+      <tr><td>Chennai UA</td><td>12.3</td><td>1.23</td></tr>
+      <tr><td rowspan="4" style="color:var(--accent3);font-weight:700">Tier-2<br>(3-9M)</td><td>Surat UA</td><td>8.7</td><td>0.87</td></tr>
+      <tr><td>Jaipur UA</td><td>4.5</td><td>0.45</td></tr>
+      <tr><td>Indore UA</td><td>4.5</td><td>0.45</td></tr>
+      <tr><td>Lucknow UA</td><td>4.2</td><td>0.42</td></tr>
+      <tr><td rowspan="3" style="color:var(--warn);font-weight:700">Tier-3<br>(1-3M)</td><td>Varanasi UA</td><td>1.8</td><td>0.18</td></tr>
+      <tr><td>Agra UA</td><td>2.4</td><td>0.24</td></tr>
+      <tr><td>Patna UA</td><td>2.9</td><td>0.29</td></tr>
+    </table>
+    </div>
+
+    <div class="sub"><h3>India — Top States by Population</h3>
+    <div class="tip"><span class="label">Memory Trick</span> <strong>"UP alone = 241M"</strong> — That's almost as much as Indonesia (#4 in the world). Bihar + Maharashtra together = another 257M.</div>
+    <table>
+      <tr><th>#</th><th>State</th><th>Population (M)</th><th>In Crore</th></tr>
+      <tr><td>1</td><td>Uttar Pradesh</td><td class="highlight">241.3</td><td>24.13</td></tr>
+      <tr><td>2</td><td>Bihar</td><td>131.0</td><td>13.10</td></tr>
+      <tr><td>3</td><td>Maharashtra</td><td>126.0</td><td>12.60</td></tr>
+      <tr><td>4</td><td>West Bengal</td><td>100.0</td><td>10.00</td></tr>
+      <tr><td>5</td><td>Madhya Pradesh</td><td>86.0</td><td>8.60</td></tr>
+      <tr><td>6</td><td>Tamil Nadu</td><td>77.0</td><td>7.70</td></tr>
+      <tr><td>7</td><td>Rajasthan</td><td>81.0</td><td>8.10</td></tr>
+      <tr><td>8</td><td>Gujarat</td><td>71.0</td><td>7.10</td></tr>
+      <tr><td>9</td><td>Karnataka</td><td>68.0</td><td>6.80</td></tr>
+      <tr><td>10</td><td>Andhra Pradesh</td><td>53.0</td><td>5.30</td></tr>
+      <tr><td>11</td><td>Odisha</td><td>47.0</td><td>4.70</td></tr>
+      <tr><td>12</td><td>Telangana</td><td>38.0</td><td>3.80</td></tr>
+      <tr><td>13</td><td>Kerala</td><td>35.0</td><td>3.50</td></tr>
+    </table>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION: DIGITAL ============ -->
+<div class="section" id="sec-digital">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-icon">📱</span>
+    <span class="section-title">Digital Behavior & Internet Usage</span>
+    <span class="section-badge">GLOBAL + INDIA</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="section-body">
+    <div class="tip"><span class="label">Memory Trick</span> <strong>"5.5B online, 4.8B on phones, 6.5 hrs/day"</strong> — More than half the planet is online, mostly on mobile.</div>
+
+    <div class="cards">
+      <div class="card"><div class="val">5.5B</div><div class="lbl">Global Internet Users</div><div class="note">68% of world population</div></div>
+      <div class="card"><div class="val">4.8B</div><div class="lbl">Global Smartphone Users</div><div class="note">60% of world</div></div>
+      <div class="card"><div class="val">6.5 hrs</div><div class="lbl">Daily Internet Time (Global)</div><div class="note">Average per person</div></div>
+      <div class="card"><div class="val">5-6 hrs</div><div class="lbl">Mobile Time (US)</div><div class="note">Per day on mobile</div></div>
+    </div>
+
+    <div class="sub"><h3>India Digital Stats</h3>
+    <div class="cards">
+      <div class="card"><div class="val">850M+</div><div class="lbl">Internet Users</div><div class="note">2nd largest globally</div></div>
+      <div class="card"><div class="val">750M+</div><div class="lbl">Smartphone Users</div><div class="note">Massive digital population</div></div>
+      <div class="card"><div class="val">60%</div><div class="lbl">Internet Penetration</div><div class="note">Still room to grow!</div></div>
+      <div class="card"><div class="val">₹10-15/GB</div><div class="lbl">Data Cost</div><div class="note">Cheapest globally (Jio revolution)</div></div>
+      <div class="card"><div class="val">20-25 GB</div><div class="lbl">Monthly Data/User</div><div class="note">High engagement per user</div></div>
+      <div class="card"><div class="val">95%</div><div class="lbl">Data Cost Drop Since 2016</div><div class="note">Jio disrupted the market</div></div>
+    </div>
+    </div>
+
+    <div class="interview-line">"India has 850M+ internet users but only 60% penetration — that means 400M+ people are yet to come online. When they do, they'll be mobile-first, vernacular-first, and extremely price-sensitive. Any product targeting this segment needs to work on ₹10-15/GB data plans."</div>
+  </div>
+</div>
+
+<!-- ============ SECTION: METRICS ============ -->
+<div class="section" id="sec-metrics">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-icon">📊</span>
+    <span class="section-title">Key Business Metrics (Benchmarks)</span>
+    <span class="section-badge">QUICK REF</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="section-body">
+    <div class="tip"><span class="label">Memory Trick</span> <strong>"2-5, 120, 30-40"</strong> → App conversion ~2-5%, Good NRR ~120%+, COGS ~30-40%.</div>
+    <table>
+      <tr><th>Metric</th><th>Benchmark</th><th>When to Use</th></tr>
+      <tr><td>App Conversion Rate</td><td class="highlight">~2-5%</td><td>Install to first-time user</td></tr>
+      <tr><td>Good SaaS NRR</td><td class="highlight2">~120%+</td><td>Net Revenue Retention — gold standard</td></tr>
+      <tr><td>COGS (Physical Products)</td><td class="highlight3">~30-40%</td><td>Cost of Goods Sold benchmark</td></tr>
+    </table>
+    <div class="interview-line">"A healthy SaaS business should target 120%+ NRR — meaning existing customers are growing faster than churning. Below 100% means you're leaking revenue and no amount of new sales fixes that."</div>
+  </div>
+</div>
+
+<!-- ============ SECTION: INDIA DEEP DIVE ============ -->
+<div class="section" id="sec-india">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-icon">🇮🇳</span>
+    <span class="section-title">India-Specific Product Sense Data</span>
+    <span class="section-badge">8 CATEGORIES</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="section-body">
+
+    <!-- Transportation -->
+    <div class="sub"><h3>🚗 Transportation</h3>
+    <div class="tip"><span class="label">Memory Trick</span> <strong>"200M two-wheelers, 30M cars, 60% public transit"</strong> — India is a two-wheeler nation, not a car nation.</div>
+    <table>
+      <tr><th>Metric</th><th>Value</th><th>Key Insight</th></tr>
+      <tr><td>Total Households</td><td class="highlight">335-350M</td><td>Base market size</td></tr>
+      <tr><td>Two-Wheeler Households</td><td class="highlight">200M+</td><td>Primary transport mode</td></tr>
+      <tr><td>Car Ownership</td><td>30M households (7%)</td><td>Very low car penetration</td></tr>
+      <tr><td>Daily Commute (Metros)</td><td>45-90 minutes</td><td>Long commute = content consumption</td></tr>
+      <tr><td>Public Transport Users</td><td>60%+ in metros</td><td>Dependent on public transit</td></tr>
+    </table>
+    </div>
+
+    <!-- Education -->
+    <div class="sub"><h3>📚 Education</h3>
+    <div class="tip"><span class="label">Memory Trick</span> <strong>"265M school, 43M higher ed, 150M edtech"</strong> — Massive education market.</div>
+    <table>
+      <tr><th>Metric</th><th>Value</th><th>Key Insight</th></tr>
+      <tr><td>Literacy Rate</td><td>77%</td><td>Still improving</td></tr>
+      <tr><td>School Education (1-12)</td><td class="highlight">265M (26.52 Cr)</td><td>Enormous K-12 base</td></tr>
+      <tr><td>Higher Education</td><td class="highlight">43M (4.33 Cr)</td><td>Large student population</td></tr>
+      <tr><td>Edtech Users</td><td class="highlight">150M+</td><td>Digital learning adoption</td></tr>
+      <tr><td>Coaching Market Size</td><td>₹70,000+ crore</td><td>Huge education spending</td></tr>
+    </table>
+    </div>
+
+    <!-- Income & Spending -->
+    <div class="sub"><h3>💰 Income & Spending</h3>
+    <div class="tip"><span class="label">Memory Trick</span> <strong>"75% earn < ₹5L, 300M middle class, ₹10-50 price sensitivity"</strong> — Design for affordability first.</div>
+    <table>
+      <tr><th>Income Bracket</th><th>% of Households</th><th>Implication</th></tr>
+      <tr><td>< ₹5 lakh/year</td><td class="highlight4">75%</td><td>Price-sensitive segment</td></tr>
+      <tr><td>₹5-10 lakh/year</td><td>15%</td><td>Aspirational middle class</td></tr>
+      <tr><td>> ₹10 lakh/year</td><td>10%</td><td>Premium segment</td></tr>
+    </table>
+    <table>
+      <tr><th>Metric</th><th>Value</th></tr>
+      <tr><td>Average Household Income</td><td>₹2.5-3 lakh/year</td></tr>
+      <tr><td>Middle Class Size</td><td class="highlight">300-400M people</td></tr>
+      <tr><td>Price Sensitivity Range</td><td class="highlight3">₹10-50 — small amounts matter!</td></tr>
+    </table>
+    </div>
+
+    <!-- Payment & Banking -->
+    <div class="sub"><h3>🏦 Payment & Banking</h3>
+    <div class="tip"><span class="label">Memory Trick</span> <strong>"12B UPI, 80% banked, 90M credit cards, 70% cash"</strong> — Digital payments exploded, but cash is still king by volume.</div>
+    <table>
+      <tr><th>Metric</th><th>Value</th><th>Key Insight</th></tr>
+      <tr><td>UPI Transactions/Month</td><td class="highlight">12B+</td><td>Digital payment explosion</td></tr>
+      <tr><td>UPI Value/Month</td><td>₹18+ lakh crore</td><td>Mainstream adoption</td></tr>
+      <tr><td>Bank Account Penetration</td><td>80%+</td><td>Jan Dhan impact</td></tr>
+      <tr><td>Credit Card Users</td><td>90M (~6%)</td><td>Very low credit penetration</td></tr>
+      <tr><td>Debit Card Users</td><td>900M+</td><td>High but underutilized</td></tr>
+      <tr><td>Cash Transactions</td><td class="highlight3">70% by volume</td><td>Cash still king</td></tr>
+    </table>
+    </div>
+
+    <!-- E-commerce -->
+    <div class="sub"><h3>🛒 E-commerce & Delivery</h3>
+    <div class="tip"><span class="label">Memory Trick</span> <strong>"7-8% penetration, 200M shoppers, 30% COD"</strong> — Huge growth runway. Trust issues = Cash on Delivery still matters.</div>
+    <table>
+      <tr><th>Metric</th><th>Value</th><th>Key Insight</th></tr>
+      <tr><td>E-commerce Penetration</td><td class="highlight">7-8% of retail</td><td>Massive growth runway</td></tr>
+      <tr><td>Online Shoppers</td><td class="highlight">200M+</td><td>Growing rapidly</td></tr>
+      <tr><td>Average Order Value</td><td>₹500-1,500</td><td>Smaller basket sizes</td></tr>
+      <tr><td>Return Rates</td><td>25-30%</td><td>High for fashion/electronics</td></tr>
+      <tr><td>Expected Delivery Time</td><td>2-5 days</td><td>Patience levels declining</td></tr>
+      <tr><td>COD Preference</td><td class="highlight3">30-40% orders</td><td>Trust issues persist</td></tr>
+    </table>
+    </div>
+
+    <!-- Social Media India -->
+    <div class="sub"><h3>📲 Social Media & Apps (India)</h3>
+    <div class="tip"><span class="label">Memory Trick</span> <strong>"WhatsApp 550M, YouTube 475M, Facebook & Insta 350M each"</strong> — WhatsApp is the de facto communication layer of India.</div>
+    <table>
+      <tr><th>Platform</th><th>India Users</th><th>Key Insight</th></tr>
+      <tr><td>WhatsApp</td><td class="highlight">550M+</td><td>Largest market globally</td></tr>
+      <tr><td>YouTube</td><td class="highlight">475M+</td><td>Primary video platform</td></tr>
+      <tr><td>Facebook</td><td>350M+</td><td>Still relevant</td></tr>
+      <tr><td>Instagram</td><td>350M+</td><td>Growing influencer culture</td></tr>
+    </table>
+    <table>
+      <tr><th>Metric</th><th>Value</th></tr>
+      <tr><td>Average Screen Time</td><td class="highlight3">4-5 hours/day</td></tr>
+      <tr><td>App Size Threshold</td><td>>50MB = high deletion rate</td></tr>
+    </table>
+    </div>
+
+    <!-- Regional Nuances -->
+    <div class="sub"><h3>🗺️ Regional Nuances</h3>
+    <div class="tip"><span class="label">Memory Trick</span> <strong>"North=Brand, South=Tech, West=Business, East=Price"</strong> — Four Indias, four strategies.</div>
+    <table>
+      <tr><th>Region</th><th>Characteristics</th><th>Product Implications</th></tr>
+      <tr><td class="highlight">North</td><td>Brand conscious, family-oriented</td><td>Emphasize brand value, family features</td></tr>
+      <tr><td class="highlight2">South</td><td>Tech-savvy, education focused</td><td>Highlight innovation, learning</td></tr>
+      <tr><td class="highlight3">West</td><td>Entrepreneurial, fashion-forward</td><td>Trendy, business-oriented features</td></tr>
+      <tr><td class="highlight4">East</td><td>Price-sensitive, traditional</td><td>Affordability, cultural relevance</td></tr>
+    </table>
+    </div>
+
+    <!-- Demographics -->
+    <div class="sub"><h3>👥 Age Demography & Tiers</h3>
+    <div class="tip"><span class="label">Memory Trick</span> <strong>"Median 28, 65% under 35, 65% rural"</strong> — India is YOUNG and mostly RURAL.</div>
+    <table>
+      <tr><th>Metric</th><th>Value</th></tr>
+      <tr><td>Urban vs Rural</td><td class="highlight">35% / 65%</td></tr>
+      <tr><td>Median Age</td><td class="highlight">28 years</td></tr>
+      <tr><td>Under 35</td><td class="highlight2">65%</td></tr>
+      <tr><td>Under 25</td><td>50%</td></tr>
+      <tr><td>Tier 1 Cities</td><td>8 cities, 40M people</td></tr>
+      <tr><td>Tier 2 Cities</td><td>~30 cities, 200M+ people</td></tr>
+      <tr><td>Tier 3+ Towns</td><td>4,000+ towns</td></tr>
+    </table>
+    </div>
+
+    <!-- Languages -->
+    <div class="sub"><h3>🗣️ Languages</h3>
+    <div class="tip"><span class="label">Memory Trick</span> <strong>"Hindi 44% (not majority!), English 10%, 22 official, 90% prefer vernacular online"</strong> — If your app is English-only, you've lost 90% of India.</div>
+    <table>
+      <tr><th>Metric</th><th>Value</th><th>Key Insight</th></tr>
+      <tr><td>Hindi Speakers</td><td>44%</td><td>Not a majority language!</td></tr>
+      <tr><td>English Speakers</td><td class="highlight">10-12% (125M+)</td><td>Limited English proficiency</td></tr>
+      <tr><td>Official Languages</td><td>22</td><td>High linguistic diversity</td></tr>
+      <tr><td>Commonly Spoken</td><td>100+</td><td>Vernacular is critical</td></tr>
+      <tr><td>Internet Users Preferring Vernacular</td><td class="highlight4">90%+</td><td>Must support local languages</td></tr>
+    </table>
+    </div>
+
+    <!-- Sector Stats -->
+    <div class="sub"><h3>⚡ Sector-Specific Quick Stats</h3>
+    <table>
+      <tr><th>Sector</th><th>Key Metrics</th><th>Notes</th></tr>
+      <tr><td>Food Delivery</td><td class="highlight">15M+ orders/day, ₹150-250 AOV</td><td>Growing rapidly</td></tr>
+      <tr><td>Ride-hailing</td><td>5M+ rides/day</td><td>Urban focused</td></tr>
+      <tr><td>OTT Platforms</td><td>100M+ paid subscriptions</td><td>Content is king</td></tr>
+      <tr><td>Mobile Gaming</td><td class="highlight">450M+ gamers</td><td>Massive casual gaming</td></tr>
+      <tr><td>Fintech/Lending</td><td>40% use digital lending</td><td>Credit access expanding</td></tr>
+      <tr><td>Healthcare</td><td>70% out-of-pocket expenses</td><td>High affordability concern</td></tr>
+      <tr><td>Quick Commerce</td><td>10-30 min delivery, ₹300-500 AOV</td><td>Premium urban service</td></tr>
+    </table>
+    </div>
+
+    <!-- Interview Framework -->
+    <div class="sub"><h3>🎯 Interview Framework Template</h3>
+    <p style="color:var(--muted);font-size:0.85rem;margin-bottom:10px;">When conceptualizing products for India, always address these factors:</p>
+    <table>
+      <tr><th>Factor</th><th>Template Statement</th></tr>
+      <tr><td class="highlight">Market Size</td><td>"With 850M internet users and only X% penetration in [sector]..."</td></tr>
+      <tr><td class="highlight">Target Segment</td><td>"Focusing on Tier 2/3 cities with 200M+ aspirational users..."</td></tr>
+      <tr><td class="highlight">Language</td><td>"Supporting vernacular languages for 90%+ non-English users..."</td></tr>
+      <tr><td class="highlight">Pricing</td><td>"Price-sensitive market requires ₹X positioning..."</td></tr>
+      <tr><td class="highlight">Payment</td><td>"Enabling UPI (12B transactions/month) and COD options..."</td></tr>
+      <tr><td class="highlight">Distribution</td><td>"Leveraging WhatsApp's 550M user base for discovery..."</td></tr>
+    </table>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============ SECTION: ATTENTION ECONOMY ============ -->
+<div class="section" id="sec-attention">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-icon">👁️</span>
+    <span class="section-title">The Attention Economy</span>
+    <span class="section-badge">CONCEPT</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="section-body">
+    <p style="font-size:0.85rem;color:var(--muted);margin-bottom:12px;">An economic model where <strong style="color:var(--text)">human attention</strong> is the scarce, most valuable resource. Information is infinite and free — but human attention is finite (~24 hrs/day).</p>
+
+    <div class="interview-line">"In the attention economy, if you're not paying for the product, <strong>you are the product</strong> — your attention is being packaged and sold to advertisers."</div>
+
+    <div class="sub"><h3>How Big Tech Monetises Attention</h3>
+    <table>
+      <tr><th>Platform</th><th>Revenue (2024)</th><th>% from Ads</th><th>Daily Time Spent</th></tr>
+      <tr><td>Meta (FB+IG)</td><td class="highlight">~$140-150B</td><td>97-98%</td><td>~60-90 min</td></tr>
+      <tr><td>Google/YouTube</td><td class="highlight">~$300B+</td><td>80-90%</td><td>~2-3 hrs (YouTube)</td></tr>
+      <tr><td>TikTok</td><td>~$20-25B</td><td>100%</td><td class="highlight4">90-120 min (highest!)</td></tr>
+      <tr><td>Netflix</td><td>~$35B</td><td>0% (subscription)</td><td>Subscription model</td></tr>
+    </table>
+    </div>
+
+    <div class="sub"><h3>Key Characteristics</h3>
+    <table>
+      <tr><th>Feature</th><th>Explanation</th></tr>
+      <tr><td>Scarce Resource</td><td>Human attention (not information or money)</td></tr>
+      <tr><td>Revenue Model</td><td>Advertising (Google, Meta, YouTube, TikTok, X)</td></tr>
+      <tr><td>Currency</td><td>Seconds/minutes → eyeballs → ad impressions → dollars</td></tr>
+      <tr><td>Business Goal</td><td>Maximize time on site/app, DAU, engagement</td></tr>
+      <tr><td>Success Metric</td><td>DAU/MAU, watch time, scroll depth, session length, retention</td></tr>
+    </table>
+    </div>
+
+    <div class="quote">"In an information-rich world, the wealth of information means a dearth of something else... <strong>it consumes the attention of its recipients</strong>. A wealth of information creates a poverty of attention." — <span class="author">Herbert Simon (1971, Nobel Laureate)</span></div>
+  </div>
+</div>
+
+<!-- ============ SECTION: REVENUE ============ -->
+<div class="section" id="sec-revenue">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-icon">💵</span>
+    <span class="section-title">Revenue — Top Companies</span>
+    <span class="section-badge">TECH + GLOBAL + INDIA</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="section-body">
+
+    <div class="sub"><h3>Top 20 Tech Companies by Revenue</h3>
+    <div class="tip"><span class="label">Memory Trick</span> <strong>"Amazon 638, Apple 416, Google 350, Microsoft 282"</strong> — Amazon is the revenue king of tech. Apple is #2 despite fewer products.</div>
+    <table>
+      <tr><th>#</th><th>Company</th><th>Revenue (USD B)</th></tr>
+      <tr><td>1</td><td>Amazon</td><td class="highlight">$637.9B</td></tr>
+      <tr><td>2</td><td>Apple</td><td class="highlight">$416.0B</td></tr>
+      <tr><td>3</td><td>Alphabet (Google)</td><td class="highlight">$350.0B</td></tr>
+      <tr><td>4</td><td>Microsoft</td><td class="highlight">$281.7B</td></tr>
+      <tr><td>5</td><td>Samsung Electronics</td><td>$220.3B</td></tr>
+      <tr><td>6</td><td>Foxconn (Hon Hai)</td><td>$213.9B</td></tr>
+      <tr><td>7</td><td>Meta (Facebook)</td><td>$164.5B</td></tr>
+      <tr><td>8</td><td>JD.com</td><td>$158.8B</td></tr>
+      <tr><td>9</td><td>Alibaba</td><td>$137.3B</td></tr>
+      <tr><td>10</td><td>Nvidia</td><td>$130.5B</td></tr>
+      <tr><td>11</td><td>AT&T</td><td>$122.3B</td></tr>
+      <tr><td>12</td><td>Huawei</td><td>$118.1B</td></tr>
+      <tr><td>13</td><td>Deutsche Telekom</td><td>$112.0B</td></tr>
+      <tr><td>14</td><td>Dell Technologies</td><td>$95.6B</td></tr>
+      <tr><td>15</td><td>Tencent</td><td>$91.8B</td></tr>
+      <tr><td>16</td><td>Sony</td><td>$90.1B</td></tr>
+      <tr><td>17</td><td>TSMC</td><td>$88.3B</td></tr>
+      <tr><td>18</td><td>Hitachi</td><td>$80.4B</td></tr>
+      <tr><td>19</td><td>Lenovo</td><td>$69.0B</td></tr>
+      <tr><td>20</td><td>Accenture</td><td>$64.9B</td></tr>
+    </table>
+    </div>
+
+    <div class="sub"><h3>Top Indian Companies by Revenue</h3>
+    <div class="tip"><span class="label">Memory Trick</span> <strong>"Reliance 109B, LIC 104B, IOC 94B, SBI 72B"</strong> — Oil, insurance, banking dominate. TCS at $30B leads IT.</div>
+    <table>
+      <tr><th>#</th><th>Company</th><th>Revenue (USD B)</th></tr>
+      <tr><td>1</td><td>Reliance Industries</td><td class="highlight">~$108.9B</td></tr>
+      <tr><td>2</td><td>LIC</td><td class="highlight">~$103.5B</td></tr>
+      <tr><td>3</td><td>Indian Oil Corporation</td><td>~$94.3B</td></tr>
+      <tr><td>4</td><td>State Bank of India</td><td>~$71.8B</td></tr>
+      <tr><td>5</td><td>ONGC</td><td>~$71.5B</td></tr>
+    </table>
+    <h4>Indian IT Companies</h4>
+    <table>
+      <tr><th>Company</th><th>Revenue (USD B)</th></tr>
+      <tr><td>TCS</td><td class="highlight2">$30.2B</td></tr>
+      <tr><td>Infosys</td><td>~$20.0B</td></tr>
+      <tr><td>HCL Technologies</td><td>$13.8B</td></tr>
+      <tr><td>Wipro</td><td>$10.4B</td></tr>
+      <tr><td>Tech Mahindra</td><td>~$6.4B</td></tr>
+    </table>
+    </div>
+
+    <div class="sub"><h3>Big Tech Acronyms</h3>
+    <div class="pills">
+      <span class="pill pill-blue">FAANG = Facebook, Apple, Amazon, Netflix, Google</span>
+      <span class="pill pill-green">MAMAA = Meta, Apple, Microsoft, Amazon, Alphabet</span>
+      <span class="pill pill-yellow">MANGA = Microsoft, Apple, Nvidia, Google, Amazon</span>
+      <span class="pill pill-pink">MAMATA = Meta, Apple, Microsoft, Amazon, Tesla, Alphabet</span>
+    </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============ SECTION: SOCIAL MEDIA ============ -->
+<div class="section" id="sec-social">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-icon">💬</span>
+    <span class="section-title">Top 35 Social Media Platforms</span>
+    <span class="section-badge">GLOBAL MAU</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="section-body">
+    <div class="tip"><span class="label">Memory Trick</span> <strong>"FB 3B, WhatsApp 3B, YouTube 2.7B, Insta 2B, TikTok 1.8B"</strong> — Meta owns 3 of the top 5 platforms. That's ~8B MAU combined (with overlap).</div>
+    <table>
+      <tr><th>#</th><th>Platform</th><th>Company</th><th>Country</th><th>MAU</th></tr>
+      <tr><td>1</td><td>Facebook</td><td>Meta</td><td>US</td><td class="highlight">3.07B</td></tr>
+      <tr><td>2</td><td>WhatsApp</td><td>Meta</td><td>US</td><td class="highlight">3.0B</td></tr>
+      <tr><td>3</td><td>YouTube</td><td>Alphabet</td><td>US</td><td class="highlight">2.7B</td></tr>
+      <tr><td>4</td><td>Instagram</td><td>Meta</td><td>US</td><td class="highlight">2.0B</td></tr>
+      <tr><td>5</td><td>TikTok</td><td>ByteDance</td><td>China</td><td class="highlight">1.84B</td></tr>
+      <tr><td>6</td><td>WeChat</td><td>Sina Corp</td><td>China</td><td>1.39B</td></tr>
+      <tr><td>7</td><td>Telegram</td><td>Telegram</td><td>UAE</td><td>1.0B</td></tr>
+      <tr><td>8</td><td>Messenger</td><td>Meta</td><td>US</td><td>947M</td></tr>
+      <tr><td>9</td><td>Snapchat</td><td>Snap Inc</td><td>US</td><td>900M</td></tr>
+      <tr><td>10</td><td>Viber</td><td>Rakuten</td><td>Japan</td><td>820M</td></tr>
+      <tr><td>11</td><td>Douyin</td><td>ByteDance</td><td>China</td><td>770M</td></tr>
+      <tr><td>12</td><td>Reddit</td><td>Reddit</td><td>US</td><td>712M</td></tr>
+      <tr><td>13</td><td>Kuaishou</td><td>Kuaishou</td><td>China</td><td>710M</td></tr>
+      <tr><td>14</td><td>Baidu</td><td>Baidu</td><td>China</td><td>679M</td></tr>
+      <tr><td>15</td><td>Spotify</td><td>Tencent</td><td>China</td><td>678M</td></tr>
+      <tr><td>16</td><td>Weibo</td><td>Sina</td><td>China</td><td>590M</td></tr>
+      <tr><td>17</td><td>Pinterest</td><td>Pinterest</td><td>US</td><td>570M</td></tr>
+      <tr><td>18</td><td>X (Twitter)</td><td>X Corp</td><td>US</td><td>563M</td></tr>
+      <tr><td>19</td><td>QQ</td><td>Tencent</td><td>China</td><td>524M</td></tr>
+      <tr><td>20</td><td>Qzone</td><td>Tencent</td><td>China</td><td>500M</td></tr>
+      <tr><td>21</td><td>Quora</td><td>Quora</td><td>US</td><td>400M</td></tr>
+      <tr><td>22</td><td>Bilibili</td><td>Bilibili</td><td>China</td><td>340M</td></tr>
+      <tr><td>23</td><td>Teams</td><td>Microsoft</td><td>US</td><td>320M</td></tr>
+      <tr><td>24</td><td>LinkedIn</td><td>Microsoft</td><td>US</td><td>310M</td></tr>
+      <tr><td>25</td><td>Vimeo</td><td>Vimeo</td><td>US</td><td>300M</td></tr>
+      <tr><td>26</td><td>Threads</td><td>Meta</td><td>US</td><td>275M</td></tr>
+      <tr><td>27</td><td>ShareChat</td><td>Mohalla Tech</td><td>India</td><td>250M</td></tr>
+      <tr><td>28</td><td>Twitch</td><td>Amazon</td><td>US</td><td>240M</td></tr>
+      <tr><td>29</td><td>Discord</td><td>Discord</td><td>US</td><td>200M</td></tr>
+      <tr><td>30</td><td>Xiaohongshu (RedNote)</td><td>Xiaohongshu</td><td>China</td><td>200M</td></tr>
+      <tr><td>31</td><td>Line</td><td>Naver</td><td>S. Korea</td><td>178M</td></tr>
+      <tr><td>32</td><td>Tumblr</td><td>Automattic</td><td>US</td><td>135M</td></tr>
+      <tr><td>33</td><td>VK</td><td>Gazprombank</td><td>Russia</td><td>88M</td></tr>
+      <tr><td>34</td><td>Medium</td><td>A Medium Corp</td><td>US</td><td>81M</td></tr>
+      <tr><td>35</td><td>Rumble</td><td>Rumble Inc</td><td>Canada</td><td>59M</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ============ SECTION: NRI ============ -->
+<div class="section" id="sec-nri">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-icon">🇺🇸</span>
+    <span class="section-title">Indian Diaspora in the US</span>
+    <span class="section-badge">METRO + STATE</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="section-body">
+    <div class="tip"><span class="label">Memory Trick</span> <strong>"NYC 7L, Bay Area 6L, Chicago 2.3L, Dallas 2.7L"</strong> — Top 4 metros. New Jersey has highest per-capita Indian density (~4.5%).</div>
+
+    <div class="sub"><h3>Top 10 US Metro Areas</h3>
+    <table>
+      <tr><th>#</th><th>Metro Area</th><th>Indian Population</th><th>Notes</th></tr>
+      <tr><td>1</td><td>New York-Newark-Jersey City</td><td class="highlight">~700K (7 Lakh)</td><td>Heavy in NJ suburbs (Edison, Jersey City)</td></tr>
+      <tr><td>2</td><td>San Francisco Bay Area</td><td class="highlight">~500-600K (6 Lakh)</td><td>Tech epicenter; Fremont, Cupertino, Sunnyvale</td></tr>
+      <tr><td>3</td><td>Chicago</td><td>~235K (2.3 Lakh)</td><td>Naperville, Schaumburg</td></tr>
+      <tr><td>4</td><td>Dallas-Fort Worth</td><td>~270K (2.7 Lakh)</td><td>Fastest-growing; Plano, Frisco</td></tr>
+      <tr><td>5</td><td>Houston</td><td>~200K (2 Lakh)</td><td>Energy & healthcare; Sugar Land</td></tr>
+      <tr><td>6</td><td>Washington DC</td><td>~200K (2 Lakh)</td><td>Northern Virginia (Fairfax, Loudoun)</td></tr>
+      <tr><td>7</td><td>Los Angeles</td><td>~170K (1.7 Lakh)</td><td>Artesia ("Little India"), Irvine</td></tr>
+      <tr><td>8</td><td>Boston</td><td>~150K</td><td>Education and tech hub</td></tr>
+      <tr><td>9</td><td>Atlanta</td><td>~150K (1.5 Lakh)</td><td>Johns Creek, Alpharetta</td></tr>
+      <tr><td>10</td><td>Philadelphia</td><td>~137K</td><td>Suburbs in NJ and PA</td></tr>
+    </table>
+    </div>
+
+    <div class="sub"><h3>Top 10 US States</h3>
+    <table>
+      <tr><th>#</th><th>State</th><th>Indian Population</th><th>% of State</th><th>Notes</th></tr>
+      <tr><td>1</td><td>California</td><td class="highlight">~900K-1M (9 Lakh)</td><td>~2.3-2.5%</td><td>Largest absolute; Silicon Valley</td></tr>
+      <tr><td>2</td><td>Texas</td><td>~500-550K (5.5 Lakh)</td><td>~1.7-1.9%</td><td>Fastest-growing; Dallas, Houston, Austin</td></tr>
+      <tr><td>3</td><td>New Jersey</td><td>~400-450K (4.5 Lakh)</td><td class="highlight3">~4.3-4.8%</td><td>Highest per capita; Edison</td></tr>
+      <tr><td>4</td><td>New York</td><td>~350-400K (4 Lakh)</td><td>~1.8-2.0%</td><td>NYC metro (Queens, Long Island)</td></tr>
+      <tr><td>5</td><td>Illinois</td><td>~250-280K (2.8 Lakh)</td><td>~2.0-2.2%</td><td>Chicago suburbs</td></tr>
+      <tr><td>6</td><td>Georgia</td><td>~150-180K (1.8 Lakh)</td><td>~1.4-1.7%</td><td>Atlanta area growth</td></tr>
+      <tr><td>7</td><td>Virginia</td><td>~150-170K (1.7 Lakh)</td><td>~1.7-2.0%</td><td>Northern VA near DC</td></tr>
+      <tr><td>8</td><td>Washington</td><td>~140-160K (1.6 Lakh)</td><td>~1.8-2.1%</td><td>Seattle tech boom (Microsoft, Amazon)</td></tr>
+      <tr><td>9</td><td>Massachusetts</td><td>~130-150K (1.5 Lakh)</td><td>~1.9-2.1%</td><td>Boston biotech & education</td></tr>
+      <tr><td>10</td><td>Florida</td><td>~130-150K (1.5 Lakh)</td><td>~0.6-0.7%</td><td>Orlando, Tampa, Miami</td></tr>
+    </table>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION: CAR OWNERSHIP ============ -->
+<div class="section" id="sec-car">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-icon">🚗</span>
+    <span class="section-title">Car Ownership — Global Comparison</span>
+    <span class="section-badge">PER 1,000</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="section-body">
+    <div class="tip"><span class="label">Memory Trick</span> <strong>"India 35, China 200, Europe 560, US 800"</strong> — India's car ownership is 23x lower than the US. Two-wheelers dominate at 185 per 1,000.</div>
+    <table>
+      <tr><th>Country/Region</th><th>Cars per 1,000</th><th>Notes</th></tr>
+      <tr><td>India</td><td class="highlight4">34-38</td><td>Two-wheelers dominate at 185/1,000</td></tr>
+      <tr><td>China</td><td>185-251</td><td>Rapid growth; total vehicles higher</td></tr>
+      <tr><td>Europe (EU avg)</td><td class="highlight2">560-570</td><td>Italy highest at 701</td></tr>
+      <tr><td>US</td><td class="highlight">779-860</td><td>92% household penetration</td></tr>
+    </table>
+    <div class="interview-line">"India has ~35 cars per 1,000 people vs 800+ in the US. The real personal mobility layer is two-wheelers at 185 per 1,000. Any mobility product for India needs to think two-wheelers first, shared mobility second, and car ownership as a premium niche."</div>
+  </div>
+</div>
+
+<!-- ============ SECTION: ENGLISH ============ -->
+<div class="section" id="sec-english">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-icon">🌐</span>
+    <span class="section-title">English Speakers — Global</span>
+    <span class="section-badge">LANGUAGES</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="section-body">
+    <div class="tip"><span class="label">Memory Trick</span> <strong>"India 265M English speakers — 2nd only to the US (299M)"</strong> — But mostly L2 (second language). China has only 10-40M despite massive learning efforts.</div>
+    <table>
+      <tr><th>Region/Country</th><th>English Speakers (M)</th><th>% of Population</th><th>Notes</th></tr>
+      <tr><td>US</td><td class="highlight">299</td><td>96%</td><td>Primarily native</td></tr>
+      <tr><td>India</td><td class="highlight">228-265</td><td>10-19%</td><td>Mostly L2; 2nd largest total</td></tr>
+      <tr><td>Europe (EU+UK)</td><td>257</td><td>~51%</td><td>65M native, rest L2</td></tr>
+      <tr><td>China</td><td>10-40</td><td><3%</td><td>Low proficiency despite learners</td></tr>
+      <tr><td style="font-weight:700">Global</td><td class="highlight2">1.5 Billion</td><td>19%</td><td>380-400M native speakers</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ============ SECTION: PUNE FACTS ============ -->
+<div class="section" id="sec-pune">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-icon">🏙️</span>
+    <span class="section-title">Pune — City Deep Dive</span>
+    <span class="section-badge">POPULATION + JOBS + TRANSPORT</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="section-body">
+
+    <div class="mnemonic">
+      <div class="big">8 - 8 - 12 - 45</div>
+      <div class="explain">
+        <strong>8</strong> = 8.4M metro pop &nbsp;|&nbsp;
+        <strong>8</strong> = 8 lakh IT employees &nbsp;|&nbsp;
+        <strong>12</strong> = 12 lakh daily bus riders &nbsp;|&nbsp;
+        <strong>45</strong> = 45K Ola/Uber cabs
+      </div>
+    </div>
+
+    <!-- Population -->
+    <div class="sub"><h3>Population</h3>
+    <div class="cards">
+      <div class="card"><div class="val">8.4M</div><div class="lbl">Pune Metro Area (2026)</div><div class="note">PMC + PCMC + Cantonment Boards</div></div>
+      <div class="card"><div class="val">4.7M</div><div class="lbl">Pune City Proper</div><div class="note">Just the PMC area</div></div>
+      <div class="card"><div class="val">7,256 km²</div><div class="lbl">Metro Region Area</div><div class="note">Massive urban sprawl</div></div>
+    </div>
+    <div class="tip"><span class="label">Anchor</span> Pune metro (8.4M) ≈ <strong>Switzerland's population (8.8M)</strong>. One Indian city = one European country.</div>
+    </div>
+
+    <!-- Jobs & Employment -->
+    <div class="sub"><h3>Jobs & Employment</h3>
+    <table>
+      <tr><th>Metric</th><th>Value</th><th>Key Insight</th></tr>
+      <tr><td>IT Employees in Pune</td><td class="highlight">~800K (8 Lakh)</td><td>3rd largest IT workforce in India after Bangalore & Hyderabad</td></tr>
+      <tr><td>IT Exports (FY24)</td><td class="highlight2">₹1,05,818 Cr</td><td>Doubled from ₹50,157 Cr in FY20 — 2x in 4 years</td></tr>
+      <tr><td>Pune's Share of India IT Jobs</td><td class="highlight3">~13.6%</td><td>Every 7th IT job in India is in Pune</td></tr>
+      <tr><td>Hinjewadi IT Park</td><td>2,800 acres, 800+ companies</td><td>"Pune's Silicon Valley" — 2.4 lakh daily commuters</td></tr>
+      <tr><td>Major IT Employers</td><td colspan="2">Infosys (30K+), Cognizant (20K+), Wipro (15K+), TCS, Accenture, IBM, Capgemini</td></tr>
+      <tr><td>Specialization</td><td colspan="2">Automotive tech, Manufacturing IT, GCC hub</td></tr>
+    </table>
+    <div class="tip"><span class="label">Anchor</span> <strong>Pune IT workforce (800K) = Germany's entire army (180K) x 4.5.</strong> Or think: 8 lakh IT workers = roughly 1 in every 10 people in the metro works in IT.</div>
+    </div>
+
+    <!-- Service Sector -->
+    <div class="sub"><h3>Service Sector Breakdown</h3>
+    <table>
+      <tr><th>Sector</th><th>Scale</th><th>Notes</th></tr>
+      <tr><td>IT & IT-BPM</td><td class="highlight">~800K employees</td><td>Dominant sector — Hinjewadi, Kharadi, Magarpatta, SP Infocity</td></tr>
+      <tr><td>Manufacturing</td><td>Large — auto hub</td><td>Bajaj Auto, Cummins, Tata Motors, Force Motors</td></tr>
+      <tr><td>Education</td><td>Major hub</td><td>100+ engineering colleges, Pune University, Symbiosis</td></tr>
+      <tr><td>Startups & GCCs</td><td>Fast growing</td><td>GCC hub — global companies setting up captive centers</td></tr>
+      <tr><td>Defense & Aerospace</td><td>Significant</td><td>DRDO labs, HAL, ordnance factories</td></tr>
+    </table>
+    </div>
+
+    <!-- Public Transport -->
+    <div class="sub"><h3>Public Transport — Daily Ridership</h3>
+    <table>
+      <tr><th>Mode</th><th>Daily Riders</th><th>Details</th></tr>
+      <tr><td>PMPML Bus</td><td class="highlight">~11-12 Lakh (1.1-1.2M)</td><td>1,650 buses, 381 routes — backbone of Pune transit</td></tr>
+      <tr><td>Pune Metro</td><td class="highlight2">~1.9 Lakh/day</td><td>57.6 lakh in July 2025 (record month). Purple + Aqua lines</td></tr>
+      <tr><td style="font-weight:700">Total Public Transport</td><td class="highlight3" style="font-weight:700">~14 Lakh/day (1.4M)</td><td>Bus + Metro combined</td></tr>
+    </table>
+    <div class="tip"><span class="label">Anchor</span> <strong>14 lakh daily transit riders = 1 in 6 people</strong> in the Pune metro takes public transport daily. PMPML plans 4,000 buses by 2026 → target 18 lakh daily riders.</div>
+
+    <h4>Future Plans</h4>
+    <table>
+      <tr><th>What</th><th>Target</th><th>When</th></tr>
+      <tr><td>New PMPML Buses</td><td>2,500 new → total 4,000</td><td>April-May 2026</td></tr>
+      <tr><td>Target Daily Ridership</td><td>18 lakh/day (bus)</td><td>Post fleet expansion</td></tr>
+      <tr><td>Metro Phase 2</td><td>Extended lines</td><td>Under construction</td></tr>
+    </table>
+    </div>
+
+    <!-- Ride Hailing -->
+    <div class="sub"><h3>Ride-Hailing (Uber / Ola / Rapido)</h3>
+    <table>
+      <tr><th>Metric</th><th>Value</th><th>Context</th></tr>
+      <tr><td>Total Cabs in Pune + PCMC</td><td class="highlight">~45,000</td><td>Ola + Uber + Rapido combined</td></tr>
+      <tr><td>India-wide Daily Rides</td><td class="highlight2">~10M (1 Cr)</td><td>Ola ~4M, Uber + others ~6M</td></tr>
+      <tr><td>India Monthly Ride-Hailing Users</td><td>150M+</td><td>Ola, Uber, Rapido leading</td></tr>
+      <tr><td>Pune YoY Growth</td><td>+18%</td><td>IT workers + students driving demand</td></tr>
+    </table>
+    <div class="tip"><span class="label">Anchor</span> <strong>45K cabs = 1 cab for every 186 people</strong> in Pune metro. Compare: 12 lakh take the bus daily but only ~45K cabs exist — public transit is 26x bigger than ride-hailing in Pune.</div>
+    </div>
+
+    <!-- Cross-references -->
+    <div class="sub"><h3>Pune Number Web — Cross-References</h3>
+    <table>
+      <tr><th>Pune Data Point</th><th>=</th><th>Cross-Reference</th></tr>
+      <tr><td>Pune metro pop (8.4M)</td><td class="highlight3">=</td><td>Switzerland (8.8M), Surat UA (8.7M), Israel (9.8M close)</td></tr>
+      <tr><td>IT employees (800K)</td><td class="highlight3">=</td><td>Viber global MAU (820M) — same digits, 1000x scale</td></tr>
+      <tr><td>Bus riders daily (12 Lakh)</td><td class="highlight3">=</td><td>UPI monthly (12B) — same number, different unit!</td></tr>
+      <tr><td>45K Ola/Uber cabs</td><td class="highlight3">=</td><td>Chandigarh UA population (1.4M) / 31</td></tr>
+      <tr><td>IT exports ₹1.06L Cr</td><td class="highlight3">=</td><td>Doubled in 4 years (₹50K → ₹1.06L Cr). Rule of 72: ~18% CAGR</td></tr>
+      <tr><td>Hinjewadi daily commuters (2.4L)</td><td class="highlight3">=</td><td>= Agra city population (2.4M) — same number, Lakh vs Million</td></tr>
+      <tr><td>Pune IT share (13.6%)</td><td class="highlight3">=</td><td>≈ India's e-commerce penetration (7-8%) x 2</td></tr>
+    </table>
+    </div>
+
+    <div class="interview-line">"Pune has 8.4M people — roughly Switzerland's population — with 800K IT workers generating ₹1 lakh crore in IT exports. That's doubled in just 4 years. When you add Hinjewadi alone processing 240K commuters daily, you understand why Pune is India's 3rd largest tech city."</div>
+  </div>
+</div>
+
+<!-- ============ SECTION: INDIA IT JOBS ============ -->
+<div class="section" id="sec-itjobs">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-icon">💻</span>
+    <span class="section-title">India IT Jobs — National & City-Wise Breakdown</span>
+    <span class="section-badge">5.8M WORKFORCE</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="section-body">
+
+    <div class="mnemonic">
+      <div class="big">5.8M → $283B → 36-16-14</div>
+      <div class="explain">
+        <strong>5.8M</strong> = Total IT workforce &nbsp;|&nbsp;
+        <strong>$283B</strong> = IT industry revenue (FY25) &nbsp;|&nbsp;
+        <strong>36-16-14</strong> = Bangalore 36%, Hyderabad 16%, Pune 14%
+      </div>
+    </div>
+
+    <!-- National Overview -->
+    <div class="sub"><h3>India IT — The Big Picture</h3>
+    <div class="cards">
+      <div class="card"><div class="val">5.8M</div><div class="lbl">Total IT-BPM Employees (FY25)</div><div class="note">58 Lakh — Net added 126K this year</div></div>
+      <div class="card"><div class="val">$283B</div><div class="lbl">IT Industry Revenue (FY25)</div><div class="note">Exports: $224B + Domestic: $59B</div></div>
+      <div class="card"><div class="val">7.5M</div><div class="lbl">Projected by 2030</div><div class="note">~30% growth in 5 years</div></div>
+      <div class="card"><div class="val">82K</div><div class="lbl">Graduate Hiring (FY26)</div><div class="note">TCS + Infosys + HCL + Wipro</div></div>
+    </div>
+    <div class="tip"><span class="label">Anchor</span> <strong>5.8M IT workers = Denmark's entire population (5.9M).</strong> India's IT sector is literally a country's worth of people writing code.</div>
+    </div>
+
+    <!-- City-wise breakdown -->
+    <div class="sub"><h3>IT Jobs — City-Wise Distribution</h3>
+    <table>
+      <tr><th>#</th><th>City</th><th>% of IT Jobs</th><th>Est. IT Employees</th><th>Specialization</th></tr>
+      <tr><td>1</td><td style="color:var(--accent);font-weight:700">Bangalore</td><td class="highlight">~36%</td><td class="highlight">~2.1M (21 Lakh)</td><td>AI/ML, startups, product companies</td></tr>
+      <tr><td>2</td><td style="color:var(--accent2);font-weight:700">Hyderabad</td><td class="highlight2">~16%</td><td>~930K (9.3 Lakh)</td><td>Cloud computing, pharma-tech, GCCs</td></tr>
+      <tr><td>3</td><td style="color:var(--accent3);font-weight:700">Pune</td><td class="highlight2">~14%</td><td>~800K (8 Lakh)</td><td>Automotive tech, manufacturing IT, GCCs</td></tr>
+      <tr><td>4</td><td>Chennai</td><td>~13%</td><td>~750K (7.5 Lakh)</td><td>Hardware, embedded systems, BFSI</td></tr>
+      <tr><td>5</td><td>Delhi-NCR</td><td>~10%</td><td>~580K (5.8 Lakh)</td><td>Consulting, govtech, BPO</td></tr>
+      <tr><td>6</td><td>Mumbai</td><td>~5%</td><td>~290K (2.9 Lakh)</td><td>Fintech, media tech</td></tr>
+      <tr><td colspan="5" style="border-top:2px solid var(--surface2);padding-top:8px;color:var(--warn);font-weight:600;">Metro Total (Top 6): ~84% of all IT jobs = ~4.9M employees</td></tr>
+    </table>
+    <div class="tip"><span class="label">Memory Trick</span> <strong>"Bangalore is 1/3 of India IT"</strong> → 36% is roughly a third. Then Hyderabad + Pune + Chennai together = another third (~43%). Rest of India = final third (~21%).</div>
+    </div>
+
+    <!-- Tier-2 Emerging -->
+    <div class="sub"><h3>Emerging Tier-2 IT Hubs</h3>
+    <table>
+      <tr><th>City</th><th>IT Growth Signal</th><th>Why It Matters</th></tr>
+      <tr><td class="highlight3">Jaipur</td><td>#1 in tier-2 junior IT hiring (18.18% share)</td><td>Startups + Govt IT initiatives (Rajiv Gandhi Infotech hubs)</td></tr>
+      <tr><td class="highlight3">Ahmedabad</td><td>GIFT City catalyst — global fintech companies entering</td><td>Gujarat International Finance Tec-City driving IT influx</td></tr>
+      <tr><td>Kochi</td><td>Infopark + SmartCity hubs</td><td>Kerala's tech corridor, lower costs</td></tr>
+      <tr><td>Coimbatore</td><td>TIDEL Park + startup growth</td><td>Tamil Nadu's #2 tech city</td></tr>
+      <tr><td>Chandigarh</td><td>IT Park + strong university pipeline</td><td>North India's emerging tech hub</td></tr>
+      <tr><td>Indore</td><td>Super Corridor IT hub</td><td>MP's tech anchor, lowest cost tier-2</td></tr>
+    </table>
+    <div class="tip"><span class="label">Key Stat</span> <strong>Tier-2 cities now capture 32% of planned IT hiring</strong> with 25% hiring growth vs only 10% in tier-1. 60% of India's engineering graduates come from smaller cities — talent is already there.</div>
+    </div>
+
+    <!-- GCC Trend -->
+    <div class="sub"><h3>GCC (Global Capability Centers) Trend</h3>
+    <div class="cards">
+      <div class="card"><div class="val">100K+</div><div class="lbl">New GCC Jobs in FY25</div><div class="note">Outpacing traditional IT services hiring</div></div>
+      <div class="card"><div class="val">3.46M</div><div class="lbl">GCC Workforce by 2030</div><div class="note">From current ~1.7M</div></div>
+    </div>
+    <div class="tip"><span class="label">Trend</span> <strong>GCCs are eating IT services.</strong> Companies like Google, Microsoft, Goldman Sachs, and JPMorgan are building captive centers in Bangalore, Hyderabad, and Pune instead of outsourcing to TCS/Infosys. Pune is a top GCC destination.</div>
+    </div>
+
+    <!-- Cross-references -->
+    <div class="sub"><h3>IT Jobs Number Web</h3>
+    <table>
+      <tr><th>Data Point</th><th>=</th><th>Cross-Reference</th></tr>
+      <tr><td>India IT workforce (5.8M)</td><td class="highlight3">=</td><td>Denmark's population (5.9M) — a country of coders</td></tr>
+      <tr><td>Bangalore IT (2.1M)</td><td class="highlight3">=</td><td>Pune metro pop (8.4M) / 4 — every 4th Punekar could be a Bangalore IT worker</td></tr>
+      <tr><td>IT revenue ($283B)</td><td class="highlight3">=</td><td>Close to Microsoft revenue ($282B) — India IT ≈ one MSFT</td></tr>
+      <tr><td>Pune IT (800K)</td><td class="highlight3">=</td><td>= US cars per 1000 (800) — same number, different context</td></tr>
+      <tr><td>Metro IT total (4.9M)</td><td class="highlight3">=</td><td>≈ Singapore population (5.9M) — close ballpark</td></tr>
+      <tr><td>Tier-2 hiring share (32%)</td><td class="highlight3">=</td><td>≈ Bangalore's IT share (36%) — tier-2 combined ≈ Bangalore alone</td></tr>
+      <tr><td>GCC new jobs (100K)</td><td class="highlight3">=</td><td>= West Bengal pop (100M) — same digits, lakh vs million</td></tr>
+    </table>
+    </div>
+
+    <div class="interview-line">"India's IT sector employs 5.8 million people — Denmark's entire population — generating $283B in revenue, which is roughly equal to Microsoft's annual revenue. Bangalore alone holds a third of these jobs, but the real story is tier-2 cities now capturing 32% of new hiring. That's why companies are setting up GCCs in Pune, Jaipur, and Ahmedabad."</div>
+  </div>
+</div>
+
+<!-- ============ SECTION: CHEAT SHEET ============ -->
+<div class="section" id="sec-cheat">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-icon">⚡</span>
+    <span class="section-title">Rapid-Fire Cheat Sheet (All Mnemonics)</span>
+    <span class="section-badge">PRINT THIS</span>
+    <span class="chevron">&#9660;</span>
+  </div>
+  <div class="section-body">
+    <table>
+      <tr><th>Topic</th><th>Mnemonic / Anchor</th></tr>
+      <tr><td>India Master Key</td><td class="highlight3"><strong>3-6-8-12</strong> (Tiers | 60% internet, rural, youth | 850M users, 80% banked | 12B UPI)</td></tr>
+      <tr><td>World Population</td><td><strong>8-5-1.5</strong> (8.2B world, 5B Asia, 1.5B Africa)</td></tr>
+      <tr><td>India vs China vs US</td><td><strong>1.46B > 1.42B > 347M</strong> (India passed China)</td></tr>
+      <tr><td>Digital Global</td><td><strong>5.5B online, 4.8B phones, 6.5 hrs/day</strong></td></tr>
+      <tr><td>India Digital</td><td><strong>850M users, 60% penetration, ₹10-15/GB</strong></td></tr>
+      <tr><td>India Demographics</td><td><strong>Median 28, 65% under 35, 65% rural</strong></td></tr>
+      <tr><td>India Income</td><td><strong>75% earn < ₹5L, 300M middle class</strong></td></tr>
+      <tr><td>India Transport</td><td><strong>200M two-wheelers, 30M cars, 35 cars/1,000</strong></td></tr>
+      <tr><td>India Payments</td><td><strong>12B UPI, 90M credit cards, 70% cash</strong></td></tr>
+      <tr><td>India E-commerce</td><td><strong>7-8% penetration, 200M shoppers, 30% COD</strong></td></tr>
+      <tr><td>India Social</td><td><strong>WhatsApp 550M, YouTube 475M, FB/Insta 350M</strong></td></tr>
+      <tr><td>India Languages</td><td><strong>Hindi 44%, English 10%, 90% prefer vernacular</strong></td></tr>
+      <tr><td>India Regions</td><td><strong>North=Brand, South=Tech, West=Business, East=Price</strong></td></tr>
+      <tr><td>Global Social Top 5</td><td><strong>FB 3B, WA 3B, YT 2.7B, IG 2B, TikTok 1.8B</strong></td></tr>
+      <tr><td>Tech Revenue Top 4</td><td><strong>Amazon 638, Apple 416, Google 350, MSFT 282</strong></td></tr>
+      <tr><td>India Revenue Top 3</td><td><strong>Reliance 109B, LIC 104B, IOC 94B</strong></td></tr>
+      <tr><td>India IT</td><td><strong>TCS 30B, Infosys 20B, HCL 14B, Wipro 10B</strong></td></tr>
+      <tr><td>Car Ownership</td><td><strong>India 35, China 200, EU 560, US 800 per 1,000</strong></td></tr>
+      <tr><td>English Speakers</td><td><strong>US 299M, India 265M, EU 257M, Global 1.5B</strong></td></tr>
+      <tr><td>Pune Master Key</td><td class="highlight3"><strong>8-8-12-45</strong> (8.4M pop | 8L IT workers | 12L bus riders | 45K cabs)</td></tr>
+      <tr><td>Pune IT</td><td><strong>800K IT workers, ₹1.06L Cr exports, 13.6% of India IT, Hinjewadi = 2.4L commuters</strong></td></tr>
+      <tr><td>India IT Total</td><td><strong>5.8M workers ($283B revenue) = Denmark's population</strong></td></tr>
+      <tr><td>IT City Split</td><td><strong>Bangalore 36%, Hyderabad 16%, Pune 14%, Chennai 13%, Delhi 10%</strong></td></tr>
+      <tr><td>Tier-2 IT</td><td><strong>32% of new hiring. Jaipur #1 tier-2. Ahmedabad = GIFT City</strong></td></tr>
+      <tr><td>SaaS Benchmarks</td><td><strong>Conv 2-5%, NRR 120%+, COGS 30-40%</strong></td></tr>
+      <tr><td>Attention Economy</td><td><strong>"Not paying? You ARE the product."</strong></td></tr>
+      <tr><td>NRI in US</td><td><strong>NYC 7L, Bay Area 6L, NJ highest per-capita (4.5%)</strong></td></tr>
+    </table>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<script>
+function toggleSection(header) {
+  header.parentElement.classList.toggle('open');
+}
+function toggleAll() {
+  const sections = document.querySelectorAll('.section');
+  const allOpen = [...sections].every(s => s.classList.contains('open'));
+  sections.forEach(s => { allOpen ? s.classList.remove('open') : s.classList.add('open'); });
+}
+function filterSections(query) {
+  const q = query.toLowerCase().trim();
+  document.querySelectorAll('.section').forEach(sec => {
+    if (!q) { sec.style.display = ''; return; }
+    const text = sec.textContent.toLowerCase();
+    sec.style.display = text.includes(q) ? '' : 'none';
+    if (text.includes(q)) sec.classList.add('open');
+  });
+}
+</script>
+</body>
+</html>
