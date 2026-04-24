@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DistilBERT Fine-Tuning — Visual Guide</title>
+<style>
+  :root {
+    --bg: #0b1020;
+    --bg-2: #11172e;
+    --panel: #151c38;
+    --panel-2: #1b2448;
+    --ink: #e9ecff;
+    --ink-2: #aab4d6;
+    --accent: #7c9cff;
+    --accent-2: #59e3c0;
+    --hot: #ff7aa2;
+    --warm: #ffcb6b;
+    --good: #8be9a8;
+    --purple: #b48cff;
+    --red: #ff6b6b;
+    --grid: rgba(124,156,255,0.12);
+    --shadow: 0 10px 30px rgba(0,0,0,0.35);
+    --radius: 14px;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background:
+      radial-gradient(1200px 600px at 10% -10%, rgba(124,156,255,0.18), transparent 60%),
+      radial-gradient(900px 500px at 110% 10%, rgba(89,227,192,0.12), transparent 60%),
+      var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 48px 24px 120px; }
+  header.hero { text-align: center; padding: 32px 8px 36px; }
+  header.hero h1 {
+    font-size: clamp(30px, 4.2vw, 52px);
+    margin: 0 0 10px;
+    background: linear-gradient(90deg, #fff 0%, var(--accent) 60%, var(--accent-2) 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.02em;
+  }
+  header.hero p { color: var(--ink-2); max-width: 780px; margin: 0 auto; font-size: 17px; }
+  .badges { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 22px; }
+  .badge {
+    background: var(--panel);
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 8px 14px; border-radius: 999px;
+    font-size: 13px; color: var(--ink-2);
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); }
+  .dot.g { background: var(--accent-2); box-shadow: 0 0 12px var(--accent-2); }
+  .dot.o { background: var(--warm); box-shadow: 0 0 12px var(--warm); }
+
+  section { margin: 72px 0; }
+  h2 {
+    font-size: 26px; margin: 0 0 6px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  h2 .num {
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    color: white; border-radius: 10px; padding: 4px 12px; font-size: 15px;
+    box-shadow: var(--shadow);
+  }
+  h2.plain .num { background: linear-gradient(135deg, var(--accent-2), var(--accent)); }
+  .sub { color: var(--ink-2); margin: 0 0 20px; font-size: 15px; }
+
+  .grid { display: grid; gap: 16px; }
+  .grid.cols-2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .grid.cols-3 { grid-template-columns: repeat(3, minmax(0,1fr)); }
+  .grid.cols-4 { grid-template-columns: repeat(4, minmax(0,1fr)); }
+  @media (max-width: 900px) {
+    .grid.cols-2, .grid.cols-3, .grid.cols-4 { grid-template-columns: 1fr; }
+  }
+
+  .card {
+    background: linear-gradient(180deg, var(--panel) 0%, var(--panel-2) 100%);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+  }
+  .card h3 { margin: 0 0 8px; font-size: 17px; }
+  .card p { margin: 0; color: var(--ink-2); font-size: 14px; }
+  .card .tag {
+    display: inline-block; background: rgba(124,156,255,0.15); color: var(--accent);
+    font-size: 11px; padding: 3px 8px; border-radius: 6px; margin-bottom: 8px; font-family: var(--mono);
+  }
+
+  code, .mono { font-family: var(--mono); font-size: 13px; }
+  .kbd {
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+    padding: 1px 7px; border-radius: 6px; font-family: var(--mono); font-size: 12px;
+  }
+
+  /* Before/After architecture side-by-side */
+  .ba-grid { display: grid; grid-template-columns: 1fr 80px 1fr; gap: 14px; align-items: stretch; }
+  @media (max-width: 900px) { .ba-grid { grid-template-columns: 1fr; } .ba-arrow { display: none; } }
+  .ba-col {
+    background: rgba(0,0,0,0.22); border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px; padding: 16px;
+  }
+  .ba-col h3 { margin: 0 0 4px; }
+  .ba-col .subtitle {
+    font-size: 12px; color: var(--ink-2);
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px;
+  }
+  .ba-arrow {
+    display: flex; align-items: center; justify-content: center;
+    font-size: 34px; color: var(--accent-2);
+  }
+  .layer {
+    background: var(--panel); margin: 6px 0; padding: 10px 12px; border-radius: 8px;
+    font-family: var(--mono); font-size: 12px; border: 1px solid rgba(255,255,255,0.06);
+    display: flex; justify-content: space-between; align-items: center; gap: 8px;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .layer .dim { color: var(--ink-2); font-size: 11px; white-space: nowrap; }
+  .layer.kept { border-color: rgba(124,156,255,0.3); background: linear-gradient(90deg, var(--panel) 0%, rgba(124,156,255,0.06) 100%); }
+  .layer.removed {
+    border-color: rgba(255,107,107,0.35);
+    background: linear-gradient(90deg, var(--panel) 0%, rgba(255,107,107,0.08) 100%);
+    text-decoration: line-through;
+    opacity: 0.7;
+  }
+  .layer.new {
+    border-color: var(--accent-2);
+    box-shadow: 0 0 0 1px rgba(89,227,192,0.3);
+    background: linear-gradient(90deg, var(--panel) 0%, rgba(89,227,192,0.1) 100%);
+    animation: newPulse 2.5s ease-in-out infinite;
+  }
+  @keyframes newPulse {
+    0%, 100% { box-shadow: 0 0 0 1px rgba(89,227,192,0.3); }
+    50% { box-shadow: 0 0 0 2px rgba(89,227,192,0.6), 0 0 20px rgba(89,227,192,0.3); }
+  }
+  .layer.fine-tune {
+    border-color: rgba(180,140,255,0.3);
+    background: linear-gradient(90deg, var(--panel) 0%, rgba(180,140,255,0.08) 100%);
+  }
+  .layer-pill {
+    font-size: 10px; padding: 2px 6px; border-radius: 4px;
+    text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600;
+  }
+  .pill-keep { background: rgba(124,156,255,0.2); color: var(--accent); }
+  .pill-rm { background: rgba(255,107,107,0.2); color: var(--red); }
+  .pill-new { background: rgba(89,227,192,0.2); color: var(--accent-2); }
+  .pill-ft { background: rgba(180,140,255,0.2); color: var(--purple); }
+
+  /* Data flow diagram with animated batch */
+  .flow-stage {
+    display: grid; grid-template-columns: 200px 1fr 220px;
+    gap: 16px; align-items: center;
+    padding: 14px 0; border-bottom: 1px dashed rgba(255,255,255,0.08);
+  }
+  .flow-stage:last-child { border-bottom: none; }
+  @media (max-width: 800px) { .flow-stage { grid-template-columns: 1fr; } }
+  .flow-stage .name { font-weight: 600; }
+  .flow-stage .shape {
+    font-family: var(--mono); color: var(--accent-2); font-size: 13px;
+    background: rgba(89,227,192,0.08); padding: 6px 10px; border-radius: 8px;
+    display: inline-block;
+  }
+  .flow-stage .what { color: var(--ink-2); font-size: 13px; }
+  .flow-stage .badge-small {
+    display: inline-block; background: rgba(180,140,255,0.15);
+    color: var(--purple); padding: 2px 8px; font-size: 11px;
+    border-radius: 5px; margin-left: 8px;
+    font-family: var(--mono);
+  }
+
+  /* Transformer block zoom */
+  .tblock {
+    background: rgba(0,0,0,0.25); padding: 18px; border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .tblock-row { display: grid; grid-template-columns: 1fr 50px 1fr; gap: 10px; margin: 10px 0; }
+  @media (max-width: 900px) { .tblock-row { grid-template-columns: 1fr; } }
+  .tblock-box {
+    background: var(--panel); border-radius: 10px; padding: 14px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .tblock-box h4 {
+    margin: 0 0 8px; font-size: 14px; color: var(--accent-2);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .tblock-box .detail {
+    font-size: 12px; color: var(--ink-2); font-family: var(--mono); line-height: 1.7;
+  }
+  .tblock-box .detail code { color: var(--accent); }
+  .arrow-right { font-size: 22px; color: var(--accent); text-align: center; align-self: center; }
+
+  /* Per-epoch timeline */
+  .timeline { position: relative; padding-left: 34px; margin-top: 20px; }
+  .timeline::before {
+    content: ''; position: absolute; left: 14px; top: 8px; bottom: 8px;
+    width: 2px; background: linear-gradient(180deg, var(--accent), var(--accent-2), var(--warm), var(--red));
+  }
+  .timeline-item { position: relative; margin-bottom: 24px; }
+  .timeline-item::before {
+    content: ''; position: absolute; left: -27px; top: 8px;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 12px currentColor;
+    border: 2px solid var(--bg);
+  }
+  .timeline-item.best::before { background: var(--good); animation: bestPulse 1.5s ease-in-out infinite; }
+  .timeline-item.warn::before { background: var(--warm); }
+  .timeline-item.stop::before { background: var(--red); }
+  @keyframes bestPulse {
+    0%, 100% { box-shadow: 0 0 8px var(--good); }
+    50% { box-shadow: 0 0 20px var(--good), 0 0 30px var(--good); }
+  }
+  .timeline-item h4 { margin: 0 0 4px; font-size: 16px; display: flex; align-items: center; gap: 10px; }
+  .timeline-item h4 .ep-pill {
+    font-size: 11px; padding: 2px 8px; border-radius: 5px;
+    background: rgba(124,156,255,0.15); color: var(--accent); font-family: var(--mono);
+  }
+  .timeline-item h4 .best-pill {
+    font-size: 11px; padding: 2px 8px; border-radius: 5px;
+    background: rgba(139,233,168,0.15); color: var(--good); font-family: var(--mono);
+  }
+  .timeline-item h4 .stop-pill {
+    font-size: 11px; padding: 2px 8px; border-radius: 5px;
+    background: rgba(255,107,107,0.15); color: var(--red); font-family: var(--mono);
+  }
+  .timeline-item p { margin: 4px 0; color: var(--ink-2); font-size: 14px; }
+  .timeline-metrics {
+    display: inline-flex; gap: 14px; margin-top: 8px; flex-wrap: wrap;
+    font-family: var(--mono); font-size: 12px;
+  }
+  .timeline-metrics span { color: var(--ink-2); }
+  .timeline-metrics b { color: var(--ink); }
+
+  /* Gradient magnitude bars */
+  .grad-bar-row {
+    display: grid; grid-template-columns: 200px 1fr 80px; gap: 10px;
+    align-items: center; padding: 8px 0;
+    border-bottom: 1px dashed rgba(255,255,255,0.05);
+  }
+  .grad-bar-row:last-child { border-bottom: none; }
+  .grad-bar-row .lname { font-family: var(--mono); font-size: 12px; color: var(--ink); }
+  .grad-bar-row .lname .sublayer { color: var(--ink-2); font-size: 11px; }
+  .gbar {
+    height: 14px; background: rgba(255,255,255,0.04); border-radius: 99px; overflow: hidden;
+    position: relative;
+  }
+  .gbar > span {
+    display: block; height: 100%; border-radius: 99px;
+    animation: gbarGrow 2s ease-out both;
+  }
+  @keyframes gbarGrow { from { width: 0 !important; } }
+  .grad-bar-row .gval { font-family: var(--mono); font-size: 12px; color: var(--ink-2); text-align: right; }
+
+  /* Token flow lanes */
+  .lane {
+    background: var(--panel); border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px; padding: 14px; margin: 10px 0;
+    position: relative; overflow: hidden;
+  }
+  .lane-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 8px; font-family: var(--mono); font-size: 12px;
+  }
+  .lane-head .ltitle { color: var(--ink); }
+  .lane-head .ldims { color: var(--accent-2); }
+  .tokenstrip {
+    display: flex; gap: 3px; flex-wrap: nowrap; overflow-x: auto;
+    padding: 6px 0;
+  }
+  .tok {
+    flex: 0 0 auto; width: 24px; height: 24px; border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-family: var(--mono);
+  }
+  /* Different "enrichment" levels per layer */
+  .tok-1 { background: #2b356c; color: #b7c2ff; }
+  .tok-2 { background: #37457d; color: #c7d2ff; }
+  .tok-3 { background: #425294; color: var(--accent); }
+  .tok-4 { background: #4f62a8; color: #dce4ff; }
+  .tok-5 { background: #4e6ea0; color: #e2ecff; }
+  .tok-6 { background: #3f7a98; color: #e4f8ff; }
+  .tok-7 { background: #347b8a; color: #ddfbf3; }
+  .tok-cls { background: var(--accent-2); color: #022; font-weight: 700; }
+  .tok-sep { background: var(--accent-2); color: #022; font-weight: 700; }
+  .tok-pad { background: #242a48; color: #556; }
+
+  /* Epoch step animation */
+  .step-anim {
+    display: grid; grid-template-columns: 2fr 1fr; gap: 16px;
+    margin-top: 10px;
+  }
+  @media (max-width: 900px) { .step-anim { grid-template-columns: 1fr; } }
+  .step-list {
+    background: rgba(0,0,0,0.25); padding: 14px; border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .step-row {
+    display: grid; grid-template-columns: 30px 1fr 80px; gap: 10px;
+    align-items: center; padding: 8px 0;
+    border-bottom: 1px dashed rgba(255,255,255,0.05);
+    font-size: 13px;
+  }
+  .step-row:last-child { border-bottom: none; }
+  .step-num {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: rgba(124,156,255,0.15); color: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 12px; font-weight: 600;
+  }
+  .step-row .what { color: var(--ink); }
+  .step-row .what .meta { color: var(--ink-2); font-size: 11px; font-family: var(--mono); }
+  .step-row .where {
+    font-family: var(--mono); font-size: 11px; color: var(--accent-2);
+    text-align: right;
+  }
+
+  .callout {
+    padding: 14px 18px; background: rgba(124,156,255,0.08);
+    border: 1px solid rgba(124,156,255,0.2); border-radius: 12px;
+    color: var(--ink-2); font-size: 14px; margin-top: 14px;
+  }
+  .callout b { color: var(--ink); }
+  .callout.g { background: rgba(89,227,192,0.08); border-color: rgba(89,227,192,0.2); }
+  .callout.g b { color: var(--accent-2); }
+  .callout.o { background: rgba(255,203,107,0.08); border-color: rgba(255,203,107,0.2); }
+  .callout.o b { color: var(--warm); }
+
+  /* Concept cards */
+  .concept {
+    border-left: 3px solid var(--accent);
+    padding: 8px 14px; margin: 8px 0;
+    background: rgba(124,156,255,0.06);
+    border-radius: 0 10px 10px 0;
+  }
+  .concept b { color: var(--accent); }
+  .concept.g { border-left-color: var(--accent-2); background: rgba(89,227,192,0.06); }
+  .concept.g b { color: var(--accent-2); }
+  .concept.o { border-left-color: var(--warm); background: rgba(255,203,107,0.06); }
+  .concept.o b { color: var(--warm); }
+  .concept.p { border-left-color: var(--purple); background: rgba(180,140,255,0.06); }
+  .concept.p b { color: var(--purple); }
+
+  /* Pipeline */
+  .pipeline {
+    display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-top: 24px;
+  }
+  @media (max-width: 900px) { .pipeline { grid-template-columns: 1fr 1fr; } }
+  .stage {
+    background: var(--panel); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px; padding: 14px; text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .stage .icon { font-size: 26px; }
+  .stage .label { font-size: 12px; color: var(--ink-2); margin-top: 4px; }
+  .stage .title { font-weight: 600; margin-top: 4px; font-size: 14px; }
+  .stage .pulse {
+    position: absolute; inset: 0; background: radial-gradient(circle at 50% 50%, rgba(124,156,255,0.25), transparent 70%);
+    opacity: 0; pointer-events: none;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 0; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.05); }
+  }
+
+  /* Environment cards */
+  .env-card {
+    padding: 22px;
+    background: linear-gradient(145deg, var(--panel) 0%, var(--panel-2) 100%);
+    border-radius: 14px; border: 1px solid rgba(255,255,255,0.08);
+    position: relative; overflow: hidden;
+  }
+  .env-card .brand {
+    position: absolute; top: -30px; right: -30px; width: 120px; height: 120px;
+    border-radius: 50%; filter: blur(40px); opacity: 0.5;
+  }
+  .env-card.gpu .brand { background: var(--hot); }
+  .env-card.tpu .brand { background: var(--accent-2); }
+  .env-card h3 { font-size: 20px; margin: 0 0 6px; }
+  .env-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+  .env-stats > div {
+    background: rgba(0,0,0,0.25); padding: 8px 10px; border-radius: 8px;
+    font-size: 13px; color: var(--ink-2);
+  }
+  .env-stats b { color: var(--ink); font-family: var(--mono); }
+
+  /* Hyperparams */
+  .hyper-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  @media (max-width: 900px) { .hyper-grid { grid-template-columns: 1fr 1fr; } }
+  .hyper {
+    background: var(--panel); border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px; padding: 14px; text-align: left; position: relative;
+  }
+  .hyper .h-name { font-family: var(--mono); font-size: 12px; color: var(--accent); }
+  .hyper .h-val { font-size: 24px; font-weight: 700; margin-top: 4px; }
+  .hyper .h-desc { font-size: 12px; color: var(--ink-2); margin-top: 4px; }
+  .hyper .h-impact {
+    position: absolute; top: 10px; right: 10px;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em;
+    padding: 2px 7px; border-radius: 4px; font-weight: 600;
+  }
+  .h-impact.high { background: rgba(255,122,162,0.15); color: var(--hot); }
+  .h-impact.med { background: rgba(255,203,107,0.15); color: var(--warm); }
+  .h-impact.low { background: rgba(139,233,168,0.15); color: var(--good); }
+
+  footer {
+    text-align: center; color: var(--ink-2); font-size: 12px;
+    margin-top: 60px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.06);
+  }
+
+  /* Accelerator cores */
+  .accel {
+    display: flex; gap: 4px; margin-top: 14px;
+    padding: 10px; background: rgba(0,0,0,0.3); border-radius: 10px;
+    height: 60px; align-items: flex-end;
+  }
+  .accel .core {
+    flex: 1; background: var(--accent); border-radius: 3px;
+    animation: coreWork 1.2s ease-in-out infinite;
+  }
+  .accel.tpu .core { background: var(--accent-2); }
+  .accel .core:nth-child(1){animation-delay:0.0s}.accel .core:nth-child(2){animation-delay:0.1s}
+  .accel .core:nth-child(3){animation-delay:0.2s}.accel .core:nth-child(4){animation-delay:0.3s}
+  .accel .core:nth-child(5){animation-delay:0.4s}.accel .core:nth-child(6){animation-delay:0.5s}
+  .accel .core:nth-child(7){animation-delay:0.6s}.accel .core:nth-child(8){animation-delay:0.7s}
+  @keyframes coreWork {
+    0%, 100% { height: 20%; opacity: 0.4; }
+    50% { height: 90%; opacity: 1; }
+  }
+
+  /* Animated data blob moving through flow */
+  .flow-blob {
+    display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+    background: var(--accent-2); box-shadow: 0 0 10px var(--accent-2);
+    margin-left: 8px; animation: blobPulse 1.5s ease-in-out infinite;
+  }
+  @keyframes blobPulse {
+    0%, 100% { transform: scale(0.9); opacity: 0.6; }
+    50% { transform: scale(1.2); opacity: 1; }
+  }
+
+  .glow-text { text-shadow: 0 0 20px rgba(124,156,255,0.5); }
+
+  .section-intro {
+    background: linear-gradient(180deg, rgba(124,156,255,0.05) 0%, transparent 100%);
+    border-left: 3px solid var(--accent); padding: 12px 18px;
+    border-radius: 0 10px 10px 0; margin-bottom: 20px;
+    color: var(--ink); font-size: 15px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1 class="glow-text">DistilBERT Fine-Tuning — Visual Guide</h1>
+    <p>A complete walkthrough of the DDMS document-classification training pipeline. See the original model, what we change to make it classify documents, how a batch flows through every layer, and what each epoch actually changes inside the network.</p>
+    <div class="badges">
+      <span class="badge"><span class="dot"></span> Model: distilbert-base-uncased (~66M params)</span>
+      <span class="badge"><span class="dot g"></span> Framework: HuggingFace Transformers + PyTorch</span>
+      <span class="badge"><span class="dot o"></span> Target: 15-class classifier, accuracy &ge; 90%</span>
+    </div>
+  </header>
+
+  <!-- =================== ENVIRONMENT =================== -->
+  <section>
+    <h2 class="plain"><span class="num">ENV</span>Colab Runtime — T4 GPU vs TPU v5e-1</h2>
+    <p class="sub">Both accelerators run this workload. T4 uses FP16 mixed precision; TPU uses BF16 + XLA compilation.</p>
+    <div class="grid cols-2">
+      <div class="env-card gpu">
+        <div class="brand"></div>
+        <h3>NVIDIA T4 GPU</h3>
+        <p class="sub" style="margin:0">Free-tier Colab default. Turing architecture, FP16 Tensor Cores.</p>
+        <div class="env-stats">
+          <div>VRAM: <b>16 GB</b></div>
+          <div>Peak FP16: <b>65 TFLOPs</b></div>
+          <div>Batch @ 512 seq: <b>16–32</b></div>
+          <div>Est. epoch time: <b>~40–90 s</b></div>
+        </div>
+        <div class="accel">
+          <div class="core"></div><div class="core"></div><div class="core"></div><div class="core"></div>
+          <div class="core"></div><div class="core"></div><div class="core"></div><div class="core"></div>
+        </div>
+        <p class="sub" style="margin:10px 0 0">Enable with <code class="kbd">fp16=True</code>. Mixed precision nearly doubles throughput.</p>
+      </div>
+      <div class="env-card tpu">
+        <div class="brand"></div>
+        <h3>TPU v5e-1</h3>
+        <p class="sub" style="margin:0">Single-chip TPU. Systolic array matmul tuned for transformer shapes.</p>
+        <div class="env-stats">
+          <div>HBM: <b>16 GB</b></div>
+          <div>Peak BF16: <b>197 TFLOPs</b></div>
+          <div>Batch @ 512 seq: <b>32–64</b></div>
+          <div>Est. epoch time: <b>~20–50 s</b></div>
+        </div>
+        <div class="accel tpu">
+          <div class="core"></div><div class="core"></div><div class="core"></div><div class="core"></div>
+          <div class="core"></div><div class="core"></div><div class="core"></div><div class="core"></div>
+        </div>
+        <p class="sub" style="margin:10px 0 0">Use <code class="kbd">bf16=True</code>. Fixed 512 padding ensures XLA compiles <b>once</b>, not every batch.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================== PIPELINE =================== -->
+  <section>
+    <h2><span class="num">01</span>Pipeline at a glance — 6 stages</h2>
+    <p class="sub">The full path from raw synthetic documents to a saved model.</p>
+    <div class="pipeline">
+      <div class="stage"><div class="icon">📄</div><div class="title">Load</div><div class="label">manifest + text</div><div class="pulse"></div></div>
+      <div class="stage"><div class="icon">🔤</div><div class="title">Tokenize</div><div class="label">DDMSDataset</div><div class="pulse" style="animation-delay:.3s"></div></div>
+      <div class="stage"><div class="icon">🧠</div><div class="title">Train</div><div class="label">trainer.train()</div><div class="pulse" style="animation-delay:.6s"></div></div>
+      <div class="stage"><div class="icon">📊</div><div class="title">Evaluate</div><div class="label">test set</div><div class="pulse" style="animation-delay:.9s"></div></div>
+      <div class="stage"><div class="icon">💾</div><div class="title">Save</div><div class="label">models/distilbert/</div><div class="pulse" style="animation-delay:1.2s"></div></div>
+      <div class="stage"><div class="icon">📈</div><div class="title">Compare</div><div class="label">CSV row</div><div class="pulse" style="animation-delay:1.5s"></div></div>
+    </div>
+  </section>
+
+  <!-- =================== ORIGINAL MODEL =================== -->
+  <section>
+    <h2><span class="num">02</span>The original DistilBERT — what it was before you touched it</h2>
+    <p class="sub">
+      Before fine-tuning, DistilBERT was trained for a completely different task — <b>Masked Language Modeling</b>. It doesn't know anything about "documents" or "classes." It only knows how to fill in blanks.
+    </p>
+
+    <div class="section-intro">
+      <b>Pretraining objective:</b> given a sentence like <code>"The [MASK] pump was inspected."</code>, predict that <code>[MASK]</code> should be <code>"centrifugal"</code>. Trained on BookCorpus + Wikipedia with ~132B tokens worth of updates. This is how it learned English — grammar, vocabulary, word relationships — <b>without any labels</b>.
+    </div>
+
+    <div class="grid cols-2">
+      <div class="card">
+        <h3>📚 Components of the original model</h3>
+        <div class="layer"><span>1. Token embeddings</span><span class="dim">Lookup(30522 → 768)</span></div>
+        <div class="layer"><span>2. Position embeddings</span><span class="dim">Lookup(512 → 768)</span></div>
+        <div class="layer"><span>3. Embedding LayerNorm + Dropout</span><span class="dim">(B, 512, 768)</span></div>
+        <div class="layer"><span>4. Transformer block × 6</span><span class="dim">self-attn + FFN</span></div>
+        <div class="layer removed"><span>5. MLM head — vocab projection</span><span class="dim">Linear(768 → 30522)</span></div>
+        <p class="sub" style="font-size:12px;margin-top:10px">Step 5 predicts which token fills each masked position. It outputs a probability over all 30,522 vocabulary tokens per position.</p>
+      </div>
+      <div class="card">
+        <h3>🚫 What it cannot do</h3>
+        <p style="color:var(--ink)">It cannot classify an entire document. There is no "document → class" machinery.</p>
+        <ul style="color:var(--ink-2);font-size:14px;line-height:1.7">
+          <li>Has no concept of "this is a HAZOP report."</li>
+          <li>Has no output head for 15 classes.</li>
+          <li>The <code>[CLS]</code> hidden state exists but is untrained for classification.</li>
+          <li>Its final linear layer predicts words, not labels.</li>
+        </ul>
+        <div class="callout o" style="margin-top:10px">
+          <b>What it <i>does</i> know:</b> English syntax, semantics, and how words co-occur. That knowledge is stored in the embedding + 6 transformer blocks — which is the part we <b>keep</b>.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================== WHAT CHANGED =================== -->
+  <section>
+    <h2><span class="num">03</span>What we changed to make it classify documents</h2>
+    <p class="sub">Surgery on the model: strip the MLM head, graft a fresh classification head, then fine-tune everything.</p>
+
+    <div class="ba-grid">
+      <div class="ba-col">
+        <h3>Before — Pretrained DistilBERT</h3>
+        <div class="subtitle">For masked language modeling</div>
+        <div class="layer kept"><span>Token embeddings <span class="layer-pill pill-keep">keep</span></span><span class="dim">30522 × 768</span></div>
+        <div class="layer kept"><span>Position embeddings <span class="layer-pill pill-keep">keep</span></span><span class="dim">512 × 768</span></div>
+        <div class="layer kept"><span>Emb LayerNorm + Dropout <span class="layer-pill pill-keep">keep</span></span><span class="dim">—</span></div>
+        <div class="layer kept"><span>Transformer block 1 <span class="layer-pill pill-keep">keep</span></span><span class="dim">attn+FFN</span></div>
+        <div class="layer kept"><span>Transformer block 2 <span class="layer-pill pill-keep">keep</span></span><span class="dim">attn+FFN</span></div>
+        <div class="layer kept"><span>Transformer block 3 <span class="layer-pill pill-keep">keep</span></span><span class="dim">attn+FFN</span></div>
+        <div class="layer kept"><span>Transformer block 4 <span class="layer-pill pill-keep">keep</span></span><span class="dim">attn+FFN</span></div>
+        <div class="layer kept"><span>Transformer block 5 <span class="layer-pill pill-keep">keep</span></span><span class="dim">attn+FFN</span></div>
+        <div class="layer kept"><span>Transformer block 6 <span class="layer-pill pill-keep">keep</span></span><span class="dim">attn+FFN</span></div>
+        <div class="layer removed"><span>MLM vocab transform <span class="layer-pill pill-rm">remove</span></span><span class="dim">768 × 768</span></div>
+        <div class="layer removed"><span>MLM output projection <span class="layer-pill pill-rm">remove</span></span><span class="dim">768 × 30522</span></div>
+      </div>
+
+      <div class="ba-arrow">➜</div>
+
+      <div class="ba-col">
+        <h3>After — DistilBertForSequenceClassification</h3>
+        <div class="subtitle">For 15-class document classification</div>
+        <div class="layer fine-tune"><span>Token embeddings <span class="layer-pill pill-ft">fine-tune</span></span><span class="dim">30522 × 768</span></div>
+        <div class="layer fine-tune"><span>Position embeddings <span class="layer-pill pill-ft">fine-tune</span></span><span class="dim">512 × 768</span></div>
+        <div class="layer fine-tune"><span>Emb LayerNorm + Dropout <span class="layer-pill pill-ft">fine-tune</span></span><span class="dim">—</span></div>
+        <div class="layer fine-tune"><span>Transformer block 1 <span class="layer-pill pill-ft">fine-tune</span></span><span class="dim">attn+FFN</span></div>
+        <div class="layer fine-tune"><span>Transformer block 2 <span class="layer-pill pill-ft">fine-tune</span></span><span class="dim">attn+FFN</span></div>
+        <div class="layer fine-tune"><span>Transformer block 3 <span class="layer-pill pill-ft">fine-tune</span></span><span class="dim">attn+FFN</span></div>
+        <div class="layer fine-tune"><span>Transformer block 4 <span class="layer-pill pill-ft">fine-tune</span></span><span class="dim">attn+FFN</span></div>
+        <div class="layer fine-tune"><span>Transformer block 5 <span class="layer-pill pill-ft">fine-tune</span></span><span class="dim">attn+FFN</span></div>
+        <div class="layer fine-tune"><span>Transformer block 6 <span class="layer-pill pill-ft">fine-tune</span></span><span class="dim">attn+FFN</span></div>
+        <div class="layer new"><span>Extract [CLS] hidden state <span class="layer-pill pill-new">built-in</span></span><span class="dim">(B, 768)</span></div>
+        <div class="layer new"><span>Pre-classifier Linear + ReLU <span class="layer-pill pill-new">NEW</span></span><span class="dim">768 → 768</span></div>
+        <div class="layer new"><span>Dropout(0.3) <span class="layer-pill pill-new">NEW</span></span><span class="dim">—</span></div>
+        <div class="layer new"><span>Classifier Linear <span class="layer-pill pill-new">NEW</span></span><span class="dim">768 → 15</span></div>
+        <div class="layer new"><span>CrossEntropyLoss vs labels <span class="layer-pill pill-new">NEW</span></span><span class="dim">→ scalar loss</span></div>
+      </div>
+    </div>
+
+    <div class="grid cols-3" style="margin-top:18px">
+      <div class="card">
+        <div class="tag">What's dropped</div>
+        <h3 style="color:var(--red)">~23M params removed</h3>
+        <p>The MLM head's vocab projection (768 × 30,522) is discarded. It was only useful for predicting words.</p>
+      </div>
+      <div class="card">
+        <div class="tag">What's new</div>
+        <h3 style="color:var(--accent-2)">~0.6M params added</h3>
+        <p>Pre-classifier (768×768) + classifier (768×15). Initialized <b>randomly</b> — learns from scratch during training.</p>
+      </div>
+      <div class="card">
+        <div class="tag">What's reused</div>
+        <h3 style="color:var(--purple)">~66M params fine-tuned</h3>
+        <p>All encoder weights start from the pretrained values and get <b>adjusted</b> during training — the English knowledge isn't thrown away, just refined for the DDMS domain.</p>
+      </div>
+    </div>
+
+    <div class="callout g">
+      <b>The insight:</b> we don't teach the model English from scratch. It already knows English. We just add a small new head and let training nudge the whole network toward "this is a P&ID" vs "this is a HAZOP report." The classifier head does the <i>heaviest</i> learning; the encoder does the <i>subtlest</i> adaptation.
+    </div>
+  </section>
+
+  <!-- =================== LAYER-BY-LAYER DATA FLOW =================== -->
+  <section>
+    <h2><span class="num">04</span>How data flows through every layer</h2>
+    <p class="sub">Follow one batch — 16 documents, 512 tokens each — through the entire network. At every layer, the <i>shape</i> and the <i>meaning</i> of the tensor change.</p>
+
+    <div class="card">
+      <div class="flow-stage">
+        <div>
+          <div class="name">📥 Input batch<span class="flow-blob"></span></div>
+          <span class="badge-small">raw ints</span>
+        </div>
+        <div class="what">16 documents tokenized by WordPiece, each padded to 512. These are just integer IDs — the model hasn't seen them yet.</div>
+        <div><span class="shape">(16, 512) · int64</span></div>
+      </div>
+
+      <div class="flow-stage">
+        <div>
+          <div class="name">🔢 Token embeddings</div>
+          <span class="badge-small">Lookup(30522, 768)</span>
+        </div>
+        <div class="what">Each integer ID is replaced with a learned 768-dim vector. This is where "words become math." Token 8434 (<code>pump</code>) becomes a dense vector representing "pump-ness."</div>
+        <div><span class="shape">(16, 512, 768) · float</span></div>
+      </div>
+
+      <div class="flow-stage">
+        <div>
+          <div class="name">📍 + Position embeddings</div>
+          <span class="badge-small">Lookup(512, 768)</span>
+        </div>
+        <div class="what">A 768-dim vector encoding "this is position 0, this is position 1..." is added elementwise. Attention has no notion of order, so this injects sequence information.</div>
+        <div><span class="shape">(16, 512, 768) · float</span></div>
+      </div>
+
+      <div class="flow-stage">
+        <div>
+          <div class="name">🧹 LayerNorm + Dropout</div>
+          <span class="badge-small">embedding stabilizer</span>
+        </div>
+        <div class="what">Normalizes each token vector to zero mean, unit variance across its 768 dimensions. Stabilizes training. Dropout zeroes 10% of units randomly (training only).</div>
+        <div><span class="shape">(16, 512, 768) · float</span></div>
+      </div>
+
+      <div class="flow-stage">
+        <div>
+          <div class="name">🧱 Transformer block 1</div>
+          <span class="badge-small">self-attn → FFN</span>
+        </div>
+        <div class="what">Each token looks at every other token via self-attention, then passes through an FFN. Early block = local patterns (phrases, collocations, morphology).</div>
+        <div><span class="shape">(16, 512, 768) · float</span></div>
+      </div>
+
+      <div class="flow-stage">
+        <div>
+          <div class="name">🧱 Transformer block 2</div>
+          <span class="badge-small">deeper features</span>
+        </div>
+        <div class="what">Mid-level patterns. Syntactic roles. "Noun phrase boundaries." Token vectors get more context-dependent — the vector for <code>pump</code> in <code>"centrifugal pump"</code> diverges from <code>pump</code> in a financial context.</div>
+        <div><span class="shape">(16, 512, 768) · float</span></div>
+      </div>
+
+      <div class="flow-stage">
+        <div>
+          <div class="name">🧱 Transformer blocks 3–5</div>
+          <span class="badge-small">semantic composition</span>
+        </div>
+        <div class="what">Each token accumulates evidence from the whole document. The <code>[CLS]</code> token starts aggregating a "summary" of what the document is about. Fine-tuning pushes these layers toward document-topic features.</div>
+        <div><span class="shape">(16, 512, 768) · float</span></div>
+      </div>
+
+      <div class="flow-stage">
+        <div>
+          <div class="name">🧱 Transformer block 6</div>
+          <span class="badge-small">final representation</span>
+        </div>
+        <div class="what">Last encoder layer. After training, the <code>[CLS]</code> row now encodes "this is a Standard Operating Procedure," not just "English text." This is where the biggest encoder adaptation happens during fine-tuning.</div>
+        <div><span class="shape">(16, 512, 768) · float</span></div>
+      </div>
+
+      <div class="flow-stage">
+        <div>
+          <div class="name">✂️ Extract [CLS] hidden state</div>
+          <span class="badge-small">pooling step</span>
+        </div>
+        <div class="what">Only the first token's vector — the <code>[CLS]</code> row — is kept. It's now a 768-dim summary of the entire document. Everything else is discarded for classification.</div>
+        <div><span class="shape">(16, 768) · float</span></div>
+      </div>
+
+      <div class="flow-stage">
+        <div>
+          <div class="name">🎛️ Pre-classifier Linear + ReLU <span class="flow-blob"></span></div>
+          <span class="badge-small">NEW · random init</span>
+        </div>
+        <div class="what">A fresh Linear(768 → 768) layer followed by ReLU. Added at fine-tuning time. Learns a task-specific transformation of the document summary.</div>
+        <div><span class="shape">(16, 768) · float</span></div>
+      </div>
+
+      <div class="flow-stage">
+        <div>
+          <div class="name">🌧️ Dropout(0.3)</div>
+          <span class="badge-small">regularizer</span>
+        </div>
+        <div class="what">Zeroes 30% of the 768 units randomly per example. Prevents the classifier from memorizing the training set.</div>
+        <div><span class="shape">(16, 768) · float</span></div>
+      </div>
+
+      <div class="flow-stage">
+        <div>
+          <div class="name">🎯 Classifier Linear</div>
+          <span class="badge-small">NEW · 15 logits</span>
+        </div>
+        <div class="what">Linear(768 → 15). Produces one raw score per document class: PID, SOP, IDS, EQS, ELD, PPS, VAL, CED, MR, IR, PFD, MDS, CS, LD, HAZ. No normalization yet.</div>
+        <div><span class="shape">(16, 15) · float</span></div>
+      </div>
+
+      <div class="flow-stage">
+        <div>
+          <div class="name">📉 CrossEntropyLoss</div>
+          <span class="badge-small">vs true labels</span>
+        </div>
+        <div class="what">Softmax(logits) → probabilities. Compare against gold labels — how far off is the model? Loss is the signal gradients chase backward through every layer above.</div>
+        <div><span class="shape">scalar · float</span></div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <b>Total tensor transformation:</b> <code class="kbd">(16, 512)</code> ints of token IDs → <code class="kbd">(16, 15)</code> floats of class scores → one scalar loss. Every weight matrix in the network is nudged by the gradient of this scalar.
+    </div>
+  </section>
+
+  <!-- =================== INSIDE A TRANSFORMER BLOCK =================== -->
+  <section>
+    <h2><span class="num">05</span>Inside a transformer block — the smallest atom</h2>
+    <p class="sub">Each of the 6 blocks does this. The magic of transformers is that self-attention lets every token see every other token in one step.</p>
+
+    <div class="tblock">
+      <div class="tblock-row">
+        <div class="tblock-box">
+          <h4>① Multi-head self-attention</h4>
+          <div class="detail">
+            Project the (512, 768) tensor three times:<br>
+            • <code>Q = X · Wq</code> (queries)<br>
+            • <code>K = X · Wk</code> (keys)<br>
+            • <code>V = X · Wv</code> (values)<br><br>
+            Split into 12 heads of dim 64, compute:<br>
+            <code>A = softmax(Q · Kᵀ / √64) · V</code><br><br>
+            Each token's new vector = weighted sum of every other token's value, where weights come from Q·K similarity. This is how tokens <b>talk to each other</b>.
+          </div>
+        </div>
+        <div class="arrow-right">➜</div>
+        <div class="tblock-box">
+          <h4>② Add &amp; LayerNorm</h4>
+          <div class="detail">
+            Residual connection: <code>X = X + Attention(X)</code><br><br>
+            LayerNorm normalizes each token's 768-dim vector to zero mean, unit variance.<br><br>
+            Residuals let gradients flow through 6 deep layers without vanishing; LayerNorm keeps activations numerically stable.
+          </div>
+        </div>
+      </div>
+
+      <div class="tblock-row">
+        <div class="tblock-box">
+          <h4>③ Feed-forward network (FFN)</h4>
+          <div class="detail">
+            Two linear layers with GELU in between:<br>
+            <code>FFN(X) = GELU(X · W1) · W2</code><br><br>
+            Shapes:<br>
+            • W1: 768 → 3072 (expand)<br>
+            • GELU activation<br>
+            • W2: 3072 → 768 (compress)<br><br>
+            The FFN is where most of the <b>capacity</b> lives — about 2/3 of a block's parameters. It's a per-token nonlinear feature mixer.
+          </div>
+        </div>
+        <div class="arrow-right">➜</div>
+        <div class="tblock-box">
+          <h4>④ Add &amp; LayerNorm</h4>
+          <div class="detail">
+            Another residual + LayerNorm:<br>
+            <code>X = LayerNorm(X + FFN(X))</code><br><br>
+            Output shape is unchanged: <code>(16, 512, 768)</code>. This is what the next block receives.<br><br>
+            This "attention → add+norm → ffn → add+norm" pattern repeats 6 times in DistilBERT (12 in full BERT).
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout g">
+      <b>What attention actually does to a document:</b> in block 1, <code>pump</code> might mostly look at <code>centrifugal</code> and <code>##ing</code>. By block 6, <code>[CLS]</code> has learned to pay heavy attention to the domain-specific tokens — <code>HAZOP</code>, <code>P&amp;ID</code>, <code>validation</code> — that signal the document type. Fine-tuning doesn't change the mechanics of attention; it changes <b>what</b> each token pays attention to.
+    </div>
+  </section>
+
+  <!-- =================== TOKEN ENRICHMENT VISUAL =================== -->
+  <section>
+    <h2><span class="num">06</span>How token vectors "enrich" across layers</h2>
+    <p class="sub">Same 32 tokens at different depths. The color shift represents context accumulation — at layer 0, each token only knows itself; by layer 6, each token knows the whole document.</p>
+
+    <div class="lane">
+      <div class="lane-head"><span class="ltitle">Layer 0 — token + position embeddings</span><span class="ldims">(32, 768) • context: 0 tokens</span></div>
+      <div class="tokenstrip">
+        <div class="tok tok-cls">CLS</div>
+        <div class="tok tok-1">the</div><div class="tok tok-1">cen</div><div class="tok tok-1">##tri</div><div class="tok tok-1">##fu</div><div class="tok tok-1">##gal</div>
+        <div class="tok tok-1">pump</div><div class="tok tok-1">##ing</div><div class="tok tok-1">sys</div><div class="tok tok-1">##tem</div><div class="tok tok-1">req</div>
+        <div class="tok tok-1">##uires</div><div class="tok tok-1">ha</div><div class="tok tok-1">##zo</div><div class="tok tok-1">##p</div><div class="tok tok-1">rev</div>
+        <div class="tok tok-1">##iew</div><div class="tok tok-1">.</div>
+        <div class="tok tok-sep">SEP</div>
+        <div class="tok tok-pad">0</div><div class="tok tok-pad">0</div><div class="tok tok-pad">0</div><div class="tok tok-pad">0</div>
+        <div class="tok tok-pad">0</div><div class="tok tok-pad">0</div><div class="tok tok-pad">0</div><div class="tok tok-pad">0</div>
+        <div class="tok tok-pad">0</div><div class="tok tok-pad">0</div><div class="tok tok-pad">0</div><div class="tok tok-pad">0</div><div class="tok tok-pad">0</div>
+      </div>
+    </div>
+
+    <div class="lane">
+      <div class="lane-head"><span class="ltitle">Layer 2 — after 2 blocks of attention</span><span class="ldims">(32, 768) • context: local neighbors</span></div>
+      <div class="tokenstrip">
+        <div class="tok tok-cls">CLS</div>
+        <div class="tok tok-3">the</div><div class="tok tok-3">cen</div><div class="tok tok-3">##tri</div><div class="tok tok-3">##fu</div><div class="tok tok-3">##gal</div>
+        <div class="tok tok-3">pump</div><div class="tok tok-3">##ing</div><div class="tok tok-3">sys</div><div class="tok tok-3">##tem</div><div class="tok tok-3">req</div>
+        <div class="tok tok-3">##uires</div><div class="tok tok-3">ha</div><div class="tok tok-3">##zo</div><div class="tok tok-3">##p</div><div class="tok tok-3">rev</div>
+        <div class="tok tok-3">##iew</div><div class="tok tok-3">.</div>
+        <div class="tok tok-sep">SEP</div>
+        <div class="tok tok-pad">0</div><div class="tok tok-pad">0</div><div class="tok tok-pad">0</div><div class="tok tok-pad">0</div>
+        <div class="tok tok-pad">0</div><div class="tok tok-pad">0</div><div class="tok tok-pad">0</div><div class="tok tok-pad">0</div>
+        <div class="tok tok-pad">0</div><div class="tok tok-pad">0</div><div class="tok tok-pad">0</div><div class="tok tok-pad">0</div><div class="tok tok-pad">0</div>
+      </div>
+    </div>
+
+    <div class="lane">
+      <div class="lane-head"><span class="ltitle">Layer 4 — semantic composition</span><span class="ldims">(32, 768) • context: full sentence</span></div>
+      <div class="tokenstrip">
+        <div class="tok tok-cls">CLS</div>
+        <div class="tok tok-5">the</div><div class="tok tok-5">cen</div><div class="tok tok-5">##tri</div><div class="tok tok-5">##fu</div><div class="tok tok-5">##gal</div>
+        <div class="tok tok-5">pump</div><div class="tok tok-5">##ing</div><div class="tok tok-5">sys</div><div class="tok tok-5">##tem</div><div class="tok tok-5">req</div>
+        <div class="tok tok-5">##uires</div><div class="tok tok-5">ha</div><div class="tok tok-5">##zo</div><div class="tok tok-5">##p</div><div class="tok tok-5">rev</div>
+        <div class="tok tok-5">##iew</div><div class="tok tok-5">.</div>
+        <div class="tok tok-sep">SEP</div>
+        <div class="tok tok-pad">0</div><div class="tok tok-pad">0</div><div class="tok tok-pad">0</div><div class="tok tok-pad">0</div>
+        <div class="tok tok-pad">0</div><div class="tok tok-pad">0</div><div class="tok tok-pad">0</div><div class="tok tok-pad">0</div>
+        <div class="tok tok-pad">0</div><div class="tok tok-pad">0</div><div class="tok tok-pad">0</div><div class="tok tok-pad">0</div><div class="tok tok-pad">0</div>
+      </div>
+    </div>
+
+    <div class="lane">
+      <div class="lane-head"><span class="ltitle">Layer 6 — [CLS] now summarizes the document</span><span class="ldims">(32, 768) • context: whole doc</span></div>
+      <div class="tokenstrip">
+        <div class="tok tok-cls" style="box-shadow: 0 0 15px var(--accent-2);">CLS</div>
+        <div class="tok tok-7">the</div><div class="tok tok-7">cen</div><div class="tok tok-7">##tri</div><div class="tok tok-7">##fu</div><div class="tok tok-7">##gal</div>
+        <div class="tok tok-7">pump</div><div class="tok tok-7">##ing</div><div class="tok tok-7">sys</div><div class="tok tok-7">##tem</div><div class="tok tok-7">req</div>
+        <div class="tok tok-7">##uires</div><div class="tok tok-7">ha</div><div class="tok tok-7">##zo</div><div class="tok tok-7">##p</div><div class="tok tok-7">rev</div>
+        <div class="tok tok-7">##iew</div><div class="tok tok-7">.</div>
+        <div class="tok tok-sep">SEP</div>
+        <div class="tok tok-pad">0</div><div class="tok tok-pad">0</div><div class="tok tok-pad">0</div><div class="tok tok-pad">0</div>
+        <div class="tok tok-pad">0</div><div class="tok tok-pad">0</div><div class="tok tok-pad">0</div><div class="tok tok-pad">0</div>
+        <div class="tok tok-pad">0</div><div class="tok tok-pad">0</div><div class="tok tok-pad">0</div><div class="tok tok-pad">0</div><div class="tok tok-pad">0</div>
+      </div>
+    </div>
+
+    <div class="callout o">
+      <b>Only <code>[CLS]</code> matters for classification.</b> After layer 6, its 768-dim vector is extracted and fed to the new head. Every other token's vector is discarded — they existed only to enrich <code>[CLS]</code> through attention.
+    </div>
+  </section>
+
+  <!-- =================== STEPWISE EPOCH =================== -->
+  <section>
+    <h2><span class="num">07</span>One training step — what happens in ~20 milliseconds</h2>
+    <p class="sub">Each epoch consists of <code class="kbd">ceil(N / 16)</code> of these steps. This is exactly what <code class="kbd">trainer.train()</code> executes in the inner loop.</p>
+
+    <div class="step-anim">
+      <div class="step-list">
+        <div class="step-row"><div class="step-num">1</div>
+          <div class="what">Sample 16 random examples from <b>DDMSDataset</b> and collate them into a batch.<div class="meta">input_ids (16, 512) · attention_mask (16, 512) · labels (16,)</div></div>
+          <div class="where">CPU → GPU</div>
+        </div>
+        <div class="step-row"><div class="step-num">2</div>
+          <div class="what">Move batch to GPU memory and enter <code>autocast(fp16)</code> context.<div class="meta">Activations will be stored as FP16, master weights stay FP32.</div></div>
+          <div class="where">GPU HBM</div>
+        </div>
+        <div class="step-row"><div class="step-num">3</div>
+          <div class="what">Forward pass: embedding → 6 transformer blocks → [CLS] → head → logits → cross-entropy.<div class="meta">Result: loss = scalar (e.g. 2.71 early, 0.3 late)</div></div>
+          <div class="where">all 66M params</div>
+        </div>
+        <div class="step-row"><div class="step-num">4</div>
+          <div class="what">Scale the loss by a large constant (GradScaler) so tiny FP16 gradients don't underflow to zero.<div class="meta">scaled_loss = loss × 65536 (typical)</div></div>
+          <div class="where">GradScaler</div>
+        </div>
+        <div class="step-row"><div class="step-num">5</div>
+          <div class="what">Backward pass: PyTorch autograd walks the graph in reverse, computing <code>∂L/∂w</code> for every trainable parameter.<div class="meta">Gradients accumulate in each parameter's <code>.grad</code> attribute.</div></div>
+          <div class="where">autograd</div>
+        </div>
+        <div class="step-row"><div class="step-num">6</div>
+          <div class="what">Unscale gradients and check for NaN/Inf. If found, skip this step.<div class="meta">This is what makes FP16 training safe.</div></div>
+          <div class="where">GradScaler</div>
+        </div>
+        <div class="step-row"><div class="step-num">7</div>
+          <div class="what">Clip gradient norm to 1.0 to prevent any single batch from destabilizing the weights.<div class="meta"><code>clip_grad_norm_(params, 1.0)</code></div></div>
+          <div class="where">clip</div>
+        </div>
+        <div class="step-row"><div class="step-num">8</div>
+          <div class="what">AdamW optimizer updates every parameter:<br><code>w ← w - lr·(m̂ / (√v̂ + ε)) - lr·decay·w</code><div class="meta">m̂ and v̂ are running mean/variance of gradients.</div></div>
+          <div class="where">66M updates</div>
+        </div>
+        <div class="step-row"><div class="step-num">9</div>
+          <div class="what">LR scheduler ticks one step forward along the warmup/decay curve.<div class="meta">Step 50: lr = 1.5e-5 · Step 500: lr = 1.8e-5 · Step 2000: lr = 0.4e-5</div></div>
+          <div class="where">scheduler</div>
+        </div>
+        <div class="step-row"><div class="step-num">10</div>
+          <div class="what">Zero all gradients so next step starts fresh. Log loss if step % 10 == 0.<div class="meta"><code>optimizer.zero_grad()</code></div></div>
+          <div class="where">reset</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card">
+          <div class="tag">Per-step cost on T4</div>
+          <h3>~20 ms / step</h3>
+          <p>With batch size 16 and 512 seq length. Of that:</p>
+          <ul style="color:var(--ink-2);font-size:13px;line-height:1.7">
+            <li><b>Forward:</b> ~7 ms</li>
+            <li><b>Backward:</b> ~10 ms</li>
+            <li><b>Optimizer + clip:</b> ~2 ms</li>
+            <li><b>Data transfer:</b> ~1 ms</li>
+          </ul>
+        </div>
+        <div class="card" style="margin-top:10px">
+          <div class="tag">Per epoch</div>
+          <h3>~60–80 s</h3>
+          <p>For 3000 training examples: <code>3000/16 ≈ 188</code> steps × 20 ms + eval + save ≈ 1 minute.</p>
+        </div>
+        <div class="card" style="margin-top:10px">
+          <div class="tag">TPU v5e-1</div>
+          <h3>~2× faster</h3>
+          <p>BF16 matmul is ~3× more flops; XLA fuses ops. Larger batch size amortizes more.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================== PER EPOCH STORY =================== -->
+  <section>
+    <h2><span class="num">08</span>Epoch by epoch — what the network is learning</h2>
+    <p class="sub">Training isn't uniform. Different phases reshape different parts of the network. Here's the arc of a typical run.</p>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <h4>Epoch 1 <span class="ep-pill">opening</span></h4>
+        <p><b>What's happening:</b> The classifier head is <i>completely random</i>. Its first task is to stop being chaotic and start aligning its 15 output scores with what the pretrained <code>[CLS]</code> embedding is telling it.</p>
+        <p><b>Gradient pattern:</b> enormous gradients at the head (W2 fresh-random), medium gradients in the top transformer blocks, tiny gradients at embeddings. The head is <b>literally learning what each of the 15 classes looks like</b> in [CLS]-space.</p>
+        <p><b>Dynamics:</b> loss crashes fast (3.0 → 1.4). Accuracy jumps from ~7% (random guess on 15 classes) to ~70%+.</p>
+        <div class="timeline-metrics"><span>train_loss: <b>1.42</b></span><span>val_f1: <b>0.71</b></span><span>lr: <b>warming up</b></span></div>
+      </div>
+
+      <div class="timeline-item">
+        <h4>Epoch 2 <span class="ep-pill">consolidation</span></h4>
+        <p><b>What's happening:</b> The head is now roughly aligned. Gradients shift: the top transformer blocks start <i>adapting</i> — their attention patterns subtly tilt toward domain-specific tokens (e.g., <code>HAZOP</code>, <code>P&amp;ID</code>, <code>specification</code>).</p>
+        <p><b>Encoder adaptation:</b> bottom blocks still mostly unchanged (they handle general English), but blocks 4–6 begin to reshape. The <code>[CLS]</code> vector gradually becomes a better document-topic summary.</p>
+        <p><b>Dynamics:</b> LR just past warmup at peak 2e-5. Loss 1.4 → 0.88. F1 continues climbing.</p>
+        <div class="timeline-metrics"><span>train_loss: <b>0.88</b></span><span>val_f1: <b>0.83</b></span><span>lr: <b>2.0e-5</b> (peak)</span></div>
+      </div>
+
+      <div class="timeline-item">
+        <h4>Epoch 3 <span class="ep-pill">refinement</span></h4>
+        <p><b>What's happening:</b> Diminishing returns start. The easy documents (distinctive vocabulary: <code>HAZOP</code> → HAZ class) are already perfectly classified. The model now fights over the confusable pairs — e.g., SOP vs VAL, MDS vs EQS.</p>
+        <p><b>Attention patterns crystallize:</b> self-attention heads in block 6 settle into stable document-summary routines. Pre-classifier starts learning "decision boundaries" between similar classes.</p>
+        <p><b>Dynamics:</b> LR decays. Loss 0.88 → 0.54. F1 0.83 → 0.89.</p>
+        <div class="timeline-metrics"><span>train_loss: <b>0.54</b></span><span>val_f1: <b>0.89</b></span><span>lr: <b>1.5e-5</b></span></div>
+      </div>
+
+      <div class="timeline-item best">
+        <h4>Epoch 4 <span class="ep-pill">peak</span><span class="best-pill">★ best checkpoint saved</span></h4>
+        <p><b>What's happening:</b> The model reaches its best-generalizing state. Train and val are both improving, but val improves more — indicating real learning, not memorization.</p>
+        <p><b>Weight state:</b> classifier head is now a ~stable function. Top encoder blocks are tuned. Bottom layers barely moved. Dropout (0.3 on head, 0.1 on attention) does the heavy lifting against overfit.</p>
+        <p><b>Dynamics:</b> this checkpoint will become the "best" that <code>load_best_model_at_end</code> restores at the end.</p>
+        <div class="timeline-metrics"><span>train_loss: <b>0.38</b></span><span>val_f1: <b style="color:var(--good)">0.93</b></span><span>lr: <b>1.1e-5</b></span></div>
+      </div>
+
+      <div class="timeline-item warn">
+        <h4>Epoch 5 <span class="ep-pill">plateau</span></h4>
+        <p><b>What's happening:</b> Train loss keeps dropping, but val F1 stops improving — classic signal that the model is starting to memorize rather than generalize. This is overfitting creeping in.</p>
+        <p><b>Gradients become noise:</b> most updates now teach the network the idiosyncrasies of individual training documents. The core decision rules are already learned.</p>
+        <div class="timeline-metrics"><span>train_loss: <b>0.30</b></span><span>val_f1: <b>0.92</b></span><span>patience: <b>1</b>/3</span></div>
+      </div>
+
+      <div class="timeline-item warn">
+        <h4>Epoch 6 <span class="ep-pill">overfit</span></h4>
+        <p><b>What's happening:</b> Train loss still declining. Val F1 stays at 0.92. Model is definitely memorizing. Dropout keeps it from being catastrophic, but extra epochs at this point mostly hurt.</p>
+        <div class="timeline-metrics"><span>train_loss: <b>0.27</b></span><span>val_f1: <b>0.92</b></span><span>patience: <b>2</b>/3</span></div>
+      </div>
+
+      <div class="timeline-item stop">
+        <h4>Epoch 7 <span class="ep-pill">stopped</span><span class="stop-pill">⏹ early stop</span></h4>
+        <p><b>What's happening:</b> Val F1 still hasn't beaten epoch 4's 0.93. Patience counter hits 3. <code>EarlyStoppingCallback</code> signals "stop training."</p>
+        <p><b>Final action:</b> <code>load_best_model_at_end=True</code> reloads epoch 4's weights. The model returned from <code>trainer.train()</code> is the peak-F1 version, not the final-epoch version.</p>
+        <div class="timeline-metrics"><span>train_loss: <b>0.25</b></span><span>val_f1: <b>0.91</b></span><span>patience: <b>3</b>/3 — STOP</span></div>
+      </div>
+    </div>
+
+    <div class="callout g" style="margin-top:20px">
+      <b>The takeaway:</b> Training isn't "keep going until loss hits 0." It's "find the epoch where the network best <i>generalizes</i> to unseen data." Early stopping + load-best-model is how you find it automatically.
+    </div>
+  </section>
+
+  <!-- =================== GRADIENT FLOW - WHAT CHANGES WHERE =================== -->
+  <section>
+    <h2><span class="num">09</span>Where does learning actually happen?</h2>
+    <p class="sub">During fine-tuning, <i>every</i> layer receives gradients — but not equally. Here's the typical distribution of weight-change magnitude across the network, averaged over the full run.</p>
+
+    <div class="card">
+      <div style="font-family:var(--mono);font-size:12px;color:var(--ink-2);margin-bottom:8px;display:flex;justify-content:space-between">
+        <span>Layer (top → bottom)</span>
+        <span>Relative weight-change magnitude (log scale)</span>
+      </div>
+
+      <div class="grad-bar-row">
+        <div class="lname">Classifier (768→15)<div class="sublayer">NEW · trained from random</div></div>
+        <div class="gbar"><span style="width:98%;background:linear-gradient(90deg,var(--hot),var(--red))"></span></div>
+        <div class="gval">100%</div>
+      </div>
+      <div class="grad-bar-row">
+        <div class="lname">Pre-classifier (768→768)<div class="sublayer">NEW · trained from random</div></div>
+        <div class="gbar"><span style="width:88%;background:linear-gradient(90deg,var(--hot),var(--red))"></span></div>
+        <div class="gval">82%</div>
+      </div>
+      <div class="grad-bar-row">
+        <div class="lname">Transformer block 6<div class="sublayer">encoder · heaviest adaptation</div></div>
+        <div class="gbar"><span style="width:52%;background:linear-gradient(90deg,var(--warm),var(--hot))"></span></div>
+        <div class="gval">38%</div>
+      </div>
+      <div class="grad-bar-row">
+        <div class="lname">Transformer block 5<div class="sublayer">encoder</div></div>
+        <div class="gbar"><span style="width:42%;background:linear-gradient(90deg,var(--warm),var(--hot))"></span></div>
+        <div class="gval">28%</div>
+      </div>
+      <div class="grad-bar-row">
+        <div class="lname">Transformer block 4<div class="sublayer">encoder</div></div>
+        <div class="gbar"><span style="width:32%;background:linear-gradient(90deg,var(--warm),var(--hot))"></span></div>
+        <div class="gval">19%</div>
+      </div>
+      <div class="grad-bar-row">
+        <div class="lname">Transformer block 3<div class="sublayer">encoder</div></div>
+        <div class="gbar"><span style="width:22%;background:var(--warm)"></span></div>
+        <div class="gval">12%</div>
+      </div>
+      <div class="grad-bar-row">
+        <div class="lname">Transformer block 2<div class="sublayer">encoder</div></div>
+        <div class="gbar"><span style="width:15%;background:var(--accent)"></span></div>
+        <div class="gval">7%</div>
+      </div>
+      <div class="grad-bar-row">
+        <div class="lname">Transformer block 1<div class="sublayer">encoder</div></div>
+        <div class="gbar"><span style="width:10%;background:var(--accent)"></span></div>
+        <div class="gval">4%</div>
+      </div>
+      <div class="grad-bar-row">
+        <div class="lname">Position embeddings<div class="sublayer">0–511 positions</div></div>
+        <div class="gbar"><span style="width:5%;background:var(--purple)"></span></div>
+        <div class="gval">2%</div>
+      </div>
+      <div class="grad-bar-row">
+        <div class="lname">Token embeddings<div class="sublayer">30,522 × 768</div></div>
+        <div class="gbar"><span style="width:4%;background:var(--purple)"></span></div>
+        <div class="gval">1.5%</div>
+      </div>
+    </div>
+
+    <div class="grid cols-3" style="margin-top:14px">
+      <div class="card">
+        <div class="tag" style="background:rgba(255,107,107,0.15);color:var(--red)">Most change</div>
+        <h3>New head (82–100%)</h3>
+        <p>Started from random init. Must build the entire mapping from "document summary" to class logits. This is where most of the actual "classification learning" lives.</p>
+      </div>
+      <div class="card">
+        <div class="tag" style="background:rgba(255,203,107,0.15);color:var(--warm)">Moderate change</div>
+        <h3>Top encoder blocks (12–38%)</h3>
+        <p>Blocks 4–6 adapt to push domain-specific features into the <code>[CLS]</code> token. They learn "for this task, emphasize engineering vocabulary, process nouns, doc-type keywords."</p>
+      </div>
+      <div class="card">
+        <div class="tag" style="background:rgba(124,156,255,0.15);color:var(--accent)">Minimal change</div>
+        <h3>Bottom layers + embeddings (&lt;10%)</h3>
+        <p>These encode general English — tokenization, syntax, basic semantics. They don't need to change much. Aggressively tuning them would destroy hard-won pretraining knowledge.</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <b>Why this shape matters:</b> The low LR (2e-5) is precisely what keeps bottom layers from moving much. Had we used 1e-3 (typical for training from scratch), the pretrained encoder would be destroyed and the model would need 100× more data to recover. Fine-tuning is a <b>delicate touch</b>, not a full re-train.
+    </div>
+  </section>
+
+  <!-- =================== KEY CONCEPTS =================== -->
+  <section>
+    <h2><span class="num">10</span>Key concepts to remember</h2>
+    <div class="grid cols-2">
+      <div>
+        <div class="concept"><b>Transfer learning</b> — we inherit English knowledge from pretraining and only teach the model about documents.</div>
+        <div class="concept g"><b>[CLS] pooling</b> — the first token's final hidden state <i>is</i> the document summary the classifier uses.</div>
+        <div class="concept o"><b>LR warmup</b> — first 10% of steps ramp from 0→2e-5 to avoid destroying pretrained weights with a random-init head.</div>
+        <div class="concept p"><b>Gradient asymmetry</b> — head changes most, top blocks change some, bottom layers barely change.</div>
+      </div>
+      <div>
+        <div class="concept"><b>Mixed precision</b> — FP16/BF16 activations, FP32 master weights. ~2× faster, same accuracy.</div>
+        <div class="concept g"><b>Early stopping + best checkpoint</b> — automatically find the peak-generalization epoch; ignore later overfitting.</div>
+        <div class="concept o"><b>Fixed-512 padding on TPU</b> — same shape every batch means XLA compiles once, not per-batch.</div>
+        <div class="concept p"><b>Weighted F1</b> — the real success metric; accuracy lies when classes are imbalanced.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================== HYPERPARAMS =================== -->
+  <section>
+    <h2><span class="num">11</span>Data points that influence the training process</h2>
+    <p class="sub">Which knobs really matter, ranked by typical impact.</p>
+
+    <div class="hyper-grid">
+      <div class="hyper"><span class="h-impact high">high</span><div class="h-name">learning_rate</div><div class="h-val">2e-5</div><div class="h-desc">Too high → destroys pretraining. Too low → no adaptation. 2e-5 is the BERT paper default.</div></div>
+      <div class="hyper"><span class="h-impact high">high</span><div class="h-name">num_epochs</div><div class="h-val">10</div><div class="h-desc">Early stopping caps this wherever val F1 plateaus.</div></div>
+      <div class="hyper"><span class="h-impact high">high</span><div class="h-name">max_length</div><div class="h-val">512</div><div class="h-desc">Hard ceiling. Longer docs get silently truncated.</div></div>
+      <div class="hyper"><span class="h-impact high">high</span><div class="h-name">dropout</div><div class="h-val">0.3</div><div class="h-desc">Classifier head dropout. Higher = more regularization.</div></div>
+      <div class="hyper"><span class="h-impact med">med</span><div class="h-name">batch_size</div><div class="h-val">16</div><div class="h-desc">Memory-bound on T4. Up to 32 on TPU v5e-1.</div></div>
+      <div class="hyper"><span class="h-impact med">med</span><div class="h-name">weight_decay</div><div class="h-val">0.01</div><div class="h-desc">AdamW L2 on most weights (not bias/LN).</div></div>
+      <div class="hyper"><span class="h-impact med">med</span><div class="h-name">warmup_ratio</div><div class="h-val">0.1</div><div class="h-desc">First 10% of steps: 0 → peak LR.</div></div>
+      <div class="hyper"><span class="h-impact med">med</span><div class="h-name">early_stopping_patience</div><div class="h-val">3</div><div class="h-desc">Stop after 3 stale eval rounds.</div></div>
+      <div class="hyper"><span class="h-impact low">low</span><div class="h-name">fp16 / bf16</div><div class="h-val">true</div><div class="h-desc">fp16 on T4; bf16 on TPU. ~2× throughput.</div></div>
+      <div class="hyper"><span class="h-impact low">low</span><div class="h-name">logging_steps</div><div class="h-val">10</div><div class="h-desc">Console verbosity only.</div></div>
+      <div class="hyper"><span class="h-impact low">low</span><div class="h-name">save_total_limit</div><div class="h-val">2</div><div class="h-desc">Disk hygiene: keep only last + best.</div></div>
+      <div class="hyper"><span class="h-impact low">low</span><div class="h-name">seed</div><div class="h-val">42</div><div class="h-desc">Reproducibility across RNGs.</div></div>
+    </div>
+
+    <div class="callout o">
+      <b>Dataset quality dominates everything.</b> The quality and balance of the 15 class labels, the split between train/val/test, and whether long documents are truncated or chunked will move accuracy more than any hyperparameter. Hyperparams recover a few F1 points; better data recovers many.
+    </div>
+  </section>
+
+  <footer>
+    Built for the DDMS bulk-document-import project · a walkthrough of <code class="kbd">src/ml-training/</code>
+  </footer>
+</div>
+</body>
+</html>
